@@ -1,8 +1,6 @@
 use super::super::health::{Health};
-use super::super::utils::GameTimeC;
-
-use std::sync::Arc;
+use super::super::utils::{SummaryC};
 
 pub trait DiseaseMonitor {
-    fn check(&self, health: &Health, game_time_delta: f32, game_time: &GameTimeC);
+    fn check(&self, health: &Health, frame_data: &SummaryC);
 }

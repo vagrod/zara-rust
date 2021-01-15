@@ -7,8 +7,7 @@ use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
 use zara::health::disease::{DiseaseMonitor};
 use zara::health::Health;
-use std::sync::Arc;
-use zara::utils::GameTimeC;
+use zara::utils::{SummaryC};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -124,8 +123,8 @@ impl Listener for ZaraEventsListener {
 
 struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
-    fn check(&self, health: &Health, game_time_delta: f32, game_time: &GameTimeC) {
-        println!("Flu monitor check: {}", game_time_delta);
+    fn check(&self, health: &Health, frame_data: &SummaryC) {
+        println!("Flu monitor check: {}", frame_data.game_time_delta);
 
         health.spawn_disease();
     }

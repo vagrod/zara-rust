@@ -57,6 +57,12 @@ impl EnvironmentData {
         e
     }
 
+    pub fn to_contract(&self) -> EnvironmentC {
+        EnvironmentC {
+            wind_speed: self.wind_speed.get()
+        }
+    }
+
     /// Sets new wind speed (m/s)
     ///
     /// # Parameters
@@ -69,7 +75,7 @@ impl EnvironmentData {
     /// ```
     /// env.set_wind_speed(new_value);
     /// ```
-    fn set_wind_speed(&self, value: f32){
+    pub fn set_wind_speed(&self, value: f32){
         self.wind_speed.set(value)
     }
 }

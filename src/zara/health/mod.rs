@@ -5,7 +5,6 @@ use crate::health::disease::DiseaseMonitor;
 
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::sync::Arc;
 
 pub mod disease;
 
@@ -43,7 +42,7 @@ impl Health {
         println!("From health update: wind speed is {}", frame.data.wind_speed);
 
         for monitor in self.monitors.borrow().iter() {
-            monitor.check(self, frame.data.game_time_delta, &frame.data.game_time);
+            monitor.check(self, &frame.data);
         }
     }
 
