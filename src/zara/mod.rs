@@ -107,9 +107,9 @@ impl ZaraController {
     ///
     /// # Parameters
     ///
-    /// - `E`: trait type that implements [`Listener`](crate::zara:evt::Listener) trait
+    /// - `E`: trait type that implements [`Listener`](crate::zara::utils::event::Listener) trait
     /// - `frame_time`: time, `in seconds`, since last `update` call.
-    /// - `listener`: [`Listener`](crate::zara:evt::Listener) instance whose methods will be called
+    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose methods will be called
     ///     as events
     ///
     /// # Examples
@@ -153,7 +153,7 @@ impl ZaraController {
     }
 
     /// Consumes the item. Item which name is passed must implement the
-    /// [`ConsumableBehavior`](crate::zara:inv::ConsumableBehavior) trait, or `false` will be
+    /// [`ConsumableBehavior`](crate::zara::inv::ConsumableBehavior) trait, or `false` will be
     /// returned
     ///
     /// # Parameters

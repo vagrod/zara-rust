@@ -53,24 +53,9 @@ impl EnvironmentData {
     pub fn from_description(ed: EnvironmentC) -> EnvironmentData{
         let e = EnvironmentData::new();
 
-        e.set_wind_speed(ed.wind_speed);
+        e.wind_speed.set(ed.wind_speed);
 
         return e;
     }
 
-    /// Sets new wind speed (m/s)
-    ///
-    /// # Parameters
-    /// - `value`: new wind speed value (m/s)
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// env.set_wind_speed(new_value);
-    /// ```
-    pub fn set_wind_speed(&self, value: f32){
-        self.wind_speed.set(value)
-    }
 }

@@ -18,6 +18,9 @@ fn main() {
         let mut now = Instant::now();
         let person = zara::ZaraController::with_environment(zara::utils::EnvironmentC::new(5.4));
 
+        // Testing environment change
+        person.environment.wind_speed.set(22.);
+
         { // Testing basic inventory
             person.inventory.add_item(Box::new(TestItem::new()));
 
