@@ -1,7 +1,6 @@
-use super::utils::{FrameC};
+use super::utils::{FrameC, ConsumableC};
 use super::utils::event::{Listener};
-use super::utils::ConsumableC;
-use super::health::disease::DiseaseMonitor;
+use super::health::disease::{DiseaseMonitor};
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -36,7 +35,7 @@ impl Health {
     /// # Parameters
     /// - `frame`: summary information for this frame
     ///
-    /// # Note
+    /// # Notes
     /// Borrows `monitors` collection
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
         println!("From health update: wind speed is {}", frame.data.wind_speed);
@@ -49,7 +48,8 @@ impl Health {
 
     /// Called by zara controller when item is consumed
     /// as food or water
-    /// # Note
+    ///
+    /// # Notes
     /// Borrows `monitors` collection
     pub fn on_item_consumed(&self, item: &ConsumableC){
         println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
