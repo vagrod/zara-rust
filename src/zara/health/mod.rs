@@ -41,6 +41,7 @@ impl Health {
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
         println!("From health update: wind speed is {}", frame.data.wind_speed);
 
+        // Update disease monitors
         for monitor in self.monitors.borrow().iter() {
             monitor.check(self, &frame.data);
         }
@@ -48,10 +49,18 @@ impl Health {
 
     /// Called by zara controller when item is consumed
     /// as food or water
+    /// # Note
+    /// Borrows `monitors` collection
     pub fn on_item_consumed(&self, item: &ConsumableC){
         println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
+
+        // Notify disease monitors
+        for monitor in self.monitors.borrow().iter() {
+            monitor.on_consumed(self, item);
+        }
     }
 
+    /// Spawns a new disease. If disease is already scheduled or active, nothing will happen
     pub fn spawn_disease(&self){
         println!("Spawn disease call");
     }

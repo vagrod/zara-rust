@@ -7,7 +7,7 @@ use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
 use zara::health::disease::{DiseaseMonitor};
 use zara::health::Health;
-use zara::utils::{SummaryC};
+use zara::utils::{SummaryC, ConsumableC};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -79,7 +79,6 @@ impl std::fmt::Debug for TestItem {
     }
 }
 
-
 impl InventoryItem for TestItem {
 
     fn get_count(&self) -> usize { self.count.get() }
@@ -127,5 +126,9 @@ impl DiseaseMonitor for FluMonitor {
         println!("Flu monitor check: {}", frame_data.game_time_delta);
 
         health.spawn_disease();
+    }
+
+    fn on_consumed(&self, health: &Health, item: &ConsumableC) {
+        println!("Flu monitor on consumed: {}", item.name);
     }
 }

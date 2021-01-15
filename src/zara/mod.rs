@@ -206,6 +206,10 @@ impl ZaraController {
         return true;
     }
 
+    /// Registers new disease monitor instance
+    ///
+    /// # Parameters
+    /// - `monitor`: an instance of an object that implements [`DiseaseMonitor`](crate::zara::health::disease::DiseaseMonitor) trait
     pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
         self.health.monitors.borrow_mut().insert(0, monitor);
     }
