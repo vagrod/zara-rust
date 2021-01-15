@@ -1,6 +1,7 @@
-use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC};
+use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC};
 use utils::event::{Listener, Dispatcher, Dispatchable};
 use health::disease::{DiseaseMonitor};
+use player::{PlayerStatus};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -11,6 +12,7 @@ pub mod utils;
 pub mod health;
 pub mod inv;
 pub mod body;
+pub mod player;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
@@ -39,11 +41,13 @@ pub struct ZaraController {
     ///
     /// Use this to sleep, control clothes and see wetness and warmth levels.
     pub body: Arc<body::Body>,
+    /// Player status runtime data
+    pub player_state: Arc<PlayerStatus>,
 
     /// How many seconds passed since last `update` call
     update_counter: Cell<f32>,
     /// Game time snapshot at the time of the last `update` call
-    last_update_game_time: Cell<Duration>,
+    last_update_game_time: Cell<Duration>
 }
 
 impl ZaraController {
@@ -62,7 +66,7 @@ impl ZaraController {
     /// let zara = zara::ZaraController::new();
     /// ```
     pub fn new() -> Self {
-        ZaraController::with_environment(EnvironmentC::empty())
+        ZaraController::init(EnvironmentC::empty())
     }
 
     /// Creates a new `ZaraController` with pre-defined environment.
@@ -80,6 +84,11 @@ impl ZaraController {
     /// let zara = zara::ZaraController::with_environment(env_desc);
     /// ```
     pub fn with_environment(env: EnvironmentC) -> Self {
+        ZaraController::init(env)
+    }
+
+    /// Private initialization function
+    fn init(env: EnvironmentC) -> Self {
         ZaraController {
             environment: Arc::new(env::EnvironmentData::from_description(env)),
             health: Arc::new(health::Health::new()),
@@ -88,6 +97,7 @@ impl ZaraController {
 
             update_counter: Cell::new(0.),
             last_update_game_time: Cell::new(Duration::new(0,0)),
+            player_state: Arc::new(PlayerStatus::empty())
         }
     }
 
@@ -218,11 +228,14 @@ impl ZaraController {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
 
         SummaryC {
-            game_time : GameTimeC{
+            game_time : GameTimeC {
                 day: self.environment.game_time.day.get(),
                 hour: self.environment.game_time.hour.get(),
                 minute: self.environment.game_time.minute.get(),
                 second: self.environment.game_time.second.get()
+            },
+            player_state: PlayerStatusC {
+                is_walking: self.player_state.is_walking.get()
             },
             game_time_delta: time_delta.as_secs_f32(),
             wind_speed: self.environment.wind_speed.get()

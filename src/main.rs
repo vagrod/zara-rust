@@ -8,6 +8,7 @@ use zara::utils::event::{Listener, Event};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor};
 use zara::utils::{SummaryC, ConsumableC};
+use zara::player::{PlayerStatus};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -37,6 +38,7 @@ fn main() {
 
         person.register_disease_monitor(Box::new(mon));
         person.consume(&String::from("Meat"));
+        person.player_state.is_walking.set(true);
 
         println!("Total weight {}", person.inventory.weight.get());
 

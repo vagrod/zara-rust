@@ -15,6 +15,7 @@ pub struct FrameC<'a, E: Listener + 'static> {
 /// Structure for storing frame meta info
 pub struct SummaryC {
     pub game_time: GameTimeC,
+    pub player_state: PlayerStatusC,
     pub game_time_delta: f32,
     pub wind_speed: f32
 }
@@ -82,7 +83,7 @@ impl GameTime {
 
         gt.update_from_duration(d);
 
-        gt
+        return gt;
     }
 
     /// Adds given `Duration` value to this game time
@@ -193,6 +194,7 @@ pub struct GameTimeC {
 
 /// Describes initial environment information
 pub struct EnvironmentC {
+    /// Wind speed value (m/s)
     pub wind_speed: f32
 }
 
@@ -214,7 +216,7 @@ impl EnvironmentC {
     /// let env = utils::EnvironmentC::new(wind_speed);
     /// ```
     pub fn new(wind_speed: f32) -> EnvironmentC {
-        EnvironmentC{
+        EnvironmentC {
             wind_speed
         }
     }
@@ -242,9 +244,13 @@ impl EnvironmentC {
 
 /// Describes consumable contract
 pub struct ConsumableC {
+    /// Unique name of the item
     pub name: String,
+    /// Is this consumable a food
     pub is_food: bool,
+    /// Is this consumable a water
     pub is_water: bool,
+    /// How many items of this type has been consumed
     pub consumed_count: usize
 }
 
@@ -257,5 +263,9 @@ impl ConsumableC {
             consumed_count: 0
         }
     }
+}
 
+/// Describes a snapshot of the player state for a single frame
+pub struct PlayerStatusC {
+    pub is_walking: bool
 }
