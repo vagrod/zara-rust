@@ -14,10 +14,14 @@ pub struct FrameC<'a, E: Listener + 'static> {
 
 /// Structure for storing frame meta info
 pub struct SummaryC {
+    /// Game time snapshot for this frame
     pub game_time: GameTimeC,
-    pub player_state: PlayerStatusC,
+    /// Player status snapshot for this frame
+    pub player: PlayerStatusC,
+    /// Environment snapshot for this frame
+    pub environment: EnvironmentC,
+    /// How many game seconds passed since last call
     pub game_time_delta: f32,
-    pub wind_speed: f32
 }
 
 /// Structure that holds game time.

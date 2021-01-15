@@ -36,7 +36,7 @@ impl Health {
     /// # Parameters
     /// - `frame`: summary information for this frame
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
-        println!("From health update: wind speed is {}", frame.data.wind_speed);
+        println!("From health update: wind speed is {}", frame.data.environment.wind_speed);
 
         // Update disease monitors
         for monitor in self.monitors.borrow().iter() {

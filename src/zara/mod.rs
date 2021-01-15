@@ -234,11 +234,13 @@ impl ZaraController {
                 minute: self.environment.game_time.minute.get(),
                 second: self.environment.game_time.second.get()
             },
-            player_state: PlayerStatusC {
+            player: PlayerStatusC {
                 is_walking: self.player_state.is_walking.get()
             },
-            game_time_delta: time_delta.as_secs_f32(),
-            wind_speed: self.environment.wind_speed.get()
+            environment: EnvironmentC {
+                wind_speed: self.environment.wind_speed.get()
+            },
+            game_time_delta: time_delta.as_secs_f32()
         }
     }
 
