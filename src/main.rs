@@ -5,6 +5,10 @@ use std::cell::Cell;
 
 use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
+use zara::health::disease::{DiseaseMonitor};
+use zara::health::Health;
+use std::sync::Arc;
+use zara::utils::GameTimeC;
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -30,6 +34,11 @@ fn main() {
 
         println!("Game Loop started!");
 
+        let mut mon = FluMonitor {
+            health: Option::None
+        };
+
+        person.register_disease_monitor(Box::new(mon));
         person.consume(&String::from("Meat"));
 
         println!("Total weight {}", person.inventory.weight.get());
@@ -112,5 +121,20 @@ impl Listener for ZaraEventsListener {
         if let Event::Dehydration = event {
             println!("Dehydration");
         }
+    }
+}
+
+struct FluMonitor {
+    health: Option<Arc<Health>>
+}
+impl DiseaseMonitor for FluMonitor {
+    fn check(&self, game_time_delta: f32, game_time: &GameTimeC) {
+        println!("Flu monitor check: {}", game_time_delta);
+
+        self.health.as_ref().unwrap().spawn_disease();
+    }
+
+    fn set_health(&mut self, health: Arc<Health>){
+        self.health = Option::Some(health);
     }
 }

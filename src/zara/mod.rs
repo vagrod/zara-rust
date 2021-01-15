@@ -1,9 +1,11 @@
 use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC};
 use utils::event::{Listener, Dispatcher, Dispatchable};
+use health::disease::{DiseaseMonitor};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
+
 
 pub mod env;
 pub mod utils;
@@ -204,6 +206,12 @@ impl ZaraController {
         return true;
     }
 
+    pub fn register_disease_monitor(&self, mut monitor: Box<dyn DiseaseMonitor>){
+        monitor.set_health(self.health.clone());
+
+        self.health.monitors.borrow_mut().insert(0, monitor);
+    }
+
     /// Gets all the info needed for all the controllers to process one frame
     fn get_summary(&self) -> utils::SummaryC {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
@@ -219,4 +227,5 @@ impl ZaraController {
             wind_speed: self.environment.wind_speed.get()
         }
     }
+
 }
