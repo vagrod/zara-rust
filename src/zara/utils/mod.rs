@@ -1,5 +1,6 @@
 use std::time::{Duration};
 use std::cell::Cell;
+
 use event::{Dispatcher, Listener};
 
 pub mod event;

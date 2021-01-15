@@ -6,7 +6,6 @@ use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
 
-
 pub mod env;
 pub mod utils;
 pub mod health;

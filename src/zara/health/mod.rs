@@ -1,7 +1,7 @@
 use super::utils::{FrameC};
-use crate::utils::event::{Listener};
-use crate::utils::ConsumableC;
-use crate::health::disease::DiseaseMonitor;
+use super::utils::event::{Listener};
+use super::utils::ConsumableC;
+use super::health::disease::DiseaseMonitor;
 
 use std::cell::RefCell;
 use std::rc::Rc;

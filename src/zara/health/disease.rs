@@ -1,6 +1,5 @@
 use super::super::health::{Health};
-use super::super::utils::{SummaryC};
-use crate::utils::ConsumableC;
+use super::super::utils::{SummaryC, ConsumableC};
 
 /// Trait for disease monitors
 pub trait DiseaseMonitor {

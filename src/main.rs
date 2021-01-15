@@ -5,8 +5,8 @@ use std::cell::Cell;
 
 use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
+use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor};
-use zara::health::Health;
 use zara::utils::{SummaryC, ConsumableC};
 
 // This will spawn a new thread for the "game loop"
@@ -33,7 +33,7 @@ fn main() {
 
         println!("Game Loop started!");
 
-        let mut mon = FluMonitor;
+        let mon = FluMonitor;
 
         person.register_disease_monitor(Box::new(mon));
         person.consume(&String::from("Meat"));
@@ -108,7 +108,6 @@ impl ConsumableBehavior for MyFood {
 
     fn spoiling(&self) -> Option<&dyn SpoilingBehavior> { None }
 }
-
 
 struct ZaraEventsListener;
 impl Listener for ZaraEventsListener {
