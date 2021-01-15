@@ -9,7 +9,7 @@ pub mod disease;
 
 /// Describes and controls player's health
 pub struct Health {
-    pub monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>
+    monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>
 }
 
 impl Health {
@@ -44,6 +44,14 @@ impl Health {
         for monitor in self.monitors.borrow().iter() {
             monitor.check(self, &frame.data);
         }
+    }
+
+    /// Registers new disease monitor instance
+    ///
+    /// # Parameters
+    /// - `monitor`: an instance of an object that implements [`DiseaseMonitor`](crate::zara::health::disease::DiseaseMonitor) trait
+    pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
+        self.monitors.borrow_mut().insert(0, monitor);
     }
 
     /// Called by zara controller when item is consumed

@@ -210,7 +210,7 @@ impl ZaraController {
     /// # Parameters
     /// - `monitor`: an instance of an object that implements [`DiseaseMonitor`](crate::zara::health::disease::DiseaseMonitor) trait
     pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
-        self.health.monitors.borrow_mut().insert(0, monitor);
+        self.health.register_disease_monitor(monitor);
     }
 
     /// Gets all the info needed for all the controllers to process one frame
