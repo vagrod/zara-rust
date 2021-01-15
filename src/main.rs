@@ -34,9 +34,7 @@ fn main() {
 
         println!("Game Loop started!");
 
-        let mut mon = FluMonitor {
-            health: Option::None
-        };
+        let mut mon = FluMonitor;
 
         person.register_disease_monitor(Box::new(mon));
         person.consume(&String::from("Meat"));
@@ -124,17 +122,11 @@ impl Listener for ZaraEventsListener {
     }
 }
 
-struct FluMonitor {
-    health: Option<Arc<Health>>
-}
+struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
-    fn check(&self, game_time_delta: f32, game_time: &GameTimeC) {
+    fn check(&self, health: &Health, game_time_delta: f32, game_time: &GameTimeC) {
         println!("Flu monitor check: {}", game_time_delta);
 
-        self.health.as_ref().unwrap().spawn_disease();
-    }
-
-    fn set_health(&mut self, health: Arc<Health>){
-        self.health = Option::Some(health);
+        health.spawn_disease();
     }
 }

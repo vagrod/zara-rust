@@ -207,8 +207,6 @@ impl ZaraController {
     }
 
     pub fn register_disease_monitor(&self, mut monitor: Box<dyn DiseaseMonitor>){
-        monitor.set_health(self.health.clone());
-
         self.health.monitors.borrow_mut().insert(0, monitor);
     }
 
