@@ -8,7 +8,6 @@ use zara::utils::event::{Listener, Event};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor};
 use zara::utils::{SummaryC, ConsumableC};
-use zara::player::{PlayerStatus};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -19,7 +18,7 @@ fn main() {
         let mut now = Instant::now();
         let person = zara::ZaraController::with_environment(zara::utils::EnvironmentC::new(5.4));
 
-        {
+        { // Testing basic inventory
             person.inventory.add_item(Box::new(TestItem::new()));
 
             let b = person.inventory.items.borrow();
@@ -34,12 +33,17 @@ fn main() {
 
         println!("Game Loop started!");
 
+        // Testing disease monitors
         let mon = FluMonitor;
-
         person.register_disease_monitor(Box::new(mon));
+
+        // Testing items consuming
         person.consume(&String::from("Meat"));
+
+        // Testing player status update
         person.player_state.is_walking.set(true);
 
+        // Total weight must change after consuming
         println!("Total weight {}", person.inventory.weight.get());
 
         loop {
@@ -75,39 +79,24 @@ impl TestItem {
     }
 }
 
-impl std::fmt::Debug for TestItem {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{0}: `count` is: {1}", self.get_name(), self.get_count())
-    }
-}
-
 impl InventoryItem for TestItem {
-
     fn get_count(&self) -> usize { self.count.get() }
-
     fn set_count(&self, new_count: usize) { self.count.set(new_count); }
-
     fn get_name(&self) -> String { String::from("Meat") }
-
     fn get_total_weight(&self) -> f32 {
         const WEIGHT_PER_UNIT: f32 = 0.4;
 
         self.count.get() as f32 * WEIGHT_PER_UNIT
     }
-
     fn consumable(&self) -> Option<&dyn ConsumableBehavior> { Some(&MyFood) }
 }
 
 struct MyFood;
 impl ConsumableBehavior for MyFood {
     fn is_food(&self) -> bool { true }
-
     fn is_water(&self) -> bool { false }
-
     fn water_gain_per_dose(&self) -> f32 { 6.1 }
-
     fn food_gain_per_dose(&self) -> f32 { 14.2 }
-
     fn spoiling(&self) -> Option<&dyn SpoilingBehavior> { None }
 }
 
