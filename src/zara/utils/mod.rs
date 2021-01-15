@@ -1,6 +1,8 @@
 use std::time::{Duration};
 use std::cell::Cell;
-use crate::evt::{Dispatcher, Listener};
+use event::{Dispatcher, Listener};
+
+pub mod event;
 
 /// Structure for storing all needed frame data for controllers
 /// including events dispatcher

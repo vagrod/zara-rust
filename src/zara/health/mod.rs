@@ -1,6 +1,8 @@
 use super::utils::{FrameC};
-use crate::evt::{Listener};
+use crate::utils::event::{Listener};
 use crate::utils::ConsumableC;
+
+pub mod disease;
 
 /// Describes and controls player's health
 pub struct Health {

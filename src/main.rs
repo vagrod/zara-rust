@@ -1,9 +1,10 @@
 use std::thread;
 use std::time::{Duration, Instant};
 use std::thread::sleep;
-use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use std::cell::Cell;
-use zara::evt::{Listener, Event};
+
+use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
+use zara::utils::event::{Listener, Event};
 
 // This will spawn a new thread for the "game loop"
 fn main() {

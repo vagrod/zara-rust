@@ -1,5 +1,5 @@
 use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC};
-use evt::{Listener, Dispatcher, Dispatchable};
+use utils::event::{Listener, Dispatcher, Dispatchable};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -10,7 +10,6 @@ pub mod utils;
 pub mod health;
 pub mod inv;
 pub mod body;
-pub mod evt;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
