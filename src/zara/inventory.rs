@@ -197,6 +197,6 @@ pub trait SpoilingBehavior {
     /// Chance of getting a food poisoning after eating one fresh item (0..100 scale)
     fn spoil_poisoning_chance(&self) -> usize;
     /// Time that is needed for fresh item to become spoiled
-    /// ([GameTimeC](crate::zara::utils::GameTimeC) structure)
+    /// ([GameTimeC](crate::utils::GameTimeC) structure)
     fn spoil_time(&self) -> GameTimeC;
 }

@@ -3,11 +3,12 @@ use std::time::{Duration, Instant};
 use std::thread::sleep;
 use std::cell::Cell;
 
-use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
+use zara::utils::{FrameSummaryC, ConsumableC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor};
-use zara::utils::{SummaryC, ConsumableC};
+use zara::health::side::{RunningSideEffects};
+use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -35,14 +36,18 @@ fn main() {
         println!("Total weight {}", person.inventory.weight.get());
 
         // Testing disease monitors
-        let mon = FluMonitor;
-        person.health.register_disease_monitor(Box::new(mon));
+        let flu_monitor = FluMonitor;
+        person.health.register_disease_monitor(Box::new(flu_monitor));
+
+        // Testing side effects monitors
+        let running_effects = RunningSideEffects::new();
+        person.health.register_side_effect_monitor(Box::new(running_effects));
 
         // Testing items consuming
         person.consume(&String::from("Meat"));
 
         // Testing player status update
-        person.player_state.is_walking.set(true);
+        person.player_state.is_running.set(true);
 
         // Total weight must change after consuming
         println!("Total weight {}", person.inventory.weight.get());
@@ -115,7 +120,7 @@ impl Listener for ZaraEventsListener {
 
 struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
-    fn check(&self, health: &Health, frame_data: &SummaryC) {
+    fn check(&self, health: &Health, frame_data: &FrameSummaryC) {
         println!("Flu monitor check: {}", frame_data.game_time_delta);
 
         health.spawn_disease();

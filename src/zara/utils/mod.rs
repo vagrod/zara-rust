@@ -8,18 +8,20 @@ pub mod event;
 /// Structure for storing all needed frame data for controllers
 /// including events dispatcher
 pub struct FrameC<'a, E: Listener + 'static> {
-    pub data: &'a SummaryC,
+    pub data: &'a FrameSummaryC,
     pub events: &'a mut Dispatcher<E>
 }
 
 /// Structure for storing frame meta info
-pub struct SummaryC {
+pub struct FrameSummaryC {
     /// Game time snapshot for this frame
     pub game_time: GameTimeC,
     /// Player status snapshot for this frame
     pub player: PlayerStatusC,
     /// Environment snapshot for this frame
     pub environment: EnvironmentC,
+    /// Health snapshot for this frame
+    pub health: HealthC,
     /// How many game seconds passed since last call
     pub game_time_delta: f32,
 }
@@ -196,6 +198,37 @@ pub struct GameTimeC {
     pub second: f64
 }
 
+/// Structure for storing health snapshot
+pub struct HealthC {
+    /// Body temperature (degrees C)
+    pub body_temperature: f32,
+    /// Heart rate (bpm)
+    pub heart_rate: f32,
+    /// Top body pressure (mmHg)
+    pub top_pressure: f32,
+    /// Bottom body pressure (mmHg)
+    pub bottom_pressure: f32,
+    /// Blood level (0..100)
+    pub blood_level: f32,
+    /// Food level (0..100)
+    pub food_level: f32,
+    /// Water level (0..100)
+    pub water_level: f32,
+    /// Stamina level (0..100)
+    pub stamina_level: f32,
+    /// Fatigue level (0..100)
+    pub fatigue_level: f32,
+    /// List of active (or scheduled) diseases
+    pub diseases: Vec<ActiveDiseaseC>
+}
+
+/// Structure for storing active disease snapshot
+pub struct ActiveDiseaseC {
+    pub name: String,
+    pub scheduled_time: GameTimeC,
+    pub is_active: bool
+}
+
 /// Describes initial environment information
 pub struct EnvironmentC {
     /// Wind speed value (m/s)
@@ -271,5 +304,13 @@ impl ConsumableC {
 
 /// Describes a snapshot of the player state for a single frame
 pub struct PlayerStatusC {
-    pub is_walking: bool
+    pub is_walking: bool,
+    pub is_running: bool,
+    pub is_swimming: bool,
+    pub is_underwater: bool
+}
+
+/// Classic linear lerp
+pub fn lerp(first: f32, second: f32, by: f32) -> f32 {
+    first * (1. - by) + second * by
 }

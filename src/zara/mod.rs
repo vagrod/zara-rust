@@ -1,10 +1,11 @@
-use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC};
+use utils::{FrameSummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC};
 use utils::event::{Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
+use crate::utils::HealthC;
 
 pub mod env;
 pub mod utils;
@@ -106,9 +107,9 @@ impl ZaraController {
     ///
     /// # Parameters
     ///
-    /// - `E`: trait type that implements [`Listener`](crate::zara::utils::event::Listener) trait
+    /// - `E`: trait type that implements [`Listener`](crate::utils::event::Listener) trait
     /// - `frame_time`: time, `in seconds`, since last `update` call.
-    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose methods will be called
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose methods will be called
     ///     as events
     ///
     /// # Examples
@@ -152,7 +153,7 @@ impl ZaraController {
     }
 
     /// Consumes the item. Item which name is passed must implement the
-    /// [`ConsumableBehavior`](crate::zara::inv::ConsumableBehavior) trait, or `false` will be
+    /// [`ConsumableBehavior`](crate::inventory::ConsumableBehavior) trait, or `false` will be
     /// returned
     ///
     /// # Parameters
@@ -215,10 +216,10 @@ impl ZaraController {
     }
 
     /// Gets all the info needed for all the controllers to process one frame
-    fn get_summary(&self) -> utils::SummaryC {
+    fn get_summary(&self) -> utils::FrameSummaryC {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
 
-        SummaryC {
+        FrameSummaryC {
             game_time : GameTimeC {
                 day: self.environment.game_time.day.get(),
                 hour: self.environment.game_time.hour.get(),
@@ -226,10 +227,27 @@ impl ZaraController {
                 second: self.environment.game_time.second.get()
             },
             player: PlayerStatusC {
-                is_walking: self.player_state.is_walking.get()
+                is_walking: self.player_state.is_walking.get(),
+                is_running: self.player_state.is_running.get(),
+                is_swimming: self.player_state.is_swimming.get(),
+                is_underwater: self.player_state.is_underwater.get()
             },
             environment: EnvironmentC {
                 wind_speed: self.environment.wind_speed.get()
+            },
+            health: HealthC {
+                body_temperature: self.health.body_temperature.get(),
+                blood_level: self.health.blood_level.get(),
+                heart_rate: self.health.heart_rate.get(),
+                water_level: self.health.water_level.get(),
+                food_level: self.health.food_level.get(),
+                top_pressure: self.health.top_pressure.get(),
+                bottom_pressure: self.health.bottom_pressure.get(),
+                stamina_level: self.health.stamina_level.get(),
+                fatigue_level: self.health.fatigue_level.get(),
+
+                // Empty for now
+                diseases: Vec::new()
             },
             game_time_delta: time_delta.as_secs_f32()
         }
