@@ -1,11 +1,13 @@
-use utils::{FrameSummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC};
+use utils::{GameTime, GameTimeC,
+            EnvironmentC, FrameC,
+            ConsumableC, PlayerStatusC,
+            HealthC, ActiveDiseaseC, FrameSummaryC};
 use utils::event::{Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
-use crate::utils::{HealthC, ActiveDiseaseC};
 
 pub mod env;
 pub mod utils;
@@ -206,8 +208,10 @@ impl ZaraController {
             return false
         }
 
+        let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
+
         // Notify health controller about the event
-        self.health.on_item_consumed(&consumable);
+        self.health.on_item_consumed(&game_time, &consumable);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count);
@@ -222,13 +226,14 @@ impl ZaraController {
     fn get_summary(&self) -> utils::FrameSummaryC {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
         let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
+        let current_secs = self.environment.game_time.duration.get().as_secs_f64();
 
         // Collect active diseases data
-        for active in self.health.diseases.borrow().iter() {
+        for (_key, active) in self.health.diseases.borrow().iter() {
             active_diseases.push(ActiveDiseaseC {
                 name: active.disease.get_name(),
-                is_active: false,
-                scheduled_time: GameTimeC::empty()
+                is_active: current_secs >= active.activation_time.to_duration().as_secs_f64(),
+                scheduled_time: active.activation_time.copy()
             });
         };
 

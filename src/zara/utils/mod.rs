@@ -2,6 +2,7 @@ use std::time::{Duration};
 use std::cell::Cell;
 
 use event::{Dispatcher, Listener};
+use core::ops;
 
 pub mod event;
 
@@ -90,6 +91,21 @@ impl GameTime {
         gt.update_from_duration(d);
 
         return gt;
+    }
+
+    /// Creates new `GameTime` object from its simple representation
+    pub fn from_contract(gt: GameTimeC) -> Self {
+        GameTime::from_duration(gt.to_duration())
+    }
+
+    /// Creates `GameTimeC` contract from this `GameTime` instance
+    pub fn to_contract(&self) -> GameTimeC {
+        GameTimeC {
+            day: self.day.get(),
+            hour: self.hour.get(),
+            minute: self.minute.get(),
+            second: self.second.get()
+        }
     }
 
     /// Adds given `Duration` value to this game time
@@ -206,6 +222,49 @@ impl GameTimeC {
             minute: 0,
             second: 0.
         }
+    }
+
+    /// Returns new `GameTimeC` by adding a given amount of minutes
+    /// to the current one
+    pub fn add_minutes(&self, amount: u64) -> GameTimeC {
+        let d= self.to_duration() + Duration::from_secs(amount*60);
+
+        GameTime::from_duration(d).to_contract()
+    }
+
+    /// Returns `Duration` object that describes current `GameTimeC`
+    pub fn to_duration(&self) -> Duration {
+        Duration::from_secs_f64(self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
+    }
+
+    /// Creates a copy of `GameTimeC`
+    pub fn copy(&self) -> GameTimeC {
+        GameTimeC {
+            day: self.day,
+            hour: self.hour,
+            minute: self.minute,
+            second: self.second
+        }
+    }
+}
+
+impl ops::Add<GameTimeC> for GameTimeC {
+    type Output = GameTimeC;
+
+    fn add(self, _rhs: GameTimeC) -> GameTimeC {
+        let d = self.to_duration() + _rhs.to_duration();
+
+        GameTime::from_duration(d).to_contract()
+    }
+}
+
+impl ops::Sub<GameTimeC> for GameTimeC {
+    type Output = GameTimeC;
+
+    fn sub(self, _rhs: GameTimeC) -> GameTimeC {
+        let d = self.to_duration() - _rhs.to_duration();
+
+        GameTime::from_duration(d).to_contract()
     }
 }
 

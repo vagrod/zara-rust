@@ -116,8 +116,8 @@ impl Inventory {
 
         total_weight = 0.;
 
-        for pair in self.items.borrow().iter() {
-            total_weight += pair.1.get_total_weight();
+        for  (_key, item) in self.items.borrow().iter() {
+            total_weight += item.get_total_weight();
         }
 
         self.weight.set(total_weight);

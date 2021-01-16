@@ -6,6 +6,8 @@ use super::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
 use crate::health::disease::Disease;
+use crate::utils::GameTimeC;
+use std::collections::HashMap;
 
 pub mod disease;
 pub mod side;
@@ -32,7 +34,7 @@ pub struct Health {
     /// Fatigue level (0..100)
     pub fatigue_level: Cell<f32>,
     /// All active or scheduled diseases
-    pub diseases: Rc<RefCell<Vec<Rc<ActiveDisease>>>>,
+    pub diseases: Rc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
 
     /// Stores all registered disease monitors
     monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>,
@@ -55,7 +57,7 @@ impl Health {
         Health {
             monitors: Rc::new(RefCell::new(Vec::new())),
             side_effects: Rc::new(RefCell::new(Vec::new())),
-            diseases: Rc::new(RefCell::new(Vec::new())),
+            diseases: Rc::new(RefCell::new(HashMap::new())),
 
             // Healthy values by default
             blood_level: Cell::new(100.),
@@ -123,22 +125,43 @@ impl Health {
 
     /// Called by zara controller when item is consumed
     /// as food or water
-    pub fn on_item_consumed(&self, item: &ConsumableC){
+    pub fn on_item_consumed(&self, game_time: &GameTimeC, item: &ConsumableC){
         println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
 
         // Notify disease monitors
         for monitor in self.monitors.borrow().iter() {
-            monitor.on_consumed(self, item);
+            monitor.on_consumed(self, game_time, item);
         }
     }
 
-    /// Spawns a new disease. If disease is already scheduled or active, nothing will happen
+    /// Spawns a new disease. If disease is already scheduled or active, nothing will happen, and
+    /// `false` will be returned
+    ///
+    /// # Parameters
+    /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
+    /// - `activation_time`: game time when this disease will start to be active. Use the
+    ///     current game time to activate immediately
+    ///
+    /// # Returns
+    /// `bool`: `true` on success.
     ///
     /// # Notes
     /// This method borrows the `diseases` collection
-    pub fn spawn_disease(&self, disease: Box<dyn Disease>){
+    pub fn spawn_disease(&self, disease: Box<dyn Disease>, activation_time: GameTimeC) -> bool {
         println!("Spawn disease call");
 
-        self.diseases.borrow_mut().insert(0, Rc::new(ActiveDisease::new(disease)));
+        let mut b = self.diseases.borrow_mut();
+        let disease_name = disease.get_name();
+
+        if b.contains_key(&disease_name) {
+            return false;
+        }
+
+        b.insert(disease_name, Rc::new(ActiveDisease::new(
+            disease,
+            activation_time
+        )));
+
+        return true;
     }
 }

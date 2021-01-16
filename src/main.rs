@@ -4,7 +4,7 @@ use std::thread::sleep;
 use std::cell::Cell;
 
 use zara::utils::event::{Listener, Event};
-use zara::utils::{FrameSummaryC, ConsumableC};
+use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::{RunningSideEffects};
@@ -43,14 +43,7 @@ fn main() {
         let running_effects = RunningSideEffects::new();
         person.health.register_side_effect_monitor(Box::new(running_effects));
 
-        // Testing items consuming
-        person.consume(&String::from("Meat"));
-
-        // Testing player status update
-        person.player_state.is_running.set(true);
-
-        // Total weight must change after consuming
-        println!("Total weight {}", person.inventory.weight.get());
+        let mut is_consumed= false;
 
         println!("Game Loop started!");
 
@@ -64,6 +57,20 @@ fn main() {
 
             // Game time is 10x the real one
             person.environment.game_time.add_seconds(frame_time * 10.);
+
+            // Just for test to fire this only once at non-zero game time
+            if !is_consumed && person.environment.game_time.second.get() >= 40. && person.environment.game_time.second.get() >= 41. {
+                // Testing items consuming
+                person.consume(&String::from("Meat"));
+
+                // Testing player status update
+                person.player_state.is_running.set(true);
+
+                // Total weight must change after consuming
+                println!("Total weight {}", person.inventory.weight.get());
+
+                is_consumed = true;
+            }
 
             let events_listener = ZaraEventsListener;
 
@@ -124,10 +131,13 @@ impl DiseaseMonitor for FluMonitor {
         println!("Flu monitor check: {}", frame_data.game_time_delta);
     }
 
-    fn on_consumed(&self, health: &Health, item: &ConsumableC) {
+    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC) {
         println!("Flu monitor on consumed: {}", item.name);
 
-        health.spawn_disease(Box::new(FluDisease::new()));
+        health.spawn_disease(Box::new(
+            FluDisease::new()),
+            game_time.add_minutes(0)
+        );
     }
 }
 
