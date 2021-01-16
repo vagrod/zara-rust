@@ -38,6 +38,7 @@ pub struct Health {
 
     /// Stores all registered disease monitors
     monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>,
+    /// Stores all registered side effects monitors
     side_effects: Rc<RefCell<Vec<Box<dyn SideEffectsMonitor>>>>
 }
 
@@ -77,8 +78,6 @@ impl Health {
     /// # Parameters
     /// - `frame`: summary information for this frame
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
-        println!("From health update: wind speed is {}", frame.data.environment.wind_speed);
-
         // Update disease monitors
         for monitor in self.monitors.borrow().iter() {
             monitor.check(self, &frame.data);
@@ -140,7 +139,7 @@ impl Health {
     /// # Parameters
     /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
     /// - `activation_time`: game time when this disease will start to be active. Use the
-    ///     current game time to activate immediately
+    ///     current game time to activate immediately (on the next `update` pass)
     ///
     /// # Returns
     /// `bool`: `true` on success.
@@ -164,4 +163,29 @@ impl Health {
 
         return true;
     }
+
+    /// Removes active disease if exists. Returns `false` if not.
+    ///
+    /// # Parameters
+    /// - `disease_name`: name of the disease
+    ///
+    /// # Returns
+    /// `bool`: `true` on success
+    ///
+    /// # Notes
+    /// This method borrows the `diseases` collection
+    pub fn remove_disease(&self, disease_name: &String) -> bool {
+        println!("Remove disease call {}", disease_name);
+
+        let mut b = self.diseases.borrow_mut();
+
+        if !b.contains_key(disease_name) {
+            return false;
+        }
+
+        b.remove(disease_name);
+
+        return true;
+    }
+
 }
