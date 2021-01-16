@@ -1,13 +1,11 @@
-use super::utils::{FrameC, ConsumableC};
+use super::utils::{FrameC, ConsumableC, GameTimeC};
 use super::utils::event::{Listener};
-use super::health::disease::{DiseaseMonitor, ActiveDisease};
+use super::health::disease::{Disease, DiseaseMonitor, ActiveDisease};
 use super::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 
+use std::collections::HashMap;
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
-use crate::health::disease::Disease;
-use crate::utils::GameTimeC;
-use std::collections::HashMap;
 
 pub mod disease;
 pub mod side;

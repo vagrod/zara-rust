@@ -1,9 +1,9 @@
 use super::utils::{FrameC, GameTimeC};
 use super::utils::event::{Event, Listener};
 
+use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use std::collections::HashMap;
 
 /// Controls player's inventory
 pub struct Inventory {

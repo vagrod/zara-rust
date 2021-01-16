@@ -1,7 +1,7 @@
 use super::super::health::{Health};
-use super::super::utils::{FrameSummaryC, ConsumableC};
+use super::super::utils::{FrameSummaryC, ConsumableC, GameTimeC};
+
 use std::rc::Rc;
-use crate::utils::GameTimeC;
 
 /// Trait for disease monitors
 pub trait DiseaseMonitor {
