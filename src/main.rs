@@ -6,7 +6,7 @@ use std::cell::Cell;
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, ConsumableC};
 use zara::health::{Health};
-use zara::health::disease::{DiseaseMonitor};
+use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::{RunningSideEffects};
 use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 
@@ -120,13 +120,25 @@ impl Listener for ZaraEventsListener {
 
 struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
-    fn check(&self, health: &Health, frame_data: &FrameSummaryC) {
+    fn check(&self, _health: &Health, frame_data: &FrameSummaryC) {
         println!("Flu monitor check: {}", frame_data.game_time_delta);
-
-        health.spawn_disease();
     }
 
     fn on_consumed(&self, health: &Health, item: &ConsumableC) {
         println!("Flu monitor on consumed: {}", item.name);
+
+        health.spawn_disease(Box::new(FluDisease::new()));
+    }
+}
+
+struct FluDisease;
+impl FluDisease {
+    fn new() -> Self {
+        FluDisease
+    }
+}
+impl Disease for FluDisease {
+    fn get_name(&self) -> String {
+        String::from("Flu")
     }
 }

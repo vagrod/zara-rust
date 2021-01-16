@@ -5,7 +5,7 @@ use player::{PlayerStatus};
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
-use crate::utils::HealthC;
+use crate::utils::{HealthC, ActiveDiseaseC};
 
 pub mod env;
 pub mod utils;
@@ -216,8 +216,21 @@ impl ZaraController {
     }
 
     /// Gets all the info needed for all the controllers to process one frame
+    ///
+    /// # Notes
+    /// This method borrows the `diseases` collection
     fn get_summary(&self) -> utils::FrameSummaryC {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
+        let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
+
+        // Collect active diseases data
+        for active in self.health.diseases.borrow().iter() {
+            active_diseases.push(ActiveDiseaseC {
+                name: active.disease.get_name(),
+                is_active: false,
+                scheduled_time: GameTimeC::empty()
+            });
+        };
 
         FrameSummaryC {
             game_time : GameTimeC {
@@ -246,8 +259,7 @@ impl ZaraController {
                 stamina_level: self.health.stamina_level.get(),
                 fatigue_level: self.health.fatigue_level.get(),
 
-                // Empty for now
-                diseases: Vec::new()
+                diseases: active_diseases
             },
             game_time_delta: time_delta.as_secs_f32()
         }

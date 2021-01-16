@@ -198,6 +198,17 @@ pub struct GameTimeC {
     pub second: f64
 }
 
+impl GameTimeC {
+    pub fn empty() -> Self {
+        GameTimeC {
+            day: 0,
+            hour: 0,
+            minute: 0,
+            second: 0.
+        }
+    }
+}
+
 /// Structure for storing health snapshot
 pub struct HealthC {
     /// Body temperature (degrees C)

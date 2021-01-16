@@ -1,11 +1,11 @@
 use super::utils::{FrameC, ConsumableC};
 use super::utils::event::{Listener};
-use super::health::disease::{DiseaseMonitor};
-use super::health::side::{SideEffectsMonitor};
+use super::health::disease::{DiseaseMonitor, ActiveDisease};
+use super::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
-use crate::health::side::SideEffectDeltasC;
+use crate::health::disease::Disease;
 
 pub mod disease;
 pub mod side;
@@ -31,6 +31,8 @@ pub struct Health {
     pub stamina_level: Cell<f32>,
     /// Fatigue level (0..100)
     pub fatigue_level: Cell<f32>,
+    /// All active or scheduled diseases
+    pub diseases: Rc<RefCell<Vec<Rc<ActiveDisease>>>>,
 
     /// Stores all registered disease monitors
     monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>,
@@ -53,6 +55,7 @@ impl Health {
         Health {
             monitors: Rc::new(RefCell::new(Vec::new())),
             side_effects: Rc::new(RefCell::new(Vec::new())),
+            diseases: Rc::new(RefCell::new(Vec::new())),
 
             // Healthy values by default
             blood_level: Cell::new(100.),
@@ -130,7 +133,12 @@ impl Health {
     }
 
     /// Spawns a new disease. If disease is already scheduled or active, nothing will happen
-    pub fn spawn_disease(&self){
+    ///
+    /// # Notes
+    /// This method borrows the `diseases` collection
+    pub fn spawn_disease(&self, disease: Box<dyn Disease>){
         println!("Spawn disease call");
+
+        self.diseases.borrow_mut().insert(0, Rc::new(ActiveDisease::new(disease)));
     }
 }

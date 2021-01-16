@@ -22,7 +22,7 @@ pub struct Inventory {
     pub weight: Cell<f32>
 }
 
-impl Inventory{
+impl Inventory {
     /// Creates new ready-to-use `Inventory`.
     ///
     /// # Examples
