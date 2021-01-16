@@ -1,7 +1,8 @@
 use super::utils::{FrameC, GameTimeC};
-use super::utils::event::{Listener, Event};
+use super::utils::event::{Dispatcher, Listener, Event};
 
 use std::cell::{Cell, RefCell};
+use std::time::Duration;
 
 pub struct Body {
     pub last_sleep_time: RefCell<Option<GameTimeC>>,
@@ -37,17 +38,21 @@ impl Body {
     /// - `frame`: summary information for this frame
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
         println!("From body update: game secs passed - {}", frame.data.game_time_delta);
+    }
 
+    /// Is called every frame by Zara controller.
+    /// Cannot be called in `update` here because we need time precision
+    pub fn sleep_check<E: Listener + 'static>(&self, events: &mut Dispatcher<E>, game_time: &Duration, game_time_delta: f32){
         if self.is_sleeping.get(){
-            let left = self.sleeping_counter.get() - frame.data.game_time_delta as f64;
+            let left = self.sleeping_counter.get() - game_time_delta as f64;
 
             if left <= 0.
             {
                 self.is_sleeping.set(false);
                 self.sleeping_counter.set(0.);
-                self.last_sleep_time.replace(Option::Some(frame.data.game_time.copy()));
+                self.last_sleep_time.replace(Option::Some(GameTimeC::from_duration(*game_time)));
 
-                frame.events.dispatch(Event::WokeUp);
+                events.dispatch(Event::WokeUp);
             } else {
                 self.sleeping_counter.set(left);
             }

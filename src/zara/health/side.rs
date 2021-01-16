@@ -1,4 +1,5 @@
 use super::super::utils::FrameSummaryC;
+
 use std::cell::Cell;
 
 /// Trait that must be implemented by all side effects monitors

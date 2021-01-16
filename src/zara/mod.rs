@@ -58,6 +58,8 @@ pub struct ZaraController<E: Listener + 'static> {
     update_counter: Cell<f32>,
     /// Game time snapshot at the time of the last `update` call
     last_update_game_time: Cell<Duration>,
+    /// Game time of the last update frame
+    last_frame_game_time: Cell<Duration>,
     /// Events dispatcher
     dispatcher: Arc<RefCell<Dispatcher<E>>>,
     // Need this reference here to keep listener in memory
@@ -128,6 +130,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             update_counter: Cell::new(0.),
             last_update_game_time: Cell::new(Duration::new(0,0)),
+            last_frame_game_time: Cell::new(Duration::new(0,0)),
             player_state: Arc::new(PlayerStatus::empty()),
 
             dispatcher: Arc::new(RefCell::new(dispatcher)),
@@ -157,6 +160,14 @@ impl<E: Listener + 'static> ZaraController<E> {
         // When sleeping, our checks are more frequent
         if self.body.is_sleeping.get() {
             ceiling = SLEEPING_UPDATE_INTERVAL;
+
+            // When sleeping, we need to check sleeping state every frame, because
+            // otherwise wake up game time will be way off
+            self.body.sleep_check(
+                &mut self.dispatcher.borrow_mut(),
+                &self.environment.game_time.duration.get(),
+                (self.environment.game_time.duration.get() - self.last_frame_game_time.get()).as_secs_f32()
+            );
         }
 
         if elapsed >= ceiling {
@@ -174,12 +185,15 @@ impl<E: Listener + 'static> ZaraController<E> {
             self.inventory.update(&mut frame_data);
             self.body.update(&mut frame_data);
 
-            // Reset the counter and last update time
+            // Reset the counter and set last update game time
             self.last_update_game_time.set(self.environment.game_time.duration.get());
             self.update_counter.set(0.);
         } else {
             self.update_counter.set(elapsed);
         }
+
+        // Set last frame game time
+        self.last_frame_game_time.set(Duration::from(self.environment.game_time.duration.get()));
     }
 
     /// Consumes the item. Item which name is passed must have the

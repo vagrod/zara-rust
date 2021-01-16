@@ -231,13 +231,17 @@ impl GameTimeC {
     pub fn add_minutes(&self, amount: u64) -> GameTimeC {
         let d= self.to_duration() + Duration::from_secs(amount*60);
 
-        GameTime::from_duration(d).to_contract()
+        GameTimeC::from_duration(d)
     }
 
     /// Returns `Duration` object that describes current `GameTimeC`
     pub fn to_duration(&self) -> Duration {
         Duration::from_secs_f64(
             self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
+    }
+
+    pub fn from_duration(d: Duration) -> Self {
+        GameTime::from_duration(d).to_contract()
     }
 
     /// Creates a copy of `GameTimeC`
