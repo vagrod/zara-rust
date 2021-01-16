@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 use std::thread::sleep;
 use std::cell::Cell;
 
-use zara::inv::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
+use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::utils::event::{Listener, Event};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor};
@@ -30,15 +30,13 @@ fn main() {
             println!("Has consumable part? {}", item.consumable().is_some());
             println!("Food gain {}", item.consumable().unwrap().food_gain_per_dose());
             println!("Has spoil part? {}", item.consumable().unwrap().spoiling().is_some());
-
-            println!("Total weight {}", person.inventory.weight.get());
         }
 
-        println!("Game Loop started!");
+        println!("Total weight {}", person.inventory.weight.get());
 
         // Testing disease monitors
         let mon = FluMonitor;
-        person.register_disease_monitor(Box::new(mon));
+        person.health.register_disease_monitor(Box::new(mon));
 
         // Testing items consuming
         person.consume(&String::from("Meat"));
@@ -48,6 +46,8 @@ fn main() {
 
         // Total weight must change after consuming
         println!("Total weight {}", person.inventory.weight.get());
+
+        println!("Game Loop started!");
 
         loop {
             now = Instant::now();

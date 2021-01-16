@@ -1,6 +1,5 @@
 use utils::{SummaryC, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC};
 use utils::event::{Listener, Dispatcher, Dispatchable};
-use health::disease::{DiseaseMonitor};
 use player::{PlayerStatus};
 
 use std::sync::Arc;
@@ -10,7 +9,7 @@ use std::time::Duration;
 pub mod env;
 pub mod utils;
 pub mod health;
-pub mod inv;
+pub mod inventory;
 pub mod body;
 pub mod player;
 
@@ -36,7 +35,7 @@ pub struct ZaraController {
     /// Inventory node.
     ///
     /// Use this to control inventory.
-    pub inventory: Arc<inv::Inventory>,
+    pub inventory: Arc<inventory::Inventory>,
     /// Body node.
     ///
     /// Use this to sleep, control clothes and see wetness and warmth levels.
@@ -92,7 +91,7 @@ impl ZaraController {
         ZaraController {
             environment: Arc::new(env::EnvironmentData::from_description(env)),
             health: Arc::new(health::Health::new()),
-            inventory: Arc::new(inv::Inventory::new()),
+            inventory: Arc::new(inventory::Inventory::new()),
             body: Arc::new(body::Body::new()),
 
             update_counter: Cell::new(0.),
@@ -174,7 +173,7 @@ impl ZaraController {
     /// ```
     pub fn consume(&self, item_name: &String) -> bool {
         let items_count: usize;
-        let mut consumable= ConsumableC::new();
+        let mut consumable = ConsumableC::new();
 
         {
             // Cant borrow `items` for long
@@ -213,14 +212,6 @@ impl ZaraController {
         self.inventory.change_item_count(item_name, new_count);
 
         return true;
-    }
-
-    /// Registers new disease monitor instance
-    ///
-    /// # Parameters
-    /// - `monitor`: an instance of an object that implements [`DiseaseMonitor`](crate::zara::health::disease::DiseaseMonitor) trait
-    pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
-        self.health.register_disease_monitor(monitor);
     }
 
     /// Gets all the info needed for all the controllers to process one frame
