@@ -1,5 +1,6 @@
 use std::time::{Duration};
 use std::cell::Cell;
+use rand::Rng;
 
 use event::{Dispatcher, Listener};
 use core::ops;
@@ -383,4 +384,33 @@ pub struct PlayerStatusC {
 /// Classic linear lerp
 pub fn lerp(first: f32, second: f32, by: f32) -> f32 {
     first * (1. - by) + second * by
+}
+
+/// Clamps ceiling
+pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
+    if value > ceiling {
+        return ceiling;
+    }
+
+    return value;
+}
+
+/// Clamps 0..1
+pub fn clamp_01(value: f32) -> f32 {
+    if value > 1. {
+        return 1.;
+    }
+    if value < 0. {
+        return 0.;
+    }
+
+    return value;
+}
+
+/// Will return `true` is a given probability is satisfied
+pub fn roll_dice(probability: usize) -> bool {
+    let mut rng = rand::thread_rng();
+    let r = rng.gen_range(0..100);
+
+    return r <= probability;
 }

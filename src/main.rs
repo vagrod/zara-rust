@@ -134,10 +134,13 @@ impl DiseaseMonitor for FluMonitor {
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC) {
         println!("Flu monitor on consumed: {}", item.name);
 
-        health.spawn_disease(Box::new(
-            FluDisease::new()),
-            game_time.add_minutes(0)
-        );
+        // 5% chance test here
+        if zara::utils::roll_dice(5) {
+            health.spawn_disease(Box::new(
+                FluDisease::new()),
+                 game_time.add_minutes(0)
+            );
+        }
     }
 }
 
