@@ -107,7 +107,8 @@ impl Health {
     /// Registers new disease monitor instance
     ///
     /// # Parameters
-    /// - `monitor`: an instance of an object that implements [`DiseaseMonitor`](crate::health::disease::DiseaseMonitor) trait
+    /// - `monitor`: an instance of an object that implements
+    /// [`DiseaseMonitor`](crate::health::disease::DiseaseMonitor) trait
     pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
         self.monitors.borrow_mut().insert(0, monitor);
     }
@@ -115,7 +116,8 @@ impl Health {
     /// Registers new side effects monitor instance
     ///
     /// # Parameters
-    /// - `monitor`: an instance of an object that implements [`SideEffectsMonitor`](crate::health::side::SideEffectsMonitor) trait
+    /// - `monitor`: an instance of an object that implements
+    /// [`SideEffectsMonitor`](crate::health::side::SideEffectsMonitor) trait
     pub fn register_side_effect_monitor(&self, monitor: Box<dyn SideEffectsMonitor>){
         self.side_effects.borrow_mut().insert(0, monitor);
     }

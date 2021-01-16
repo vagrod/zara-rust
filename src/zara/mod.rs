@@ -18,7 +18,12 @@ pub mod player;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
+/// when player is awake
 const UPDATE_INTERVAL: f32 = 1.;
+/// How frequently should Zara update all its controllers,
+/// recalculate values and check monitors (real seconds)
+/// when player is sleeping
+const SLEEPING_UPDATE_INTERVAL: f32 = UPDATE_INTERVAL / 5.;
 
 /// Zara survival framework controller.
 ///
@@ -44,8 +49,11 @@ pub struct ZaraController {
     /// Use this to sleep, control clothes and see wetness and warmth levels.
     pub body: Arc<body::Body>,
     /// Player status runtime data
+    ///
+    /// Use this to tell Zara state of a player (is he running, walking, swimming etc.)
     pub player_state: Arc<PlayerStatus>,
 
+    // Private fields
     /// How many seconds passed since last `update` call
     update_counter: Cell<f32>,
     /// Game time snapshot at the time of the last `update` call
@@ -111,8 +119,8 @@ impl ZaraController {
     ///
     /// - `E`: trait type that implements [`Listener`](crate::utils::event::Listener) trait
     /// - `frame_time`: time, `in seconds`, since last `update` call.
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose methods will be called
-    ///     as events
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose methods will be
+    ///     called as events
     ///
     /// # Examples
     ///
@@ -124,8 +132,14 @@ impl ZaraController {
     pub fn update<E: Listener + 'static>(&self, frame_time: f32, listener : E)
     {
         let elapsed = self.update_counter.get() + frame_time;
+        let mut ceiling = UPDATE_INTERVAL;
 
-        if elapsed >= UPDATE_INTERVAL {
+        // When sleeping, our checks are more frequent
+        if self.body.is_sleeping.get() {
+            ceiling = SLEEPING_UPDATE_INTERVAL;
+        }
+
+        if elapsed >= ceiling {
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
 
@@ -154,9 +168,9 @@ impl ZaraController {
         }
     }
 
-    /// Consumes the item. Item which name is passed must implement the
-    /// [`ConsumableBehavior`](crate::inventory::ConsumableBehavior) trait, or `false` will be
-    /// returned
+    /// Consumes the item. Item which name is passed must have the
+    /// [`ConsumableBehavior`](crate::inventory::ConsumableBehavior) option present, or
+    /// `false` will be returned
     ///
     /// # Parameters
     /// - `item_name`: unique name of the item that is being consumed
@@ -190,6 +204,10 @@ impl ZaraController {
 
             items_count = item.get_count();
 
+            if items_count - 1 <= 0 { // 1 so far
+                return false
+            }
+
             if !item.consumable().is_some() {
                 return false;
             }
@@ -203,11 +221,6 @@ impl ZaraController {
         }
 
         let new_count = items_count - 1;
-
-        if new_count <= 0 {
-            return false
-        }
-
         let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
 
         // Notify health controller about the event
@@ -222,7 +235,7 @@ impl ZaraController {
     /// Gets all the info needed for all the controllers to process one frame
     ///
     /// # Notes
-    /// This method borrows the `diseases` collection
+    /// This method borrows the `diseases` collection, `body.last_sleep_time` field
     fn get_summary(&self) -> utils::FrameSummaryC {
         let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
         let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
@@ -237,6 +250,16 @@ impl ZaraController {
             });
         };
 
+        // Determine last sleep time
+        let mut last_slept = Option::None;
+        {
+            let borrowed_time= self.body.last_sleep_time.borrow();
+
+            if borrowed_time.is_some() {
+                last_slept = Option::Some(borrowed_time.as_ref().unwrap().copy());
+            }
+        }
+
         FrameSummaryC {
             game_time : GameTimeC {
                 day: self.environment.game_time.day.get(),
@@ -248,7 +271,9 @@ impl ZaraController {
                 is_walking: self.player_state.is_walking.get(),
                 is_running: self.player_state.is_running.get(),
                 is_swimming: self.player_state.is_swimming.get(),
-                is_underwater: self.player_state.is_underwater.get()
+                is_underwater: self.player_state.is_underwater.get(),
+                is_sleeping: self.body.is_sleeping.get(),
+                last_slept
             },
             environment: EnvironmentC {
                 wind_speed: self.environment.wind_speed.get()

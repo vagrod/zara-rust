@@ -208,6 +208,7 @@ impl GameTime {
 }
 
 /// Structure for storing simple game time slice
+/// #[derive(Copy)]
 pub struct GameTimeC {
     pub day: u64,
     pub hour: u64,
@@ -235,7 +236,8 @@ impl GameTimeC {
 
     /// Returns `Duration` object that describes current `GameTimeC`
     pub fn to_duration(&self) -> Duration {
-        Duration::from_secs_f64(self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
+        Duration::from_secs_f64(
+            self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
     }
 
     /// Creates a copy of `GameTimeC`
@@ -378,7 +380,9 @@ pub struct PlayerStatusC {
     pub is_walking: bool,
     pub is_running: bool,
     pub is_swimming: bool,
-    pub is_underwater: bool
+    pub is_underwater: bool,
+    pub is_sleeping: bool,
+    pub last_slept: Option<GameTimeC>
 }
 
 /// Classic linear lerp

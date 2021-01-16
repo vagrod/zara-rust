@@ -6,6 +6,7 @@ use std::cell::RefCell;
 
 #[derive(Debug)]
 pub enum Event {
+    WokeUp,
     Dehydration
 }
 

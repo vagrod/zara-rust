@@ -56,12 +56,20 @@ fn main() {
             frame_time = now.elapsed().as_secs_f32();
 
             // Game time is 10x the real one
-            person.environment.game_time.add_seconds(frame_time * 10.);
+            if person.body.is_sleeping.get() {
+                // Progress time faster during the sleep
+                person.environment.game_time.add_seconds(frame_time * 1800.); // one game hour per real second
+            } else {
+                person.environment.game_time.add_seconds(frame_time * 10.);
+            }
 
             // Just for test to fire this only once at non-zero game time
             if !is_consumed && person.environment.game_time.second.get() >= 40. && person.environment.game_time.second.get() >= 41. {
                 // Testing items consuming
                 person.consume(&String::from("Meat"));
+
+                // Sleeping test
+                person.body.start_sleeping(6.);
 
                 // Testing player status update
                 person.player_state.is_running.set(true);
@@ -121,6 +129,9 @@ impl Listener for ZaraEventsListener {
         println!("Notify called with {:?}", event);
         if let Event::Dehydration = event {
             println!("Dehydration");
+        }
+        if let Event::WokeUp = event {
+            println!("Woke up!");
         }
     }
 }

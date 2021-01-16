@@ -65,7 +65,9 @@ impl SideEffectsMonitor for RunningSideEffects {
                 self.running_time.set(0.);
             }
 
-            self.running_time.set(crate::utils::clamp_to(self.running_time.get() + frame_data.game_time_delta, TIME_TO_REACH_RUNNING_EXHAUST));
+            self.running_time.set(crate::utils::clamp_to(
+                self.running_time.get() + frame_data.game_time_delta,
+                TIME_TO_REACH_RUNNING_EXHAUST));
 
             let p = self.running_time.get() / TIME_TO_REACH_RUNNING_EXHAUST;
 
