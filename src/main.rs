@@ -14,10 +14,16 @@ use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 fn main() {
     let game_loop = thread::spawn(|| {
         let two_millis= Duration::new(0, 2000000); // 2ms
-
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
-        let person = zara::ZaraController::with_environment(zara::utils::EnvironmentC::new(5.4));
+
+        let events_listener = ZaraEventsListener;
+        let environment = zara::utils::EnvironmentC::new(5.4);
+
+        let person =
+            zara::ZaraController::with_environment (
+                events_listener, environment
+            );
 
         // Testing environment change
         person.environment.wind_speed.set(22.);
@@ -80,10 +86,8 @@ fn main() {
                 is_consumed = true;
             }
 
-            let events_listener = ZaraEventsListener;
-
             // Update Zara state
-            person.update::<ZaraEventsListener>(frame_time, events_listener);
+            person.update(frame_time);
         }
     });
 
@@ -123,7 +127,7 @@ impl ConsumableBehavior for MyFood {
     fn spoiling(&self) -> Option<&dyn SpoilingBehavior> { None }
 }
 
-struct ZaraEventsListener;
+struct ZaraEventsListener ;
 impl Listener for ZaraEventsListener {
     fn notify(&mut self, event: &Event) {
         println!("Notify called with {:?}", event);

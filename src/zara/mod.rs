@@ -31,7 +31,7 @@ const SLEEPING_UPDATE_INTERVAL: f32 = UPDATE_INTERVAL / 5.;
 ///
 /// [`new`]: #method.new
 /// [`with_environment`]: #method.with_environment
-pub struct ZaraController {
+pub struct ZaraController<E: Listener + 'static> {
     /// Environment node.
     ///
     /// Use this to control weather and game time.
@@ -57,14 +57,24 @@ pub struct ZaraController {
     /// How many seconds passed since last `update` call
     update_counter: Cell<f32>,
     /// Game time snapshot at the time of the last `update` call
-    last_update_game_time: Cell<Duration>
+    last_update_game_time: Cell<Duration>,
+    /// Events dispatcher
+    dispatcher: Arc<RefCell<Dispatcher<E>>>,
+    // Need this reference here to keep listener in memory
+    // or else notifications won't dispatch
+    #[allow(dead_code)]
+    listener: Arc<RefCell<E>>
 }
 
-impl ZaraController {
+impl<E: Listener + 'static> ZaraController<E> {
     /// Creates new `ZaraController` without pre-defined environment.
     /// To set up environment right away, use [`with_environment`] method.
     ///
     /// [`with_environment`]: #method.with_environment
+    ///
+    /// # Parameters
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
+    ///     called when Zara event occurs
     ///
     /// # Examples
     ///
@@ -73,10 +83,10 @@ impl ZaraController {
     /// ```
     /// use zara;
     ///
-    /// let zara = zara::ZaraController::new();
+    /// let zara = zara::ZaraController::new(listener);
     /// ```
-    pub fn new() -> Self {
-        ZaraController::init(EnvironmentC::empty())
+    pub fn new(listener : E) -> Self {
+        ZaraController::init(listener, EnvironmentC::empty())
     }
 
     /// Creates a new `ZaraController` with pre-defined environment.
@@ -84,6 +94,11 @@ impl ZaraController {
     ///
     /// [`new`]: #method.new
     ///
+    /// # Parameters
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
+    ///     called when Zara event occurs
+    /// - `env_desc`: [`EnvironmentC`](crate::utils::EnvironmentC) object that describes initial state of the environment
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -91,14 +106,20 @@ impl ZaraController {
     /// ```
     /// use zara;
     ///
-    /// let zara = zara::ZaraController::with_environment(env_desc);
+    /// let zara = zara::ZaraController::with_environment(listener, env_desc);
     /// ```
-    pub fn with_environment(env: EnvironmentC) -> Self {
-        ZaraController::init(env)
+    pub fn with_environment(listener : E, env: EnvironmentC) -> Self {
+        ZaraController::init(listener, env)
     }
 
     /// Private initialization function
-    fn init(env: EnvironmentC) -> Self {
+    fn init(listener : E, env: EnvironmentC) -> Self {
+        // Register external events listener
+        let mut dispatcher: Dispatcher<E> = Dispatcher::<E>::new();
+        let listener_rc = Arc::new(RefCell::new(listener));
+
+        dispatcher.register_listener(listener_rc.clone());
+
         ZaraController {
             environment: Arc::new(env::EnvironmentData::from_description(env)),
             health: Arc::new(health::Health::new()),
@@ -107,7 +128,10 @@ impl ZaraController {
 
             update_counter: Cell::new(0.),
             last_update_game_time: Cell::new(Duration::new(0,0)),
-            player_state: Arc::new(PlayerStatus::empty())
+            player_state: Arc::new(PlayerStatus::empty()),
+
+            dispatcher: Arc::new(RefCell::new(dispatcher)),
+            listener: listener_rc
         }
     }
 
@@ -116,20 +140,16 @@ impl ZaraController {
     /// This method should be called every frame.
     ///
     /// # Parameters
-    ///
-    /// - `E`: trait type that implements [`Listener`](crate::utils::event::Listener) trait
     /// - `frame_time`: time, `in seconds`, since last `update` call.
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose methods will be
-    ///     called as events
     ///
     /// # Examples
     ///
     /// Basic usage:
     ///
     /// ```
-    /// zara_controller.update::<MyEventListener>(time_delta, listener);
+    /// zara_controller.update(time_delta);
     /// ```
-    pub fn update<E: Listener + 'static>(&self, frame_time: f32, listener : E)
+    pub fn update(&self, frame_time: f32)
     {
         let elapsed = self.update_counter.get() + frame_time;
         let mut ceiling = UPDATE_INTERVAL;
@@ -143,15 +163,9 @@ impl ZaraController {
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
 
-            // Register external events listener
-            let dispatcher: &mut Dispatcher<E> = &mut Dispatcher::<E>::new();
-            let listener_rc = Arc::new(RefCell::new(listener));
-
-            dispatcher.register_listener(listener_rc.clone());
-
             // Form the frame data structure
             let mut frame_data = &mut FrameC {
-                events: dispatcher,
+                events: &mut self.dispatcher.borrow_mut(),
                 data: summary
             };
 
