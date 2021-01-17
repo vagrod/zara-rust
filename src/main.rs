@@ -43,7 +43,7 @@ fn main() {
             println!("Has spoil part? {}", item.consumable().unwrap().spoiling().is_some());
         }
 
-        println!("Total weight {}", person.inventory.weight.get());
+        println!("Total weight {}", person.inventory.get_weight());
 
         // Testing disease monitors
         let flu_monitor = FluMonitor;
@@ -85,7 +85,7 @@ fn main() {
                 person.player_state.is_running.set(true);
 
                 // Total weight must change after consuming
-                println!("Total weight {}", person.inventory.weight.get());
+                println!("Total weight {}", person.inventory.get_weight());
 
                 is_consumed = true;
             }

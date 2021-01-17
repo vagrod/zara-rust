@@ -41,6 +41,16 @@ impl Inventory {
         }
     }
 
+    /// Returns `true` is item of this kind exists in the inventory
+    ///
+    ///# Parameters
+    ///- `item_name`: unique name of the item (item kind)
+    pub fn has_item(&self, item_name: &String) -> bool {
+        let b = self.items.borrow();
+
+        b.contains_key(item_name)
+    }
+
     /// Adds new item to the inventory and recalculates inventory weight
     ///
     /// # Parameters
