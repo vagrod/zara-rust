@@ -28,7 +28,11 @@ impl Health {
             side_effects_summary.bottom_pressure_bonus += res.bottom_pressure_bonus;
             side_effects_summary.water_level_bonus += res.water_level_bonus;
             side_effects_summary.stamina_bonus += res.stamina_bonus;
-            side_effects_summary.fatigue_bonus += res.fatigue_bonus;
+
+            // Just for pretty picture
+            if !frame.data.player.is_sleeping {
+                side_effects_summary.fatigue_bonus += res.fatigue_bonus;
+            }
         }
 
         let mut snapshot = HealthC::healthy();
@@ -38,6 +42,11 @@ impl Health {
         snapshot.food_level = self.food_level.get();
         snapshot.water_level = self.water_level.get();
         snapshot.blood_level = self.blood_level.get();
+
+        // For pretty picture
+        if frame.data.player.is_sleeping {
+           snapshot.fatigue_level = frame.data.health.fatigue_level;
+        }
 
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);

@@ -86,7 +86,7 @@ fn main() {
                 person.consume(&String::from("Meat"));
 
                 // Sleeping test
-                //person.body.start_sleeping(6.);
+                person.body.start_sleeping(6.);
 
                 // Testing player status update
                 person.player_state.is_running.set(false);
