@@ -1,6 +1,4 @@
-use utils::{GameTime, GameTimeC,
-            EnvironmentC, FrameC,
-            ConsumableC, PlayerStatusC,
+use utils::{GameTime, GameTimeC, EnvironmentC, FrameC, ConsumableC, PlayerStatusC,
             HealthC, ActiveDiseaseC, FrameSummaryC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
@@ -9,7 +7,7 @@ use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
 
-pub mod env;
+pub mod world;
 pub mod utils;
 pub mod health;
 pub mod inventory;
@@ -35,7 +33,7 @@ pub struct ZaraController<E: Listener + 'static> {
     /// Environment node.
     ///
     /// Use this to control weather and game time.
-    pub environment : Arc<env::EnvironmentData>,
+    pub environment : Arc<world::EnvironmentData>,
     /// Health node.
     ///
     /// Use this to check and control health.
@@ -69,6 +67,7 @@ pub struct ZaraController<E: Listener + 'static> {
 }
 
 impl<E: Listener + 'static> ZaraController<E> {
+
     /// Creates new `ZaraController` without pre-defined environment.
     /// To set up environment right away, use [`with_environment`] method.
     ///
@@ -123,7 +122,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         dispatcher.register_listener(listener_rc.clone());
 
         ZaraController {
-            environment: Arc::new(env::EnvironmentData::from_description(env)),
+            environment: Arc::new(world::EnvironmentData::from_description(env)),
             health: Arc::new(health::Health::new()),
             inventory: Arc::new(inventory::Inventory::new()),
             body: Arc::new(body::Body::new()),
