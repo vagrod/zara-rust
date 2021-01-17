@@ -31,7 +31,7 @@ impl SideEffectsMonitor for FatigueSideEffects {
         let added_fatigue= crate::utils::lerp(0., 100., p_added);
 
         SideEffectDeltasC {
-            fatigue_bonus: left_fatigue + added_fatigue,
+            fatigue_bonus: crate::utils::clamp(left_fatigue + added_fatigue, 0., 100.),
             ..Default::default()
         }
     }
