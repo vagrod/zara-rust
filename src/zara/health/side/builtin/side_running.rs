@@ -30,15 +30,17 @@ impl SideEffectsMonitor for RunningSideEffects {
 
             self.running_time.set(crate::utils::clamp_to(
                 self.running_time.get() + frame_data.game_time_delta,
-                TIME_TO_REACH_RUNNING_EXHAUST));
+                TIME_TO_REACH_RUNNING_EXHAUST)
+            );
 
-            let p = self.running_time.get() / TIME_TO_REACH_RUNNING_EXHAUST;
+            let p = crate::utils::clamp_01(self.running_time.get() / TIME_TO_REACH_RUNNING_EXHAUST);
 
             return SideEffectDeltasC {
                 body_temp_bonus: crate::utils::lerp(0., MAX_BODY_TEMP_IMPACT, p),
                 heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
                 top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                 bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
+                stamina_bonus: -crate::utils::lerp(0., 100., p),
 
                 ..Default::default()
             }

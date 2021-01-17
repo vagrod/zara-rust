@@ -8,6 +8,9 @@ use super::ConsumableC;
 pub enum Event {
     WokeUp,
     ItemConsumed { item: ConsumableC },
+    StaminaDrained,
+    Tired,
+    Exhausted
 }
 
 pub trait Listener {
