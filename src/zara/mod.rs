@@ -304,6 +304,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                 is_swimming: self.player_state.is_swimming.get(),
                 is_underwater: self.player_state.is_underwater.get(),
                 is_sleeping: self.body.is_sleeping.get(),
+                last_slept_duration: self.body.last_sleep_duration.get(),
                 last_slept
             },
             environment: EnvironmentC {

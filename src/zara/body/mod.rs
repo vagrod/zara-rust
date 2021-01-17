@@ -7,6 +7,8 @@ use std::time::Duration;
 pub struct Body {
     /// Game time when player slept last time
     pub last_sleep_time: RefCell<Option<GameTimeC>>,
+    /// For how long player slept last time (game hours)
+    pub last_sleep_duration: Cell<f64>,
     /// Is player sleeping now
     pub is_sleeping: Cell<bool>,
 
@@ -30,7 +32,8 @@ impl Body {
         Body {
             last_sleep_time: RefCell::new(Option::None),
             is_sleeping: Cell::new(false),
-            sleeping_counter: Cell::new(0.)
+            sleeping_counter: Cell::new(0.),
+            last_sleep_duration: Cell::new(0.)
         }
     }
 
@@ -70,6 +73,7 @@ impl Body {
     pub fn start_sleeping(&self, game_hours: f64) -> bool {
         self.is_sleeping.set(true);
         self.sleeping_counter.set(game_hours * 60. * 60.);
+        self.last_sleep_duration.set(game_hours);
 
         return true;
     }
