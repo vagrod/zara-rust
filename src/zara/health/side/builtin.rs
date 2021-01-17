@@ -8,7 +8,9 @@ mod side_fatigue;
 /// heart rate, blood pressure, affects stamina, fatigue and water level
 pub struct RunningSideEffects {
     running_state: Cell<bool>,
-    running_time: Cell<f32> // game seconds
+    sleeping_state: Cell<bool>,
+    running_time: Cell<f32>, // game seconds
+    gained_fatigue: Cell<f32>
 }
 
 /// This side effect will make player's vitals slightly change back and forth over time
