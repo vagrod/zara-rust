@@ -33,17 +33,27 @@ impl Health {
 
         let mut snapshot = HealthC::healthy();
 
-        // Only stamina is relative
+        // Stamina, blood, food and water are relative
         snapshot.stamina_level = self.stamina_level.get();
+        snapshot.food_level = self.food_level.get();
+        snapshot.water_level = self.water_level.get();
+        snapshot.blood_level = self.blood_level.get();
 
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
         // TODO: collect and apply disease effects
 
-        // Will always regain stamina. Side effects must "fight" with if
-        let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
-        snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
+        // Will always regain stamina. Side effects must "fight" it
+        {
+            let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
+        }
+        // Will always regain blood. Side effects must "fight" it
+        {
+            let value = snapshot.blood_level + self.blood_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.blood_level = crate::utils::clamp(value, 0., 100.);
+        }
 
         // Apply the resulted health snapshot
         self.apply_health_snapshot(&snapshot);
@@ -65,6 +75,7 @@ impl Health {
         snapshot.top_pressure += deltas.top_pressure_bonus;
         snapshot.bottom_pressure += deltas.bottom_pressure_bonus;
         snapshot.water_level += deltas.water_level_bonus;
+        snapshot.food_level += deltas.food_level_bonus;
         snapshot.stamina_level += deltas.stamina_bonus;
         snapshot.fatigue_level += deltas.fatigue_bonus;
     }

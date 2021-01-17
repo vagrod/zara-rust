@@ -37,7 +37,9 @@ pub struct SideEffectDeltasC {
     pub top_pressure_bonus: f32,
     /// Delta that will be added to the healthy value (absolute delta)
     pub bottom_pressure_bonus: f32,
-    /// Delta that will be added to the healthy value (absolute delta)
+    /// Delta relative to the current food value (relative delta)
+    pub food_level_bonus: f32,
+    /// Delta relative to the current water value (relative delta)
     pub water_level_bonus: f32,
     /// Delta relative to the current stamina value (relative delta)
     pub stamina_bonus: f32,

@@ -22,6 +22,7 @@ impl SideEffectsMonitor for RunningSideEffects {
         const MAX_TOP_PRESSURE_IMPACT: f32 = 24.;
         const MAX_BOTTOM_PRESSURE_IMPACT: f32 = 16.;
         const STAMINA_DRAIN: f32 = 0.22; // percents per game second
+        const WATER_DRAIN: f32 = 0.009; // percents per game second
 
         if frame_data.player.is_running {
             if self.running_state.get() == false {
@@ -42,6 +43,7 @@ impl SideEffectsMonitor for RunningSideEffects {
                 top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                 bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
                 stamina_bonus: -STAMINA_DRAIN * frame_data.game_time_delta,
+                water_level_bonus: -WATER_DRAIN * frame_data.game_time_delta,
 
                 ..Default::default()
             }
