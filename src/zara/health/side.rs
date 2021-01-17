@@ -1,7 +1,5 @@
 use crate::utils::FrameSummaryC;
 
-use std::cell::Cell;
-
 pub mod builtin;
 
 /// Trait that must be implemented by all side effects monitors

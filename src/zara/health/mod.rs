@@ -1,4 +1,4 @@
-use crate::utils::{FrameC, ConsumableC, GameTimeC};
+use crate::utils::{FrameC, ConsumableC, GameTimeC, HealthC};
 use crate::utils::event::{Listener};
 use crate::health::disease::{Disease, DiseaseMonitor, ActiveDisease};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
@@ -53,21 +53,23 @@ impl Health {
     /// let h = health::Health::new();
     /// ```
     pub fn new() -> Self {
+        let healthy = HealthC::healthy();
+
         Health {
             monitors: Rc::new(RefCell::new(Vec::new())),
             side_effects: Rc::new(RefCell::new(Vec::new())),
             diseases: Rc::new(RefCell::new(HashMap::new())),
 
             // Healthy values by default
-            blood_level: Cell::new(100.),
-            body_temperature: Cell::new(36.6),
-            top_pressure: Cell::new(120.),
-            bottom_pressure: Cell::new(70.),
-            food_level: Cell::new(100.),
-            water_level: Cell::new(100.),
-            heart_rate: Cell::new(64.),
-            stamina_level: Cell::new(100.),
-            fatigue_level: Cell::new(0.)
+            blood_level: Cell::new(healthy.blood_level),
+            body_temperature: Cell::new(healthy.body_temperature),
+            top_pressure: Cell::new(healthy.top_pressure),
+            bottom_pressure: Cell::new(healthy.bottom_pressure),
+            food_level: Cell::new(healthy.food_level),
+            water_level: Cell::new(healthy.water_level),
+            heart_rate: Cell::new(healthy.heart_rate),
+            stamina_level: Cell::new(healthy.stamina_level),
+            fatigue_level: Cell::new(healthy.fatigue_level)
         }
     }
 
@@ -96,12 +98,35 @@ impl Health {
             side_effects_summary.fatigue_bonus += res.fatigue_bonus;
         }
 
+        let mut snapshot = HealthC::healthy();
+
         // Apply monitors deltas
-        self.apply_deltas(&side_effects_summary);
+        self.apply_deltas(&mut snapshot, &side_effects_summary);
+
+        // TODO: collect and apply disease effects
+
+        // Apply the resulted health snapshot
+        self.apply_health_snapshot(&snapshot);
     }
 
-    fn apply_deltas(&self, _deltas: &SideEffectDeltasC){
+    fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC){
+        snapshot.body_temperature += deltas.body_temp_bonus;
+        snapshot.heart_rate += deltas.heart_rate_bonus;
+        snapshot.top_pressure += deltas.top_pressure_bonus;
+        snapshot.bottom_pressure += deltas.bottom_pressure_bonus;
+        snapshot.water_level += deltas.water_level_bonus;
+        snapshot.stamina_level += deltas.stamina_bonus;
+        snapshot.fatigue_level += deltas.fatigue_bonus;
+    }
 
+    fn apply_health_snapshot(&self, snapshot: &HealthC) {
+        self.body_temperature.set(snapshot.body_temperature);
+        self.heart_rate.set(snapshot.heart_rate);
+        self.top_pressure.set(snapshot.top_pressure);
+        self.bottom_pressure.set(snapshot.bottom_pressure);
+        self.water_level.set(snapshot.water_level);
+        self.stamina_level.set(snapshot.stamina_level);
+        self.fatigue_level.set(snapshot.fatigue_level);
     }
 
     /// Registers new disease monitor instance

@@ -298,6 +298,22 @@ pub struct HealthC {
     /// List of active (or scheduled) diseases
     pub diseases: Vec<ActiveDiseaseC>
 }
+impl HealthC {
+    pub fn healthy() -> Self {
+        HealthC {
+            blood_level: 100.,
+            body_temperature: 36.6,
+            top_pressure: 120.,
+            bottom_pressure: 70.,
+            food_level: 100.,
+            water_level: 100.,
+            heart_rate: 64.,
+            stamina_level: 100.,
+            fatigue_level: 0.,
+            diseases: Vec::new()
+        }
+    }
+}
 
 /// Structure for storing active disease snapshot
 pub struct ActiveDiseaseC {

@@ -13,6 +13,9 @@ impl DynamicVitalsSideEffect {
 }
 impl SideEffectsMonitor for DynamicVitalsSideEffect {
     fn check(&self, _frame_data: &FrameSummaryC) -> SideEffectDeltasC {
-        SideEffectDeltasC {..Default::default()}
+        SideEffectDeltasC {
+            body_temp_bonus: 0.,
+            ..Default::default()
+        }
     }
 }

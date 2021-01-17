@@ -7,7 +7,7 @@ use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease};
-use zara::health::side::builtin::{RunningSideEffects};
+use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect};
 use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 
 // This will spawn a new thread for the "game loop"
@@ -52,6 +52,9 @@ fn main() {
         // Testing side effects monitors
         let running_effects = RunningSideEffects::new();
         person.health.register_side_effect_monitor(Box::new(running_effects));
+
+        let vitals_effects = DynamicVitalsSideEffect::new();
+        person.health.register_side_effect_monitor(Box::new(vitals_effects));
 
         let mut is_consumed= false;
 
