@@ -335,7 +335,7 @@ impl EnvironmentC {
         }
     }
 
-    /// Creates empty (default) environment description object.
+    /// Creates default environment description object.
     ///
     /// To create environment description with default values,
     /// use [`new`] method.
@@ -349,9 +349,9 @@ impl EnvironmentC {
     /// ```
     /// use zara::utils;
     ///
-    /// let env = utils::EnvironmentC::empty();
+    /// let env = utils::EnvironmentC::default();
     /// ```
-    pub fn empty() -> EnvironmentC{
+    pub fn default() -> EnvironmentC {
         EnvironmentC::new(0.)
     }
 }

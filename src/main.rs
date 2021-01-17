@@ -131,7 +131,7 @@ impl ConsumableBehavior for MyFood {
     fn spoiling(&self) -> Option<&dyn SpoilingBehavior> { None }
 }
 
-struct ZaraEventsListener ;
+struct ZaraEventsListener;
 impl Listener for ZaraEventsListener {
     fn notify(&mut self, event: &Event) {
         match event {
@@ -140,7 +140,8 @@ impl Listener for ZaraEventsListener {
             },
             Event::WokeUp => {
                 println!("Woke up!");
-            }
+            },
+            _ => println!("Other event")
         }
     }
 }

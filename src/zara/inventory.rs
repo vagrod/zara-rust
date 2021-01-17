@@ -19,7 +19,7 @@ pub struct Inventory {
     pub items: Rc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
 
     /// Weight of all inventory items (in grams)
-    pub weight: Cell<f32>
+    weight: Cell<f32>
 }
 
 impl Inventory {
@@ -102,6 +102,11 @@ impl Inventory {
 
             self.recalculate_weight();
         }
+    }
+
+    /// Returns total cached inventory weight (in grams)
+    pub fn get_weight(&self) -> f32 {
+        self.weight.get()
     }
 
     /// Recalculates the inventory weight

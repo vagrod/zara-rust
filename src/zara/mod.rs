@@ -88,7 +88,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// let zara = zara::ZaraController::new(listener);
     /// ```
     pub fn new(listener : E) -> Self {
-        ZaraController::init(listener, EnvironmentC::empty())
+        ZaraController::init(listener, EnvironmentC::default())
     }
 
     /// Creates a new `ZaraController` with pre-defined environment.
