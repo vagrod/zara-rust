@@ -29,11 +29,18 @@ pub trait SideEffectsMonitor {
 /// ```
 #[derive(Default)]
 pub struct SideEffectDeltasC {
+    /// Delta that will be added to the healthy value (absolute delta)
     pub body_temp_bonus: f32,
+    /// Delta that will be added to the healthy value (absolute delta)
     pub heart_rate_bonus: f32,
+    /// Delta that will be added to the healthy value (absolute delta)
     pub top_pressure_bonus: f32,
+    /// Delta that will be added to the healthy value (absolute delta)
     pub bottom_pressure_bonus: f32,
+    /// Delta that will be added to the healthy value (absolute delta)
     pub water_level_bonus: f32,
+    /// Delta relative to the current stamina value (relative delta)
     pub stamina_bonus: f32,
+    /// Delta that will be added to the healthy value (absolute delta)
     pub fatigue_bonus: f32
 }

@@ -7,7 +7,7 @@ use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease};
-use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect};
+use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 
 // This will spawn a new thread for the "game loop"
@@ -56,7 +56,11 @@ fn main() {
         let vitals_effects = DynamicVitalsSideEffect::new();
         person.health.register_side_effect_monitor(Box::new(vitals_effects));
 
+        let fatigue_effects = FatigueSideEffects::new();
+        person.health.register_side_effect_monitor(Box::new(fatigue_effects));
+
         let mut is_consumed= false;
+        let mut already_stopped_running = false;
 
         println!("Game Loop started!");
 
@@ -77,7 +81,7 @@ fn main() {
             }
 
             // Just for test to fire this only once at non-zero game time
-            if !is_consumed && person.environment.game_time.second.get() >= 40. && person.environment.game_time.second.get() >= 41. {
+            if !is_consumed && person.environment.game_time.second.get() >= 58. && person.environment.game_time.second.get() >= 59. {
                 // Testing items consuming
                 person.consume(&String::from("Meat"));
 
@@ -85,12 +89,18 @@ fn main() {
                 //person.body.start_sleeping(6.);
 
                 // Testing player status update
-                //person.player_state.is_running.set(true);
+                person.player_state.is_running.set(false);
+                already_stopped_running = true;
 
                 // Total weight must change after consuming
                 println!("Total weight {}", person.inventory.get_weight());
 
                 is_consumed = true;
+            } else {
+                // Testing player status update
+                if !already_stopped_running {
+                    person.player_state.is_running.set(true);
+                }
             }
 
             // Update Zara state
@@ -153,6 +163,8 @@ struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
     fn check(&self, _health: &Health, frame_data: &FrameSummaryC) {
         println!("body t {}", frame_data.health.body_temperature);
+        println!("fatigue {}", frame_data.health.fatigue_level);
+        println!("stamina {}", frame_data.health.stamina_level);
     }
 
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC) {

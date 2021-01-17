@@ -282,12 +282,12 @@ impl<E: Listener + 'static> ZaraController<E> {
         };
 
         // Determine last sleep time
-        let mut last_slept = Option::None;
+        let mut last_slept: GameTimeC = GameTimeC::empty();
         {
             let borrowed_time= self.body.last_sleep_time.borrow();
 
             if borrowed_time.is_some() {
-                last_slept = Option::Some(borrowed_time.as_ref().unwrap().copy());
+                last_slept = borrowed_time.as_ref().unwrap().copy();
             }
         }
 

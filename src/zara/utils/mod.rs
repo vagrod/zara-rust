@@ -402,7 +402,7 @@ pub struct PlayerStatusC {
     pub is_swimming: bool,
     pub is_underwater: bool,
     pub is_sleeping: bool,
-    pub last_slept: Option<GameTimeC>
+    pub last_slept: GameTimeC
 }
 
 /// Classic linear lerp

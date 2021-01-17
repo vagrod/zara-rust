@@ -2,6 +2,7 @@ use std::cell::Cell;
 
 mod side_running;
 mod side_fluctuate;
+mod side_fatigue;
 
 /// Side effects monitor that checks if player is running and increases his
 /// heart rate, blood pressure, affects stamina, fatigue and water level
@@ -21,4 +22,9 @@ pub struct DynamicVitalsSideEffect {
     heart_rate_ceiling: Cell<f32>,
     top_pressure_ceiling: Cell<f32>,
     bottom_pressure_ceiling: Cell<f32>
+}
+
+/// Side effects monitor that will increase fatigue level according to when player slept last time
+pub struct FatigueSideEffects {
+
 }

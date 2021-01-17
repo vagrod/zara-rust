@@ -32,18 +32,18 @@ impl Health {
         }
 
         let mut snapshot = HealthC::healthy();
-        let old_stamina = self.stamina_level.get();
+
+        // Only stamina is relative
+        snapshot.stamina_level = self.stamina_level.get();
 
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
         // TODO: collect and apply disease effects
 
-        // If no one touches stamina, we'll start regaining it
-        if snapshot.stamina_level <= 0. {
-            let value = old_stamina + self.stamina_regain_rate.get() * frame.data.game_time_delta;
-            snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
-        }
+        // Will always regain stamina. Side effects must "fight" with if
+        let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
+        snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
 
         // Apply the resulted health snapshot
         self.apply_health_snapshot(&snapshot);
