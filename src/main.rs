@@ -17,13 +17,17 @@ fn main() {
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
 
+        // Instantiate our events listener
         let events_listener = ZaraEventsListener;
+
+        // Describe environment conditions
         let environment = zara::utils::EnvironmentC::new(5.4);
 
+        // Initialize Zara instance
         let person =
             zara::ZaraController::with_environment (
-                events_listener, environment
-            );
+            events_listener, environment
+        );
 
         // Testing environment change
         person.environment.wind_speed.set(22.);
@@ -64,7 +68,7 @@ fn main() {
             // Game time is 10x the real one
             if person.body.is_sleeping.get() {
                 // Progress time faster during the sleep
-                person.environment.game_time.add_seconds(frame_time * 1800.); // one game hour per real second
+                person.environment.game_time.add_seconds(frame_time * 1800.); // 30 game minutes per real second
             } else {
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
@@ -130,12 +134,13 @@ impl ConsumableBehavior for MyFood {
 struct ZaraEventsListener ;
 impl Listener for ZaraEventsListener {
     fn notify(&mut self, event: &Event) {
-        println!("Notify called with {:?}", event);
-        if let Event::Dehydration = event {
-            println!("Dehydration");
-        }
-        if let Event::WokeUp = event {
-            println!("Woke up!");
+        match event {
+            Event::ItemConsumed {item} => {
+                println!("Item {} consumed", item.name);
+            },
+            Event::WokeUp => {
+                println!("Woke up!");
+            }
         }
     }
 }

@@ -167,7 +167,7 @@ impl Health {
     /// Removes active disease if exists. Returns `false` if not.
     ///
     /// # Parameters
-    /// - `disease_name`: name of the disease
+    /// - `disease_name`: unique name of the disease
     ///
     /// # Returns
     /// `bool`: `true` on success

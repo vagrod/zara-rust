@@ -3,11 +3,11 @@
 
 use std::sync::{Arc, Weak};
 use std::cell::RefCell;
+use super::ConsumableC;
 
-#[derive(Debug)]
 pub enum Event {
     WokeUp,
-    Dehydration
+    ItemConsumed { item: ConsumableC },
 }
 
 pub trait Listener {

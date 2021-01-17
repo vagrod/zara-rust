@@ -1,5 +1,5 @@
 use super::utils::{FrameC, GameTimeC};
-use super::utils::event::{Event, Listener};
+use super::utils::event::{Listener};
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
@@ -62,6 +62,7 @@ impl Inventory {
     ///
     /// # Returns
     /// `true` on success.
+    ///
     /// `false` if a given kind was not found.
     ///
     /// # Notes
@@ -84,19 +85,15 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
-        frame.events.dispatch(Event::Dehydration {
+    pub fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>) {
 
-        });
-
-        println!("From inventory update: game secs passed - {}", frame.data.game_time_delta);
     }
 
     /// Shorthand function to change count of a given kind
     ///
     /// # Notes
     /// This method borrows the `items` collection
-    pub fn change_item_count(&self, name: &String, new_value: usize){
+    pub fn change_item_count(&self, name: &String, new_value: usize) {
         let b = self.items.borrow();
         let res = b.get(name);
 
@@ -111,7 +108,7 @@ impl Inventory {
     ///
     /// # Notes
     /// This method borrows the `items` collection
-    fn recalculate_weight(&self){
+    fn recalculate_weight(&self) {
         let mut total_weight: f32;
 
         total_weight = 0.;

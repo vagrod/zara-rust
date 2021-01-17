@@ -50,7 +50,7 @@ impl EnvironmentData {
     ///
     /// let env = env::EnvironmentData::from_description(env_desc);
     /// ```
-    pub fn from_description(ed: EnvironmentC) -> EnvironmentData{
+    pub fn from_description(ed: EnvironmentC) -> EnvironmentData {
         let e = EnvironmentData::new();
 
         e.wind_speed.set(ed.wind_speed);

@@ -22,7 +22,7 @@ pub trait DiseaseMonitor {
 
 /// Trait that must be implemented by all diseases
 pub trait Disease {
-    /// Gets the name of the disease
+    /// Gets the unique name of this disease kind
     fn get_name(&self) -> String;
 }
 

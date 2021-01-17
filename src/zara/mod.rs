@@ -2,7 +2,7 @@ use utils::{GameTime, GameTimeC,
             EnvironmentC, FrameC,
             ConsumableC, PlayerStatusC,
             HealthC, ActiveDiseaseC, FrameSummaryC};
-use utils::event::{Listener, Dispatcher, Dispatchable};
+use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 
 use std::sync::Arc;
@@ -152,10 +152,10 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// zara_controller.update(time_delta);
     /// ```
-    pub fn update(&self, frame_time: f32)
-    {
+    pub fn update(&self, frame_time: f32) {
         let elapsed = self.update_counter.get() + frame_time;
         let mut ceiling = UPDATE_INTERVAL;
+        let game_time_duration = self.environment.game_time.duration.get();
 
         // When sleeping, our checks are more frequent
         if self.body.is_sleeping.get() {
@@ -165,8 +165,8 @@ impl<E: Listener + 'static> ZaraController<E> {
             // otherwise wake up game time will be way off
             self.body.sleep_check(
                 &mut self.dispatcher.borrow_mut(),
-                &self.environment.game_time.duration.get(),
-                (self.environment.game_time.duration.get() - self.last_frame_game_time.get()).as_secs_f32()
+                &game_time_duration,
+                (game_time_duration - self.last_frame_game_time.get()).as_secs_f32()
             );
         }
 
@@ -186,14 +186,14 @@ impl<E: Listener + 'static> ZaraController<E> {
             self.body.update(&mut frame_data);
 
             // Reset the counter and set last update game time
-            self.last_update_game_time.set(self.environment.game_time.duration.get());
+            self.last_update_game_time.set(game_time_duration);
             self.update_counter.set(0.);
         } else {
             self.update_counter.set(elapsed);
         }
 
         // Set last frame game time
-        self.last_frame_game_time.set(Duration::from(self.environment.game_time.duration.get()));
+        self.last_frame_game_time.set(Duration::from(game_time_duration));
     }
 
     /// Consumes the item. Item which name is passed must have the
@@ -257,6 +257,9 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Change items count
         self.inventory.change_item_count(item_name, new_count);
 
+        // Send the event
+        self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed { item: consumable });
+
         return true;
     }
 
@@ -265,9 +268,10 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Notes
     /// This method borrows the `diseases` collection, `body.last_sleep_time` field
     fn get_summary(&self) -> utils::FrameSummaryC {
-        let time_delta = self.environment.game_time.duration.get() - self.last_update_game_time.get();
+        let game_time_duration = self.environment.game_time.duration.get();
+        let time_delta = game_time_duration - self.last_update_game_time.get();
         let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
-        let current_secs = self.environment.game_time.duration.get().as_secs_f64();
+        let current_secs = game_time_duration.as_secs_f64();
 
         // Collect active diseases data
         for (_key, active) in self.health.diseases.borrow().iter() {
