@@ -410,6 +410,19 @@ pub fn lerp(first: f32, second: f32, by: f32) -> f32 {
     first * (1. - by) + second * by
 }
 
+/// Clamp both ways
+pub fn clamp(value: f32, floor: f32, ceiling: f32) -> f32 {
+    if value > ceiling {
+        return ceiling;
+    }
+
+    if value < floor {
+        return floor;
+    }
+
+    return value;
+}
+
 /// Clamps ceiling
 pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
     if value > ceiling {

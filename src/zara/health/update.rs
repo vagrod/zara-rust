@@ -32,11 +32,18 @@ impl Health {
         }
 
         let mut snapshot = HealthC::healthy();
+        let old_stamina = self.stamina_level.get();
 
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
         // TODO: collect and apply disease effects
+
+        // If no one touches stamina, we'll start regaining it
+        if snapshot.stamina_level <= 0. {
+            let value = old_stamina + self.stamina_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
+        }
 
         // Apply the resulted health snapshot
         self.apply_health_snapshot(&snapshot);
@@ -67,8 +74,8 @@ impl Health {
         self.heart_rate.set(snapshot.heart_rate);
         self.top_pressure.set(snapshot.top_pressure);
         self.bottom_pressure.set(snapshot.bottom_pressure);
-        self.water_level.set(snapshot.water_level);
-        self.stamina_level.set(snapshot.stamina_level);
-        self.fatigue_level.set(snapshot.fatigue_level);
+        self.water_level.set(crate::utils::clamp(snapshot.water_level, 0., 100.));
+        self.stamina_level.set(crate::utils::clamp(snapshot.stamina_level, 0., 100.));
+        self.fatigue_level.set(crate::utils::clamp(snapshot.fatigue_level, 0., 100.));
     }
 }

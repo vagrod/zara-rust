@@ -34,6 +34,8 @@ pub struct Health {
     pub stamina_level: Cell<f32>,
     /// Fatigue level (0..100)
     pub fatigue_level: Cell<f32>,
+    /// How fast stamina recovers (percents per game second)
+    pub stamina_regain_rate: Cell<f32>,
     /// All active or scheduled diseases
     pub diseases: Rc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
 
@@ -62,6 +64,7 @@ impl Health {
             monitors: Rc::new(RefCell::new(Vec::new())),
             side_effects: Rc::new(RefCell::new(Vec::new())),
             diseases: Rc::new(RefCell::new(HashMap::new())),
+            stamina_regain_rate: Cell::new(0.1),
 
             // Healthy values by default
             blood_level: Cell::new(healthy.blood_level),

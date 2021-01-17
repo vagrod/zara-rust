@@ -10,7 +10,7 @@ impl RunningSideEffects {
     pub fn new() -> Self {
         RunningSideEffects {
             running_state: Cell::new(false),
-            running_time: Cell::new(0.),
+            running_time: Cell::new(0.)
         }
     }
 }
