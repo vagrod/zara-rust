@@ -1,7 +1,7 @@
-use super::utils::{FrameC, ConsumableC, GameTimeC};
-use super::utils::event::{Listener};
-use super::health::disease::{Disease, DiseaseMonitor, ActiveDisease};
-use super::health::side::{SideEffectsMonitor, SideEffectDeltasC};
+use crate::utils::{FrameC, ConsumableC, GameTimeC};
+use crate::utils::event::{Listener};
+use crate::health::disease::{Disease, DiseaseMonitor, ActiveDisease};
+use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 
 use std::collections::HashMap;
 use std::cell::{RefCell, Cell};

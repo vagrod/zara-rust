@@ -7,7 +7,7 @@ use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease};
-use zara::health::side::{RunningSideEffects};
+use zara::health::side::builtin::{RunningSideEffects};
 use zara::inventory::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 
 // This will spawn a new thread for the "game loop"

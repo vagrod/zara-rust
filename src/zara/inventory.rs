@@ -1,5 +1,5 @@
-use super::utils::{FrameC, GameTimeC};
-use super::utils::event::{Listener};
+use crate::utils::{FrameC, GameTimeC};
+use crate::utils::event::{Listener};
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
@@ -41,10 +41,13 @@ impl Inventory {
         }
     }
 
-    /// Returns `true` is item of this kind exists in the inventory
+    /// Returns `true` if item of this kind exists in the inventory
     ///
     ///# Parameters
     ///- `item_name`: unique name of the item (item kind)
+    ///
+    /// # Notes
+    /// This method borrows the `items` collection
     pub fn has_item(&self, item_name: &String) -> bool {
         let b = self.items.borrow();
 

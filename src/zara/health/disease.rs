@@ -1,5 +1,5 @@
-use super::super::health::{Health};
-use super::super::utils::{FrameSummaryC, ConsumableC, GameTimeC};
+use crate::health::{Health};
+use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 
 use std::rc::Rc;
 

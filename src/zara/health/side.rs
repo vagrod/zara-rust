@@ -1,6 +1,8 @@
-use super::super::utils::FrameSummaryC;
+use crate::utils::FrameSummaryC;
 
 use std::cell::Cell;
+
+pub mod builtin;
 
 /// Trait that must be implemented by all side effects monitors
 pub trait SideEffectsMonitor {
@@ -36,56 +38,4 @@ pub struct SideEffectDeltasC {
     pub water_level_bonus: f32,
     pub stamina_bonus: f32,
     pub fatigue_bonus: f32
-}
-
-/// Side effects monitor that checks if player is running and increases his
-/// heart rate, blood pressure, affects stamina, fatigue and water level
-pub struct RunningSideEffects {
-    running_state: Cell<bool>,
-    running_time: Cell<f32> // game seconds
-}
-
-impl RunningSideEffects {
-    pub fn new() -> Self {
-        RunningSideEffects {
-            running_state: Cell::new(false),
-            running_time: Cell::new(0.),
-        }
-    }
-}
-impl SideEffectsMonitor for RunningSideEffects {
-    fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
-        const TIME_TO_REACH_RUNNING_EXHAUST: f32 = 60. * 5.; // game seconds
-        const MAX_HEART_RATE_IMPACT: f32 = 45.;
-        const MAX_TOP_PRESSURE_IMPACT: f32 = 24.;
-        const MAX_BOTTOM_PRESSURE_IMPACT: f32 = 16.;
-
-        if frame_data.player.is_running {
-            if self.running_state.get() == false {
-                self.running_state.set(true);
-                self.running_time.set(0.);
-            }
-
-            self.running_time.set(crate::utils::clamp_to(
-                self.running_time.get() + frame_data.game_time_delta,
-                TIME_TO_REACH_RUNNING_EXHAUST));
-
-            let p = self.running_time.get() / TIME_TO_REACH_RUNNING_EXHAUST;
-
-            return SideEffectDeltasC {
-                body_temp_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
-                top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
-                bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
-
-                ..Default::default()
-            }
-        } else {
-            if self.running_state.get() == true {
-                self.running_state.set(false);
-                self.running_time.set(0.);
-            }
-        }
-
-        Default::default() // No effects otherwise
-    }
 }

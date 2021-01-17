@@ -1,5 +1,5 @@
-use super::utils::{FrameC, GameTimeC};
-use super::utils::event::{Dispatcher, Listener, Event};
+use crate::utils::{FrameC, GameTimeC};
+use crate::utils::event::{Dispatcher, Listener, Event};
 
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
