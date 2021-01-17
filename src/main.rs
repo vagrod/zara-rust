@@ -82,10 +82,10 @@ fn main() {
                 person.consume(&String::from("Meat"));
 
                 // Sleeping test
-                person.body.start_sleeping(6.);
+                //person.body.start_sleeping(6.);
 
                 // Testing player status update
-                person.player_state.is_running.set(true);
+                //person.player_state.is_running.set(true);
 
                 // Total weight must change after consuming
                 println!("Total weight {}", person.inventory.get_weight());
@@ -152,7 +152,7 @@ impl Listener for ZaraEventsListener {
 struct FluMonitor;
 impl DiseaseMonitor for FluMonitor {
     fn check(&self, _health: &Health, frame_data: &FrameSummaryC) {
-        println!("Flu monitor check: {}", frame_data.game_time_delta);
+        println!("body t {}", frame_data.health.body_temperature);
     }
 
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC) {

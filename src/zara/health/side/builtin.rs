@@ -13,5 +13,12 @@ pub struct RunningSideEffects {
 /// This side effect will make player's vitals slightly change back and forth over time
 /// to make it look more interesting and alive
 pub struct DynamicVitalsSideEffect {
-
+    first_iteration: Cell<bool>,
+    counter: Cell<f32>,
+    half_duration: Cell<f32>,
+    direction: Cell<f32>,
+    body_temperature_ceiling: Cell<f32>,
+    heart_rate_ceiling: Cell<f32>,
+    top_pressure_ceiling: Cell<f32>,
+    bottom_pressure_ceiling: Cell<f32>
 }

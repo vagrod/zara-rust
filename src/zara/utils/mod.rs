@@ -438,3 +438,8 @@ pub fn roll_dice(probability: usize) -> bool {
 
     return r <= probability;
 }
+
+pub fn range(a: f32, b: f32) -> f32 {
+    let mut rng = rand::thread_rng();
+    return rng.gen_range(a..b);
+}

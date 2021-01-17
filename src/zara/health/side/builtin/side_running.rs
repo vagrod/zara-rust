@@ -18,6 +18,7 @@ impl SideEffectsMonitor for RunningSideEffects {
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
         const TIME_TO_REACH_RUNNING_EXHAUST: f32 = 60. * 5.; // game seconds
         const MAX_HEART_RATE_IMPACT: f32 = 45.;
+        const MAX_BODY_TEMP_IMPACT: f32 = 0.3;
         const MAX_TOP_PRESSURE_IMPACT: f32 = 24.;
         const MAX_BOTTOM_PRESSURE_IMPACT: f32 = 16.;
 
@@ -34,7 +35,8 @@ impl SideEffectsMonitor for RunningSideEffects {
             let p = self.running_time.get() / TIME_TO_REACH_RUNNING_EXHAUST;
 
             return SideEffectDeltasC {
-                body_temp_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
+                body_temp_bonus: crate::utils::lerp(0., MAX_BODY_TEMP_IMPACT, p),
+                heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
                 top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                 bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
 
