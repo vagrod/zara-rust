@@ -51,13 +51,18 @@ fn main() {
 
         // Testing side effects monitors
         let running_effects = RunningSideEffects::new();
-        person.health.register_side_effect_monitor(Box::new(running_effects));
+        let mut test_key = person.health.register_side_effect_monitor(Box::new(running_effects));
 
         let vitals_effects = DynamicVitalsSideEffect::new();
         person.health.register_side_effect_monitor(Box::new(vitals_effects));
 
         let fatigue_effects = FatigueSideEffects::new();
         person.health.register_side_effect_monitor(Box::new(fatigue_effects));
+
+        person.health.unregister_side_effect_monitor(test_key);
+
+        let running_effects2 = RunningSideEffects::new();
+        let _test_key2 = person.health.register_side_effect_monitor(Box::new(running_effects2));
 
         let mut is_consumed= false;
         let mut already_stopped_running = false;

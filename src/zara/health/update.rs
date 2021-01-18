@@ -12,14 +12,14 @@ impl Health {
     /// - `frame`: summary information for this frame
     pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
         // Update disease monitors
-        for monitor in self.monitors.borrow().iter() {
+        for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.check(self, &frame.data);
         }
 
         let mut side_effects_summary: SideEffectDeltasC = Default::default();
 
         // Collect side effects data
-        for side_effect in self.side_effects.borrow().iter() {
+        for (_, side_effect) in self.side_effects.borrow().iter() {
             let res = side_effect.check(&frame.data);
 
             side_effects_summary.body_temp_bonus += res.body_temp_bonus;

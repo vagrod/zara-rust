@@ -43,9 +43,9 @@ pub struct Health {
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
 
     /// Stores all registered disease monitors
-    monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>,
+    disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
     /// Stores all registered side effects monitors
-    side_effects: Rc<RefCell<Vec<Box<dyn SideEffectsMonitor>>>>
+    side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>
 }
 
 impl Health {
@@ -64,8 +64,8 @@ impl Health {
         let healthy = HealthC::healthy();
 
         Health {
-            monitors: Rc::new(RefCell::new(Vec::new())),
-            side_effects: Rc::new(RefCell::new(Vec::new())),
+            disease_monitors: Rc::new(RefCell::new(HashMap::new())),
+            side_effects: Rc::new(RefCell::new(HashMap::new())),
             diseases: Arc::new(RefCell::new(HashMap::new())),
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
@@ -88,17 +88,71 @@ impl Health {
     /// # Parameters
     /// - `monitor`: an instance of an object that implements
     /// [`DiseaseMonitor`](crate::health::disease::DiseaseMonitor) trait
-    pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>){
-        self.monitors.borrow_mut().insert(0, monitor);
+    ///
+    /// # Returns
+    /// `usize`: unique key of this registered instance
+    pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>) -> usize {
+        let mut b = self.disease_monitors.borrow_mut();
+        let key = b.keys().max().unwrap_or(&0) + 1;
+
+        b.insert(key, monitor);
+
+        return key;
+    }
+
+    /// Unregisters disease monitor
+    ///
+    /// # Parameters
+    /// - `key`: unique key given as a result of a [`register_disease_monitor`] method.
+    ///
+    /// [`register_disease_monitor`]:#method.register_disease_monitor
+    pub fn unregister_disease_monitor(&self, key: usize) -> bool {
+        let mut b = self.disease_monitors.borrow_mut();
+
+        if !b.contains_key(&key)
+        {
+            return false;
+        }
+
+        b.remove(&key);
+
+        return true;
     }
 
     /// Registers new side effects monitor instance
     ///
     /// # Parameters
     /// - `monitor`: an instance of an object that implements
+    ///
+    /// # Returns
+    /// `usize`: unique key of this registered instance
     /// [`SideEffectsMonitor`](crate::health::side::SideEffectsMonitor) trait
-    pub fn register_side_effect_monitor(&self, monitor: Box<dyn SideEffectsMonitor>){
-        self.side_effects.borrow_mut().insert(0, monitor);
+    pub fn register_side_effect_monitor(&self, monitor: Box<dyn SideEffectsMonitor>) -> usize {
+        let mut b = self.side_effects.borrow_mut();
+        let key = b.keys().max().unwrap_or(&0) + 1;
+
+        b.insert(key, monitor);
+
+        return key;
+    }
+
+    /// Unregisters side effects monitor
+    ///
+    /// # Parameters
+    /// - `key`: unique key given as a result of a [`register_side_effect_monitor`] method.
+    ///
+    /// [`register_side_effect_monitor`]:#method.register_side_effect_monitor
+    pub fn unregister_side_effect_monitor(&self, key: usize) -> bool {
+        let mut b = self.side_effects.borrow_mut();
+
+        if !b.contains_key(&key)
+        {
+            return false;
+        }
+
+        b.remove(&key);
+
+        return true;
     }
 
     /// Called by zara controller when item is consumed
@@ -107,7 +161,7 @@ impl Health {
         println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
 
         // Notify disease monitors
-        for monitor in self.monitors.borrow().iter() {
+        for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_consumed(self, game_time, item);
         }
     }
