@@ -2,7 +2,7 @@ use crate::inventory::items::InventoryItem;
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
-use std::rc::Rc;
+use std::sync::Arc;
 
 mod crud;
 mod update;
@@ -20,7 +20,7 @@ pub struct Inventory {
     ///
     /// [`add_item`]: #method.add_item
     /// [`remove_item`]: #method.remove_item
-    pub items: Rc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
+    pub items: Arc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
 
     /// Weight of all inventory items (in grams)
     weight: Cell<f32>
@@ -40,15 +40,12 @@ impl Inventory {
     /// ```
     pub fn new() -> Self {
         Inventory{
-            items: Rc::new(RefCell::new(HashMap::new())),
+            items: Arc::new(RefCell::new(HashMap::new())),
             weight: Cell::new(0.)
         }
     }
 
     /// Shorthand function to change count of a given kind
-    ///
-    /// # Notes
-    /// This method borrows the `items` collection
     pub fn change_item_count(&self, name: &String, new_value: usize) {
         let b = self.items.borrow();
         let res = b.get(name);
@@ -66,9 +63,6 @@ impl Inventory {
     }
 
     /// Recalculates the inventory weight
-    ///
-    /// # Notes
-    /// This method borrows the `items` collection
     fn recalculate_weight(&self) {
         let mut total_weight: f32;
 

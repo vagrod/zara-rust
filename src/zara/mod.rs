@@ -218,34 +218,30 @@ impl<E: Listener + 'static> ZaraController<E> {
     pub fn consume(&self, item_name: &String) -> bool {
         let items_count: usize;
         let mut consumable = ConsumableC::new();
+        let b = self.inventory.items.borrow();
 
-        {
-            // Cant borrow `items` for long
-            let b = self.inventory.items.borrow();
-
-            if !b.contains_key(item_name) {
-                return false;
-            }
-
-            let item = b.get(item_name).unwrap();
-
-            items_count = item.get_count();
-
-            if items_count - 1 <= 0 { // 1 so far
-                return false
-            }
-
-            if !item.consumable().is_some() {
-                return false;
-            }
-
-            let c = item.consumable().unwrap();
-
-            consumable.name = item.get_name();
-            consumable.is_water = c.is_water();
-            consumable.is_food = c.is_food();
-            consumable.consumed_count = 1; // so far
+        if !b.contains_key(item_name) {
+            return false;
         }
+
+        let item = b.get(item_name).unwrap();
+
+        items_count = item.get_count();
+
+        if items_count - 1 <= 0 { // 1 so far
+            return false
+        }
+
+        if !item.consumable().is_some() {
+            return false;
+        }
+
+        let c = item.consumable().unwrap();
+
+        consumable.name = item.get_name();
+        consumable.is_water = c.is_water();
+        consumable.is_food = c.is_food();
+        consumable.consumed_count = 1; // so far
 
         let new_count = items_count - 1;
         let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
