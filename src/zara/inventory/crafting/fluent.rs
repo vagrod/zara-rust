@@ -1,16 +1,16 @@
 use crate::inventory::crafting::{CraftingCombination, ItemInCombination, Builder};
 
 pub trait BuilderStepResultItem {
-    fn build_for(&self, key: &str) -> Box<&dyn BuilderStepFirstItem>;
+    fn build_for(&self, key: &str) -> &dyn BuilderStepFirstItem;
 }
 
 pub trait BuilderStepFirstItem {
-    fn is(&self, key: &str, count: usize) -> Box<&dyn BuilderStepItemNode>;
+    fn is(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode;
 }
 
 pub trait BuilderStepItemNode {
-    fn plus(&self, key: &str, count: usize) -> Box<&dyn BuilderStepItemNode>;
-    fn and(&self, key: &str, count: usize) -> Box<&dyn BuilderStepDone>;
+    fn plus(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode;
+    fn and(&self, key: &str, count: usize) -> &dyn BuilderStepDone;
 }
 
 pub trait BuilderStepDone {
@@ -24,43 +24,43 @@ impl Builder {
 }
 
 impl BuilderStepResultItem for Builder {
-    fn build_for(&self, key: &str) -> Box<&dyn BuilderStepFirstItem> {
+    fn build_for(&self, key: &str) -> &dyn BuilderStepFirstItem {
         self.result_item.replace(String::from(key));
 
-        Box::new(self.as_builder_step_first_item())
+        self.as_builder_step_first_item()
     }
 }
 
 impl BuilderStepFirstItem for Builder {
-    fn is(&self, key: &str, count: usize) -> Box<&dyn BuilderStepItemNode> {
+    fn is(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode {
         self.items.borrow_mut().push(ItemInCombination {
             count,
             item_name: String::from(key)
         });
 
-        Box::new(self.as_builder_step_item_node())
+        self.as_builder_step_item_node()
     }
 }
 
 impl BuilderStepItemNode for Builder {
-    fn plus(&self, key: &str, count: usize) -> Box<&dyn BuilderStepItemNode> {
+    fn plus(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode {
         self.items.borrow_mut().push(ItemInCombination {
             count,
             item_name: String::from(key)
         });
 
 
-        Box::new(self.as_builder_step_item_node())
+        self.as_builder_step_item_node()
     }
 
-    fn and(&self, key: &str, count: usize) -> Box<&dyn BuilderStepDone> {
+    fn and(&self, key: &str, count: usize) -> &dyn BuilderStepDone {
         self.items.borrow_mut().push(ItemInCombination {
             count,
             item_name: String::from(key)
         });
 
 
-        Box::new(self.as_builder_step_done())
+        self.as_builder_step_done()
     }
 }
 

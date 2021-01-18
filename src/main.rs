@@ -37,7 +37,7 @@ fn main() {
                 .plus("b item", 3)
                 .and("a item", 2)
             .build();
-
+        /
         let o2 = CraftingCombination::new(String::from("FishingRod"),
         vec![
             ItemInCombination::new("Stick", 1),
@@ -46,7 +46,7 @@ fn main() {
             ItemInCombination::new("Worm", 2),
         ]);
 
-        println!("{}", o.key);
+        println!("{}", o.unique_key);
         */
 
         // Testing environment change
