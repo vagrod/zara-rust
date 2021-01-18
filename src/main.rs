@@ -10,6 +10,7 @@ use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
+use zara::inventory::crafting::{CraftingCombination, ItemInCombination};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -30,6 +31,7 @@ fn main() {
             events_listener, environment
         );
 
+        /* Testing new combinations
         let o = crafting::Builder::start()
             .build_for("result item")
                 .is("k item", 1)
@@ -37,7 +39,16 @@ fn main() {
                 .and("a item", 2)
             .build();
 
-        println!("{}", o.key);
+        let o2 = CraftingCombination::new(String::from("FishingRod"),
+        vec![
+            ItemInCombination::new("Stick", 1),
+            ItemInCombination::new("Liana", 1),
+            ItemInCombination::new("Pin", 1),
+            ItemInCombination::new("Worm", 2),
+        ]);
+
+        println!("{}", o2.key);
+    */
 
         // Testing environment change
         person.environment.wind_speed.set(22.);

@@ -15,6 +15,19 @@ pub struct ItemInCombination {
 }
 
 impl ItemInCombination {
+    /// Creates new `ItemInCombination`.
+    ///
+    /// # Parameters
+    /// - `name`: unique name of the inventory item kind
+    /// - `count`: how many these items we'll need
+    pub fn new(name: &str, count: usize) -> Self {
+        ItemInCombination {
+            item_name: String::from(name),
+            count
+        }
+    }
+
+    /// Creates a copy of this instance
     pub fn copy(&self) -> ItemInCombination {
         ItemInCombination {
             item_name: String::from(&self.item_name),
