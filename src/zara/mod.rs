@@ -259,9 +259,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Gets all the info needed for all the controllers to process one frame
-    ///
-    /// # Notes
-    /// This method borrows the `diseases` collection, `body.last_sleep_time` field
     fn get_summary(&self) -> utils::FrameSummaryC {
         let game_time_duration = self.environment.game_time.duration.get();
         let time_delta = game_time_duration - self.last_update_game_time.get();
@@ -280,7 +277,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Determine last sleep time
         let mut last_slept: GameTimeC = GameTimeC::empty();
         {
-            let borrowed_time= self.body.last_sleep_time.borrow();
+            let borrowed_time = self.body.last_sleep_time.borrow();
 
             if borrowed_time.is_some() {
                 last_slept = borrowed_time.as_ref().unwrap().copy();

@@ -19,6 +19,9 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `item`: any boxed object that supports `InventoryItem` trait
+    ///
+    /// # Notes
+    /// Borrows the `items` collection
     pub fn add_item(&self, item: Box<dyn InventoryItem>) {
         let key = item.get_name();
 
@@ -35,6 +38,9 @@ impl Inventory {
     /// `true` on success.
     ///
     /// `false` if a given kind was not found.
+    ///
+    /// # Notes
+    /// Borrows the `items` collection
     pub fn remove_item(&self, item_kind: &String) -> bool {
         let mut b = self.items.borrow_mut();
 
