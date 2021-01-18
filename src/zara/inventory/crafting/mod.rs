@@ -39,7 +39,9 @@ impl ItemInCombination {
 /// Describes crafting recipe
 pub struct CraftingCombination {
     /// Unique key of this combination
-    pub key: String,
+    pub unique_key: String,
+    /// Key for matching resources
+    pub match_key: String,
     /// Result item kind
     pub result_item: String,
     /// Items involved
@@ -51,6 +53,7 @@ impl CraftingCombination {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
+        let match_key = &mut String::new();
         let mut b = [0; 2];
         let sep = '\u{0003}'.encode_utf8(&mut b);
 
@@ -63,10 +66,14 @@ impl CraftingCombination {
             key.push_str(&sep);
             key.push_str(&item.count.to_string());
             key.push_str(&sep);
+
+            match_key.push_str(&item.item_name);
+            key.push_str(&sep);
         }
 
         CraftingCombination {
-            key: key.to_string(),
+            unique_key: key.to_string(),
+            match_key: match_key.to_string(),
             result_item,
             items: Rc::new(RefCell::new(mapped))
         }
