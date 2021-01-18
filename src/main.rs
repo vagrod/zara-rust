@@ -9,7 +9,7 @@ use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
-use zara::inventory::crafting::{CraftingCombination, ItemInCombination};
+use zara::inventory::crafting;
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -29,6 +29,15 @@ fn main() {
             zara::ZaraController::with_environment (
             events_listener, environment
         );
+
+        let o = crafting::Builder::start()
+            .build_for("result item")
+                .is("k item", 1)
+                .plus("b item", 3)
+                .and("a item", 2)
+            .build();
+
+        println!("{}", o.key);
 
         // Testing environment change
         person.environment.wind_speed.set(22.);
@@ -52,7 +61,7 @@ fn main() {
 
         // Testing side effects monitors
         let running_effects = RunningSideEffects::new();
-        let mut test_key = person.health.register_side_effect_monitor(Box::new(running_effects));
+        person.health.register_side_effect_monitor(Box::new(running_effects));
 
         let vitals_effects = DynamicVitalsSideEffect::new();
         person.health.register_side_effect_monitor(Box::new(vitals_effects));
@@ -60,10 +69,8 @@ fn main() {
         let fatigue_effects = FatigueSideEffects::new();
         person.health.register_side_effect_monitor(Box::new(fatigue_effects));
 
-        person.health.unregister_side_effect_monitor(test_key);
-
-        let running_effects2 = RunningSideEffects::new();
-        let _test_key2 = person.health.register_side_effect_monitor(Box::new(running_effects2));
+        // Testing unregister
+        //person.health.unregister_side_effect_monitor(test_key);
 
         let mut is_consumed= false;
         let mut already_stopped_running = false;
