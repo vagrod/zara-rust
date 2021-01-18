@@ -5,6 +5,7 @@ use crate::health::side::{SideEffectsMonitor};
 use std::collections::HashMap;
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
+use std::sync::Arc;
 
 mod update;
 mod disease_methods;
@@ -39,7 +40,7 @@ pub struct Health {
     /// How fast blood recovers (percents per game second)
     pub blood_regain_rate: Cell<f32>,
     /// All active or scheduled diseases
-    pub diseases: Rc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
+    pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
 
     /// Stores all registered disease monitors
     monitors: Rc<RefCell<Vec<Box<dyn DiseaseMonitor>>>>,
@@ -65,7 +66,7 @@ impl Health {
         Health {
             monitors: Rc::new(RefCell::new(Vec::new())),
             side_effects: Rc::new(RefCell::new(Vec::new())),
-            diseases: Rc::new(RefCell::new(HashMap::new())),
+            diseases: Arc::new(RefCell::new(HashMap::new())),
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
 
