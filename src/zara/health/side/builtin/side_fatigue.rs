@@ -19,7 +19,7 @@ impl SideEffectsMonitor for FatigueSideEffects {
         let sleep_time: Duration = frame_data.player.last_slept.to_duration();
         let elapsed = frame_data.game_time.to_duration() - sleep_time;
         let p_added = crate::utils::clamp_01(elapsed.as_secs_f32() / MAX_HOURS_UNTIL_FULLY_EXHAUSTED_SECS);
-        let mut p_left = 1.; // if player did not sleep yet, no left fatigue
+        let mut p_left = 1.; // if player haven't slept yet, no left fatigue
 
         if frame_data.player.last_slept_duration > 0.001
         {

@@ -1,6 +1,6 @@
+use crate::health::side::builtin::DynamicVitalsSideEffect;
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC};
-use crate::health::side::builtin::DynamicVitalsSideEffect;
 
 use std::cell::Cell;
 

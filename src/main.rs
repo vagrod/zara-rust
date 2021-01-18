@@ -72,11 +72,11 @@ fn main() {
 
             frame_time = now.elapsed().as_secs_f32();
 
-            // Game time is 10x the real one
             if person.body.is_sleeping.get() {
                 // Progress time faster during the sleep
                 person.environment.game_time.add_seconds(frame_time * 1800.); // 30 game minutes per real second
             } else {
+                // Game time is 10x the real one
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
 
