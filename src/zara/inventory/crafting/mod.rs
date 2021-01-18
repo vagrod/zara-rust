@@ -46,6 +46,33 @@ pub struct CraftingCombination {
     pub items: Rc<RefCell<HashMap<String, ItemInCombination>>>
 }
 
+impl CraftingCombination {
+    pub fn new(result_item: String, items: Vec<ItemInCombination>) -> Self {
+        let mut mapped = HashMap::new();
+        let mut copy = Vec::from(items);
+        let key = &mut String::from(&result_item);
+        let mut b = [0; 2];
+        let sep = '\u{0003}'.encode_utf8(&mut b);
+
+        key.push_str(sep);
+        copy.sort_by(|a, b| a.item_name.cmp(&b.item_name));
+
+        for item in copy.iter() {
+            mapped.insert(String::from(&item.item_name), item.copy());
+            key.push_str(&item.item_name);
+            key.push_str(&sep);
+            key.push_str(&item.count.to_string());
+            key.push_str(&sep);
+        }
+
+        CraftingCombination {
+            key: key.to_string(),
+            result_item,
+            items: Rc::new(RefCell::new(mapped))
+        }
+    }
+}
+
 /// Used to build a crafting combination (crafting reciepe)
 ///
 /// # Example
@@ -72,30 +99,5 @@ impl Builder {
             result_item: RefCell::new(String::new()),
             items: Rc::new(RefCell::new(Vec::new()))
         })
-    }
-}
-
-impl CraftingCombination {
-    pub fn new(result_item: String, items: Vec<ItemInCombination>) -> Self {
-        let mut mapped = HashMap::new();
-        let mut copy = Vec::from(items);
-        let key = &mut String::from(&result_item);
-        let mut b = [0; 2];
-        let sep = '\u{0003}'.encode_utf8(&mut b);
-
-        key.push_str(sep);
-        copy.sort_by(|a, b| a.item_name.cmp(&b.item_name));
-
-        for item in copy.iter() {
-            mapped.insert(String::from(&item.item_name), item.copy());
-            key.push_str(&item.item_name);
-            key.push_str(&sep);
-        }
-
-        CraftingCombination {
-            key: key.to_string(),
-            result_item,
-            items: Rc::new(RefCell::new(mapped))
-        }
     }
 }

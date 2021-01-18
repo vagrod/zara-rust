@@ -10,7 +10,6 @@ use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
-use zara::inventory::crafting::{CraftingCombination, ItemInCombination};
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -47,8 +46,8 @@ fn main() {
             ItemInCombination::new("Worm", 2),
         ]);
 
-        println!("{}", o2.key);
-    */
+        println!("{}", o.key);
+        */
 
         // Testing environment change
         person.environment.wind_speed.set(22.);
