@@ -8,6 +8,7 @@ mod crud;
 mod update;
 
 pub mod items;
+pub mod crafting;
 
 /// Controls player's inventory
 pub struct Inventory {
