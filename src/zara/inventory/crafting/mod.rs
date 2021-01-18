@@ -1,9 +1,10 @@
+use crate::inventory::crafting::fluent::BuilderStepResultItem;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use crate::inventory::crafting::fluent::BuilderStepResultItem;
 
-pub mod fluent;
+mod fluent;
 
 /// Describes item in combination
 pub struct ItemInCombination {
