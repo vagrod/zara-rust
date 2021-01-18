@@ -33,10 +33,7 @@ impl BuilderStepResultItem for Builder {
 
 impl BuilderStepFirstItem for Builder {
     fn is(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode {
-        self.items.borrow_mut().push(ItemInCombination {
-            count,
-            item_name: String::from(key)
-        });
+        self.items.borrow_mut().push(ItemInCombination::new(key, count));
 
         self.as_builder_step_item_node()
     }
@@ -44,21 +41,13 @@ impl BuilderStepFirstItem for Builder {
 
 impl BuilderStepItemNode for Builder {
     fn plus(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode {
-        self.items.borrow_mut().push(ItemInCombination {
-            count,
-            item_name: String::from(key)
-        });
-
+        self.items.borrow_mut().push(ItemInCombination::new(key, count));
 
         self.as_builder_step_item_node()
     }
 
     fn and(&self, key: &str, count: usize) -> &dyn BuilderStepDone {
-        self.items.borrow_mut().push(ItemInCombination {
-            count,
-            item_name: String::from(key)
-        });
-
+        self.items.borrow_mut().push(ItemInCombination::new(key, count));
 
         self.as_builder_step_done()
     }
