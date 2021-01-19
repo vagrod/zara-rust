@@ -96,8 +96,8 @@ impl CraftingCombination {
 ///   .build();
 /// ```
 pub struct Builder {
-    pub result_item: RefCell<String>,
-    pub items: Rc<RefCell<Vec<ItemInCombination>>>
+    result_item: RefCell<String>,
+    items: Rc<RefCell<Vec<ItemInCombination>>>
 }
 
 impl Builder {
