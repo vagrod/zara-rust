@@ -14,7 +14,7 @@ use zara::inventory::crafting;
 // This will spawn a new thread for the "game loop"
 fn main() {
     let game_loop = thread::spawn(|| {
-        let two_millis= Duration::new(0, 2000000); // 2ms
+        let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
 
