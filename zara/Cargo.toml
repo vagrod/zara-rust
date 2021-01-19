@@ -1,0 +1,16 @@
+[package]
+name = "zara"
+version = "0.1.0"
+authors = ["Vadim Gromov <zara-survival@imw.su>"]
+description = "Zara survival engine"
+repository = "https://github.com/vagrod/zara-rust/"
+documentation = "https://github.com/vagrod/zara-rust/wiki"
+license-file = "LICENSE"
+keywords = ["gamedev", "survival"]
+exclude = ["target", "CHANGELOG.md", "image.png", "Cargo.lock"]
+edition = "2018"
+
+[dependencies]
+rand = "0.8.2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

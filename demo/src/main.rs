@@ -27,31 +27,31 @@ fn main() {
         // Initialize Zara instance
         let person =
             zara::ZaraController::with_environment (
-            events_listener, environment
-        );
+                events_listener, environment
+            );
 
         // Testing new combinations
         person.inventory.register_crafting_combinations(
             vec! [
                 crafting::Builder::start()
                     .build_for("StoneAxe")
-                        .is("SharpenStone", 1)
-                        .plus("Stick", 3)
-                        .and("Rope", 2)
+                    .is("SharpenStone", 1)
+                    .plus("Stick", 3)
+                    .and("Rope", 2)
                     .build(),
 
                 crafting::Builder::start()
                     .build_for("LeafHat")
-                        .is("Leaf", 30)
-                        .and("NeedleAndThread", 1)
+                    .is("Leaf", 30)
+                    .and("NeedleAndThread", 1)
                     .build(),
 
                 crafting::Builder::start()
                     .build_for("FishingRod")
-                        .is("Stick", 1)
-                        .plus("Liana", 1)
-                        .plus("Pin", 1)
-                        .and("Worm", 2)
+                    .is("Stick", 1)
+                    .plus("Liana", 1)
+                    .plus("Pin", 1)
+                    .and("Worm", 2)
                     .build(),
             ]
         );
@@ -222,7 +222,7 @@ impl DiseaseMonitor for FluMonitor {
         if zara::utils::roll_dice(5) {
             health.spawn_disease(Box::new(
                 FluDisease::new()),
-                 game_time.add_minutes(0)
+                                 game_time.add_minutes(0)
             );
         }
     }
