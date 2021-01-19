@@ -117,15 +117,21 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
            termion::clear::All)
         .unwrap();
 
-    writeln!(stdout, "{}Body temp: {:.2} °C", termion::cursor::Goto(1, 1), person.health.body_temperature.get()).unwrap();
-    writeln!(stdout, "{}Heart rate: {:.0} bpm", termion::cursor::Goto(1, 2), person.health.heart_rate.get()).unwrap();
-    writeln!(stdout, "{}Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 3), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
-    writeln!(stdout, "{}Water: {:.0}%", termion::cursor::Goto(1, 4), person.health.water_level.get()).unwrap();
-    writeln!(stdout, "{}Food: {:.0}%", termion::cursor::Goto(1, 5), person.health.food_level.get()).unwrap();
-    writeln!(stdout, "{}Stamina: {:.0}%", termion::cursor::Goto(1, 6), person.health.stamina_level.get()).unwrap();
-    writeln!(stdout, "{}Fatigue: {:.2}%", termion::cursor::Goto(1, 7), person.health.fatigue_level.get()).unwrap();
+    writeln!(stdout, "{}{}Game time: {}d {}h {}m {:.0}s", termion::cursor::Goto(1, 1), color::Fg(color::Cyan),
+             person.environment.game_time.day.get(),
+             person.environment.game_time.hour.get(),
+             person.environment.game_time.minute.get(),
+             person.environment.game_time.second.get()).unwrap();
 
-    writeln!(stdout, "{}Inventory:", termion::cursor::Goto(50, 1));
+    writeln!(stdout, "{}{}Body temp: {:.2} °C", termion::cursor::Goto(1, 2), color::Fg(color::Green), person.health.body_temperature.get()).unwrap();
+    writeln!(stdout, "{}Heart rate: {:.0} bpm", termion::cursor::Goto(1, 3), person.health.heart_rate.get()).unwrap();
+    writeln!(stdout, "{}Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 4), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
+    writeln!(stdout, "{}Water: {:.0}%", termion::cursor::Goto(1, 5), person.health.water_level.get()).unwrap();
+    writeln!(stdout, "{}Food: {:.0}%", termion::cursor::Goto(1, 6), person.health.food_level.get()).unwrap();
+    writeln!(stdout, "{}Stamina: {:.0}%", termion::cursor::Goto(1, 7), person.health.stamina_level.get()).unwrap();
+    writeln!(stdout, "{}Fatigue: {:.2}%", termion::cursor::Goto(1, 8), person.health.fatigue_level.get()).unwrap();
+
+    writeln!(stdout, "{}{}Inventory:", color::Fg(color::Blue), termion::cursor::Goto(50, 1));
 
     let mut y = 2;
     for (name, item) in person.inventory.items.borrow().iter() {
