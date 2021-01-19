@@ -226,6 +226,15 @@ impl GameTimeC {
         }
     }
 
+    pub fn new(day: u64, hour: u64, minute: u64, second: f64) -> Self {
+        GameTimeC {
+            day,
+            minute,
+            hour,
+            second
+        }
+    }
+
     /// Returns new `GameTimeC` by adding a given amount of minutes
     /// to the current one
     pub fn add_minutes(&self, amount: u64) -> GameTimeC {

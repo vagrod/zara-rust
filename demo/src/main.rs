@@ -1,3 +1,5 @@
+extern crate termion;
+
 use std::thread;
 use std::time::{Duration, Instant};
 use std::thread::sleep;
@@ -11,12 +13,23 @@ use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, F
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
 
+use termion::{color, style};
+use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+use std::io::{Write, stdout, stdin};
+
+mod inventory;
+
 // This will spawn a new thread for the "game loop"
 fn main() {
     let game_loop = thread::spawn(|| {
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
+        let mut console_update_counter = 0.;
+
+        let mut stdout = stdout().into_raw_mode().unwrap();
 
         // Instantiate our events listener
         let events_listener = ZaraEventsListener;
@@ -30,87 +43,10 @@ fn main() {
                 events_listener, environment
             );
 
-        // Testing new combinations
-        person.inventory.register_crafting_combinations(
-            vec! [
-                crafting::Builder::start()
-                    .build_for("StoneAxe")
-                    .is("SharpenStone", 1)
-                    .plus("Stick", 3)
-                    .and("Rope", 2)
-                    .build(),
+        add_side_effects(&person);
+        populate_inventory(&person);
 
-                crafting::Builder::start()
-                    .build_for("LeafHat")
-                    .is("Leaf", 30)
-                    .and("NeedleAndThread", 1)
-                    .build(),
-
-                crafting::Builder::start()
-                    .build_for("FishingRod")
-                    .is("Stick", 1)
-                    .plus("Liana", 1)
-                    .plus("Pin", 1)
-                    .and("Worm", 2)
-                    .build(),
-            ]
-        );
-
-        let res = person.inventory.get_suitable_combinations_for(vec![
-            String::from("Leaf"),
-            String::from("NeedleAndThread")
-        ]);
-
-        println!("{:?}", res);
-        /*
-        let o = CraftingCombination::new(String::from("FishingRod"),
-        vec![
-            ItemInCombination::new("Stick", 1),
-            ItemInCombination::new("Liana", 1),
-            ItemInCombination::new("Pin", 1),
-            ItemInCombination::new("Worm", 2),
-        ]);
-
-        println!("{}", o.unique_key);
-        */
-
-        // Testing environment change
-        person.environment.wind_speed.set(22.);
-
-        { // Testing basic inventory
-            person.inventory.add_item(Box::new(TestItem::new()));
-
-            let b = person.inventory.items.borrow();
-            let item = b.get("Meat").unwrap();
-
-            println!("Has consumable part? {}", item.consumable().is_some());
-            println!("Food gain {}", item.consumable().unwrap().food_gain_per_dose());
-            println!("Has spoil part? {}", item.consumable().unwrap().spoiling().is_some());
-        }
-
-        println!("Total weight {}", person.inventory.get_weight());
-
-        // Testing disease monitors
-        let flu_monitor = FluMonitor;
-        person.health.register_disease_monitor(Box::new(flu_monitor));
-
-        // Testing side effects monitors
-        let running_effects = RunningSideEffects::new();
-        person.health.register_side_effect_monitor(Box::new(running_effects));
-
-        let vitals_effects = DynamicVitalsSideEffect::new();
-        person.health.register_side_effect_monitor(Box::new(vitals_effects));
-
-        let fatigue_effects = FatigueSideEffects::new();
-        person.health.register_side_effect_monitor(Box::new(fatigue_effects));
-
-        // Testing unregister
-        //person.health.unregister_side_effect_monitor(test_key);
-
-        let mut is_consumed= false;
-        let mut already_stopped_running = false;
-
-        println!("Game Loop started!");
+        write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
         loop {
             now = Instant::now();
@@ -128,68 +64,77 @@ fn main() {
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
 
-            // Just for test to fire this only once at non-zero game time
-            if !is_consumed && person.environment.game_time.second.get() >= 58. && person.environment.game_time.second.get() >= 59. {
-                // Testing items consuming
-                person.consume(&String::from("Meat"));
-
-                // Sleeping test
-                person.body.start_sleeping(6.);
-
-                // Testing player status update
-                person.player_state.is_running.set(false);
-                already_stopped_running = true;
-
-                // Total weight must change after consuming
-                println!("Total weight {}", person.inventory.get_weight());
-
-                is_consumed = true;
-            } else {
-                // Testing player status update
-                if !already_stopped_running {
-                    person.player_state.is_running.set(true);
-                }
-            }
-
             // Update Zara state
             person.update(frame_time);
+
+            console_update_counter += frame_time;
+
+            if console_update_counter >= 1. {
+                console_update_counter = 0.;
+
+                flush_data(&mut stdout, &person);
+            }
         }
     });
 
     game_loop.join().unwrap();
 }
 
-struct TestItem {
-    count: Cell<usize>
+fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
+    let meat = inventory::Meat{ count: Cell::new(2) };
+    let knife = inventory::Knife{ count: Cell::new(1) };
+    let rope = inventory::Rope{ count: Cell::new(5) };
+
+    person.inventory.add_item(Box::new(meat));
+    person.inventory.add_item(Box::new(knife));
+    person.inventory.add_item(Box::new(rope));
 }
 
-impl TestItem {
-    pub fn new() -> Self {
-        TestItem{
-            count: Cell::new(11)
-        }
+fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
+    let vitals_effects = zara::health::side::builtin::DynamicVitalsSideEffect::new();
+    person.health.register_side_effect_monitor(Box::new(vitals_effects));
+
+    let running_effects = zara::health::side::builtin::RunningSideEffects::new();
+    person.health.register_side_effect_monitor(Box::new(running_effects));
+
+    let vitals_effects = zara::health::side::builtin::DynamicVitalsSideEffect::new();
+    person.health.register_side_effect_monitor(Box::new(vitals_effects));
+
+    let fatigue_effects = zara::health::side::builtin::FatigueSideEffects::new();
+    person.health.register_side_effect_monitor(Box::new(fatigue_effects));
+
+    let food_drain_effect =  zara::health::side::builtin::FoodDrainOverTimeSideEffect::new(0.01);
+    person.health.register_side_effect_monitor(Box::new(food_drain_effect));
+
+    let water_drain_effect =  zara::health::side::builtin::WaterDrainOverTimeSideEffect::new(0.03);
+    person.health.register_side_effect_monitor(Box::new(water_drain_effect));
+}
+
+fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEventsListener>) {
+    write!(stdout,
+           "{}{}",
+           termion::cursor::Goto(1, 1),
+           termion::clear::All)
+        .unwrap();
+
+    writeln!(stdout, "{}Body temp: {:.2} °C", termion::cursor::Goto(1, 1), person.health.body_temperature.get()).unwrap();
+    writeln!(stdout, "{}Heart rate: {:.0} bpm", termion::cursor::Goto(1, 2), person.health.heart_rate.get()).unwrap();
+    writeln!(stdout, "{}Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 3), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
+    writeln!(stdout, "{}Water: {:.0}%", termion::cursor::Goto(1, 4), person.health.water_level.get()).unwrap();
+    writeln!(stdout, "{}Food: {:.0}%", termion::cursor::Goto(1, 5), person.health.food_level.get()).unwrap();
+    writeln!(stdout, "{}Stamina: {:.0}%", termion::cursor::Goto(1, 6), person.health.stamina_level.get()).unwrap();
+    writeln!(stdout, "{}Fatigue: {:.2}%", termion::cursor::Goto(1, 7), person.health.fatigue_level.get()).unwrap();
+
+    writeln!(stdout, "{}Inventory:", termion::cursor::Goto(50, 1));
+
+    let mut y = 2;
+    for (name, item) in person.inventory.items.borrow().iter() {
+        writeln!(stdout, "{}   {} - {}, weight {:.0}g", termion::cursor::Goto(50, y), name, item.get_count(), item.get_total_weight());
+        y+=1;
     }
-}
 
-impl InventoryItem for TestItem {
-    fn get_count(&self) -> usize { self.count.get() }
-    fn set_count(&self, new_count: usize) { self.count.set(new_count); }
-    fn get_name(&self) -> String { String::from("Meat") }
-    fn get_total_weight(&self) -> f32 {
-        const WEIGHT_PER_UNIT: f32 = 0.4;
-
-        self.count.get() as f32 * WEIGHT_PER_UNIT
-    }
-    fn consumable(&self) -> Option<&dyn ConsumableBehavior> { Some(&MyFood) }
-}
-
-struct MyFood;
-impl ConsumableBehavior for MyFood {
-    fn is_food(&self) -> bool { true }
-    fn is_water(&self) -> bool { false }
-    fn water_gain_per_dose(&self) -> f32 { 6.1 }
-    fn food_gain_per_dose(&self) -> f32 { 14.2 }
-    fn spoiling(&self) -> Option<&dyn SpoilingBehavior> { None }
+    writeln!(stdout, "{}   ____________________________", termion::cursor::Goto(50, y));
+    writeln!(stdout, "{}   Total weight: {}g", termion::cursor::Goto(50, y+1), person.inventory.get_weight());
 }
 
 struct ZaraEventsListener;
@@ -204,38 +149,5 @@ impl Listener for ZaraEventsListener {
             },
             _ => println!("Other event")
         }
-    }
-}
-
-struct FluMonitor;
-impl DiseaseMonitor for FluMonitor {
-    fn check(&self, _health: &Health, frame_data: &FrameSummaryC) {
-        println!("body t {}", frame_data.health.body_temperature);
-        println!("fatigue {}", frame_data.health.fatigue_level);
-        println!("stamina {}", frame_data.health.stamina_level);
-    }
-
-    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC) {
-        println!("Flu monitor on consumed: {}", item.name);
-
-        // 5% chance test here
-        if zara::utils::roll_dice(5) {
-            health.spawn_disease(Box::new(
-                FluDisease::new()),
-                                 game_time.add_minutes(0)
-            );
-        }
-    }
-}
-
-struct FluDisease;
-impl FluDisease {
-    fn new() -> Self {
-        FluDisease
-    }
-}
-impl Disease for FluDisease {
-    fn get_name(&self) -> String {
-        String::from("Flu")
     }
 }

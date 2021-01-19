@@ -27,6 +27,7 @@ impl Health {
             side_effects_summary.top_pressure_bonus += res.top_pressure_bonus;
             side_effects_summary.bottom_pressure_bonus += res.bottom_pressure_bonus;
             side_effects_summary.water_level_bonus += res.water_level_bonus;
+            side_effects_summary.food_level_bonus += res.food_level_bonus;
             side_effects_summary.stamina_bonus += res.stamina_bonus;
 
             // Just for pretty picture
@@ -83,8 +84,8 @@ impl Health {
         snapshot.heart_rate += deltas.heart_rate_bonus;
         snapshot.top_pressure += deltas.top_pressure_bonus;
         snapshot.bottom_pressure += deltas.bottom_pressure_bonus;
-        snapshot.water_level += deltas.water_level_bonus;
         snapshot.food_level += deltas.food_level_bonus;
+        snapshot.water_level += deltas.water_level_bonus;
         snapshot.stamina_level += deltas.stamina_bonus;
         snapshot.fatigue_level += deltas.fatigue_bonus;
     }
@@ -94,6 +95,7 @@ impl Health {
         self.heart_rate.set(snapshot.heart_rate);
         self.top_pressure.set(snapshot.top_pressure);
         self.bottom_pressure.set(snapshot.bottom_pressure);
+        self.food_level.set(crate::utils::clamp(snapshot.food_level, 0., 100.));
         self.water_level.set(crate::utils::clamp(snapshot.water_level, 0., 100.));
         self.stamina_level.set(crate::utils::clamp(snapshot.stamina_level, 0., 100.));
         self.fatigue_level.set(crate::utils::clamp(snapshot.fatigue_level, 0., 100.));

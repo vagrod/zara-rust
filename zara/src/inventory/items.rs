@@ -1,5 +1,73 @@
 use crate::utils::GameTimeC;
 
+/// Macro for declaring a simple inventory item with particular weight
+#[macro_export]
+macro_rules! inv_item(
+    ($t:ty, $nm:expr, $wt:expr) => (
+        impl zara::inventory::items::InventoryItem for $t {
+            fn get_count(&self) -> usize { self.count.get() }
+            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
+        }
+    );
+);
+
+/// Macro for declaring consumable inventory item
+#[macro_export]
+macro_rules! inv_cons_item(
+    ($t:ty, $nm:expr, $wt:expr, $cons:expr) => (
+        impl zara::inventory::items::InventoryItem for $t {
+            fn get_count(&self) -> usize { self.count.get() }
+            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior>{ $cons }
+        }
+    );
+);
+
+/// Macro for declaring food consumable option
+#[macro_export]
+macro_rules! inv_food(
+    ($t:ty, $wg:expr, $fg:expr, $sp:expr) => (
+        impl zara::inventory::items::ConsumableBehavior for $t {
+            fn is_food(&self) -> bool { true }
+            fn is_water(&self) -> bool { false}
+            fn water_gain_per_dose(&self) -> f32 { $wg as f32}
+            fn food_gain_per_dose(&self) -> f32 { $fg as f32 }
+            fn spoiling(&self) -> Option<&dyn zara::inventory::items::SpoilingBehavior> { $sp }
+        }
+    );
+);
+
+/// Macro for declaring water consumable option
+#[macro_export]
+macro_rules! inv_water(
+    ($t:ty, $wg:expr, $fg:expr, $sp:ty) => (
+        impl zara::inventory::items::ConsumableBehavior for $t {
+            fn is_food(&self) -> bool { false }
+            fn is_water(&self) -> bool { true }
+            fn water_gain_per_dose(&self) -> f32 { $wg as f32}
+            fn food_gain_per_dose(&self) -> f32 { $fg as f32 }
+            fn spoiling(&self) -> Option<&dyn zara::inventory::items::SpoilingBehavior> { $sp }
+        }
+    );
+);
+
+/// Macro for declaring a spoiling option
+#[macro_export]
+macro_rules! inv_spoil(
+    ($t:ty, $c1:expr, $c2:expr, $st:expr) => (
+        impl zara::inventory::items::SpoilingBehavior for $t {
+            fn fresh_poisoning_chance(&self) -> usize { $c1 as usize }
+            fn spoil_poisoning_chance(&self) -> usize { $c2 as usize }
+            fn spoil_time(&self) -> zara::utils::GameTimeC { $st }
+        }
+    );
+);
+
 /// Trait that must be implemented by all inventory items
 pub trait InventoryItem {
     /// Returns count of items of this kind in the inventory
