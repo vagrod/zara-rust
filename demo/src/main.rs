@@ -67,6 +67,7 @@ fn main() {
             // Update Zara state
             person.update(frame_time);
 
+            // Update console data
             console_update_counter += frame_time;
 
             if console_update_counter >= 1. {
@@ -84,10 +85,12 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let meat = inventory::Meat{ count: Cell::new(2) };
     let knife = inventory::Knife{ count: Cell::new(1) };
     let rope = inventory::Rope{ count: Cell::new(5) };
+    let mre = inventory::MRE{ count: Cell::new(2) };
 
     person.inventory.add_item(Box::new(meat));
     person.inventory.add_item(Box::new(knife));
     person.inventory.add_item(Box::new(rope));
+    person.inventory.add_item(Box::new(mre));
 }
 
 fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
@@ -96,9 +99,6 @@ fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
 
     let running_effects = zara::health::side::builtin::RunningSideEffects::new();
     person.health.register_side_effect_monitor(Box::new(running_effects));
-
-    let vitals_effects = zara::health::side::builtin::DynamicVitalsSideEffect::new();
-    person.health.register_side_effect_monitor(Box::new(vitals_effects));
 
     let fatigue_effects = zara::health::side::builtin::FatigueSideEffects::new();
     person.health.register_side_effect_monitor(Box::new(fatigue_effects));
@@ -111,41 +111,72 @@ fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
 }
 
 fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEventsListener>) {
-    write!(stdout,
-           "{}{}",
-           termion::cursor::Goto(1, 1),
-           termion::clear::All)
-        .unwrap();
+    // Cls
+    write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
 
+    // Show game time
     writeln!(stdout, "{}{}Game time: {}d {}h {}m {:.0}s", termion::cursor::Goto(1, 1), color::Fg(color::Cyan),
              person.environment.game_time.day.get(),
              person.environment.game_time.hour.get(),
              person.environment.game_time.minute.get(),
              person.environment.game_time.second.get()).unwrap();
 
-    writeln!(stdout, "{}{}Body temp: {:.2}°C", termion::cursor::Goto(1, 2), color::Fg(color::Green), person.health.body_temperature.get()).unwrap();
-    writeln!(stdout, "{}Heart rate: {:.0} bpm", termion::cursor::Goto(1, 3), person.health.heart_rate.get()).unwrap();
-    writeln!(stdout, "{}Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 4), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
-    writeln!(stdout, "{}Water: {:.0}%", termion::cursor::Goto(1, 5), person.health.water_level.get()).unwrap();
-    writeln!(stdout, "{}Food: {:.0}%", termion::cursor::Goto(1, 6), person.health.food_level.get()).unwrap();
-    writeln!(stdout, "{}Stamina: {:.0}%", termion::cursor::Goto(1, 7), person.health.stamina_level.get()).unwrap();
-    writeln!(stdout, "{}Fatigue: {:.2}%", termion::cursor::Goto(1, 8), person.health.fatigue_level.get()).unwrap();
+    // Show vitals
+    writeln!(stdout, "{}{}Vitals", termion::cursor::Goto(1, 2), color::Fg(color::Green)).unwrap();
+    writeln!(stdout, "{}  Body temp: {:.2}°C", termion::cursor::Goto(1, 3), person.health.body_temperature.get()).unwrap();
+    writeln!(stdout, "{}  Heart rate: {:.0} bpm", termion::cursor::Goto(1, 4), person.health.heart_rate.get()).unwrap();
+    writeln!(stdout, "{}  Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 5), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
+    writeln!(stdout, "{}  Water: {:.0}%", termion::cursor::Goto(1, 6), person.health.water_level.get()).unwrap();
+    writeln!(stdout, "{}  Food: {:.0}%", termion::cursor::Goto(1, 7), person.health.food_level.get()).unwrap();
+    writeln!(stdout, "{}  Stamina: {:.0}%", termion::cursor::Goto(1, 8), person.health.stamina_level.get()).unwrap();
+    writeln!(stdout, "{}  Fatigue: {:.2}%", termion::cursor::Goto(1, 9), person.health.fatigue_level.get()).unwrap();
 
+    let vitals_h = 9;
+
+    // Show inventory
     writeln!(stdout, "{}{}Inventory", color::Fg(color::Blue), termion::cursor::Goto(50, 1));
-
-    let mut y = 2;
+    let mut invent_h = 2;
     for (name, item) in person.inventory.items.borrow().iter() {
-        writeln!(stdout, "{}   {} - {}, weight {:.0}g", termion::cursor::Goto(50, y), name, item.get_count(), item.get_total_weight());
-        y+=1;
+        write!(stdout, "{}  {} - {}, weight {:.0}g", termion::cursor::Goto(50, invent_h), name, item.get_count(), item.get_total_weight());
+        let consumable = item.consumable();
+        if consumable.is_some() {
+            let cons = item.consumable().unwrap();
+            write!(stdout, " (consumable +{:.0}% food and +{:.0}% water", cons.food_gain_per_dose(), cons.water_gain_per_dose());
+            if cons.spoiling().is_some(){
+                write!(stdout, ", can spoil)");
+            } else {
+                write!(stdout, ", cannot spoil)");
+            }
+        }
+        invent_h +=1;
+    }
+    writeln!(stdout, "{}  _______________________", termion::cursor::Goto(50, invent_h));
+    writeln!(stdout, "{}  Total weight: {}g", termion::cursor::Goto(50, invent_h +1), person.inventory.get_weight());
+
+    invent_h+=1;
+
+    // Show weather
+    writeln!(stdout, "{}{}Weather", color::Fg(color::LightMagenta), termion::cursor::Goto(1, vitals_h+2));
+    writeln!(stdout, "{}  Temp: {}°C", termion::cursor::Goto(1, vitals_h+3), person.environment.temperature.get());
+    writeln!(stdout, "{}  Wind: {:.1} m/s", termion::cursor::Goto(1, vitals_h+4), person.environment.wind_speed.get());
+    writeln!(stdout, "{}  Rain (0..1): {}", termion::cursor::Goto(1, vitals_h+5), person.environment.rain_intensity.get());
+
+    // Show other player stats
+    writeln!(stdout, "{}{}Stats", color::Fg(color::LightYellow), termion::cursor::Goto(50, invent_h+2));
+    writeln!(stdout, "{}  Is sleeping: {}", termion::cursor::Goto(50, invent_h+3), person.body.is_sleeping.get());
+    let sleep_time = person.body.last_sleep_time.borrow();
+    if sleep_time.is_some() {
+        let time = sleep_time.as_ref().unwrap();
+        writeln!(stdout, "{}  Last time slept: {}d {}h {}m {:.0}s (for {}h)", termion::cursor::Goto(50, invent_h+4),
+                 time.day,
+                 time.hour,
+                 time.minute,
+                 time.second,
+                 person.body.last_sleep_duration.get()).unwrap();
+    } else {
+        writeln!(stdout, "{}  Last time slept: none", termion::cursor::Goto(50, invent_h+4));
     }
 
-    writeln!(stdout, "{}   _______________________", termion::cursor::Goto(50, y));
-    writeln!(stdout, "{}   Total weight: {}g", termion::cursor::Goto(50, y+1), person.inventory.get_weight());
-
-    writeln!(stdout, "{}{}Weather", color::Fg(color::LightMagenta), termion::cursor::Goto(1, 10));
-    writeln!(stdout, "{}  Temp: {}°C", termion::cursor::Goto(1, 11), person.environment.temperature.get());
-    writeln!(stdout, "{}  Wind: {:.1} m/s", termion::cursor::Goto(1, 12), person.environment.wind_speed.get());
-    writeln!(stdout, "{}  Rain (0..1): {}", termion::cursor::Goto(1, 13), person.environment.rain_intensity.get());
 }
 
 struct ZaraEventsListener;

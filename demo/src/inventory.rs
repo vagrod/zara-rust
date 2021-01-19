@@ -24,3 +24,13 @@ zara::inv_food!(
     /* food gain, 0..100% */ 30.,
     /* spoil option */ Some(&MeatSpoilOption)
 );
+
+pub struct MRE { pub count: Cell<usize> }
+pub struct MREConsumableOption;
+zara::inv_cons_item!(MRE, "MRE", 269., Some(&MREConsumableOption));
+zara::inv_food!(
+    MREConsumableOption,
+    /* water gain, 0..100% */ 0.,
+    /* food gain, 0..100% */ 18.,
+    /* spoil option */ None
+);
