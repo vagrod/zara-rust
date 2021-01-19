@@ -47,6 +47,21 @@ impl Inventory {
         }
     }
 
+    /// Returns a list of `combination unique keys` for the combinations that can be done
+    /// using a set of passed items (**without checking for resources availability**)
+    pub fn get_available_combinations_for(&self, items: Vec<String>) -> Vec<String> {
+        let key_to_check_against = get_match_key(items);
+        let mut result = Vec::new();
+
+        for cmb in self.crafting_combinations.borrow().iter() {
+            if cmb.match_key == key_to_check_against {
+                result.push(String::from(&cmb.unique_key));
+            }
+        }
+
+        return result;
+    }
+
 }
 
 /// Describes item in combination
@@ -96,7 +111,7 @@ impl CraftingCombination {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
-        let match_key = &mut String::new();
+        let mut item_names: Vec<String> = Vec::new();
         let mut b = [0; 2];
         let sep = '\u{0003}'.encode_utf8(&mut b);
 
@@ -104,19 +119,18 @@ impl CraftingCombination {
         copy.sort_by(|a, b| a.item_name.cmp(&b.item_name));
 
         for item in copy.iter() {
+            item_names.push(String::from(&item.item_name));
+
             mapped.insert(String::from(&item.item_name), item.copy());
             key.push_str(&item.item_name);
             key.push_str(&sep);
             key.push_str(&item.count.to_string());
             key.push_str(&sep);
-
-            match_key.push_str(&item.item_name);
-            key.push_str(&sep);
         }
 
         CraftingCombination {
             unique_key: key.to_string(),
-            match_key: match_key.to_string(),
+            match_key: get_match_key(item_names).to_string(),
             result_item,
             items: Rc::new(RefCell::new(mapped))
         }
@@ -150,4 +164,20 @@ impl Builder {
             items: Rc::new(RefCell::new(Vec::new()))
         })
     }
+}
+
+fn get_match_key(items: Vec<String>) -> String {
+    let mut match_key: String = String::new();
+    let mut copy = Vec::from(items);
+    let mut b = [0; 2];
+    let sep = '\u{0003}'.encode_utf8(&mut b);
+
+    copy.sort_by(|a, b| a.cmp(b));
+
+    for item in copy.iter() {
+        match_key.push_str(item);
+        match_key.push_str(&sep);
+    }
+
+    return match_key.to_string();
 }

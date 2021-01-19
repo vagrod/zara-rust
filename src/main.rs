@@ -55,6 +55,13 @@ fn main() {
                     .build(),
             ]
         );
+
+        let res = person.inventory.get_available_combinations_for(vec![
+            String::from("Leaf"),
+            String::from("NeedleAndThread")
+        ]);
+
+        println!("{:?}", res);
         /*
         let o = CraftingCombination::new(String::from("FishingRod"),
         vec![
