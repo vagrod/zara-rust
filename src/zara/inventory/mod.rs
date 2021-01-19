@@ -1,8 +1,10 @@
 use crate::inventory::items::InventoryItem;
+use crate::inventory::crafting::CraftingCombination;
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
+use std::rc::Rc;
 
 mod crud;
 mod update;
@@ -24,7 +26,9 @@ pub struct Inventory {
     pub items: Arc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
 
     /// Weight of all inventory items (in grams)
-    weight: Cell<f32>
+    weight: Cell<f32>,
+    /// Registered crafting combinations (recipes)
+    crafting_combinations: Rc<RefCell<Vec<CraftingCombination>>>
 }
 
 impl Inventory {
@@ -42,6 +46,7 @@ impl Inventory {
     pub fn new() -> Self {
         Inventory{
             items: Arc::new(RefCell::new(HashMap::new())),
+            crafting_combinations: Rc::new(RefCell::new(Vec::new())),
             weight: Cell::new(0.)
         }
     }
@@ -59,9 +64,7 @@ impl Inventory {
     }
 
     /// Returns total cached inventory weight (in grams)
-    pub fn get_weight(&self) -> f32 {
-        self.weight.get()
-    }
+    pub fn get_weight(&self) -> f32 { self.weight.get() }
 
     /// Recalculates the inventory weight
     fn recalculate_weight(&self) {

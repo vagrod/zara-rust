@@ -3,8 +3,51 @@ use crate::inventory::crafting::fluent::BuilderStepResultItem;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use crate::inventory::Inventory;
 
 mod fluent;
+
+impl Inventory {
+
+    /// Registers crafting combinations (recipes) for this Zara instance
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use zara::inventory::crafting;
+    ///
+    /// person.inventory.register_crafting_combinations(
+    ///    vec! [
+    ///         crafting::Builder::start()
+    ///            .build_for("StoneAxe")
+    ///                .is("SharpenStone", 1)
+    ///                .plus("Stick", 3)
+    ///                .and("Rope", 2)
+    ///            .build(),
+    ///
+    ///        crafting::Builder::start()
+    ///            .build_for("LeafHat")
+    ///                .is("Leaf", 30)
+    ///                .and("NeedleAndThread", 1)
+    ///            .build(),
+    ///
+    ///        crafting::Builder::start()
+    ///            .build_for("FishingRod")
+    ///                .is("Stick", 1)
+    ///                .plus("Liana", 1)
+    ///                .plus("Pin", 1)
+    ///                .and("Worm", 2)
+    ///            .build(),
+    ///    ]
+    /// );
+    /// ```
+    pub fn register_crafting_combinations(&self, combinations: Vec<CraftingCombination>) {
+        for combination in combinations {
+            self.crafting_combinations.borrow_mut().push(combination);
+        }
+    }
+
+}
 
 /// Describes item in combination
 pub struct ItemInCombination {
