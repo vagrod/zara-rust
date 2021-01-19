@@ -100,7 +100,7 @@ fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
     let running_effects = zara::health::side::builtin::RunningSideEffects::new();
     person.health.register_side_effect_monitor(Box::new(running_effects));
 
-    let fatigue_effects = zara::health::side::builtin::FatigueSideEffects::new();
+    let fatigue_effects = zara::health::side::builtin::FatigueSideEffects::new(8);
     person.health.register_side_effect_monitor(Box::new(fatigue_effects));
 
     let food_drain_effect =  zara::health::side::builtin::FoodDrainOverTimeSideEffect::new(0.01);
@@ -143,7 +143,15 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             let cons = item.consumable().unwrap();
             write!(stdout, " (consumable +{:.0}% food and +{:.0}% water", cons.food_gain_per_dose(), cons.water_gain_per_dose());
             if cons.spoiling().is_some(){
-                write!(stdout, ", can spoil)");
+                write!(stdout, ", can spoil in ");
+                let spoil = cons.spoiling().unwrap();
+                let time = spoil.spoil_time();
+                write!(stdout, "{}d {}h {}m {:.0}s",
+                         time.day,
+                         time.hour,
+                         time.minute,
+                         time.second).unwrap();
+                write!(stdout, ")");
             } else {
                 write!(stdout, ", cannot spoil)");
             }

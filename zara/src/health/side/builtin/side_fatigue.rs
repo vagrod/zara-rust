@@ -3,28 +3,29 @@ use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::FrameSummaryC;
 
 use std::time::Duration;
+use std::cell::Cell;
 
 impl FatigueSideEffects {
-    pub fn new() -> Self {
+    pub fn new(hours_to_fully_rest: usize) -> Self {
         FatigueSideEffects {
-
+            hours_to_fully_rest: Cell::new(hours_to_fully_rest)
         }
     }
 }
 impl SideEffectsMonitor for FatigueSideEffects {
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
-        const MAX_HOURS_UNTIL_FULLY_EXHAUSTED: f32 = 9.; // game hours
-        const MAX_HOURS_UNTIL_FULLY_EXHAUSTED_SECS: f32 = MAX_HOURS_UNTIL_FULLY_EXHAUSTED*60.*60.; // game seconds
+        let max_hours_until_fully_exhausted: f32 = self.hours_to_fully_rest.get() as f32; // game hours
+        let max_hours_until_fully_exhausted_secs: f32 = max_hours_until_fully_exhausted *60.*60.; // game seconds
 
         let sleep_time: Duration = frame_data.player.last_slept.to_duration();
         let elapsed = frame_data.game_time.to_duration() - sleep_time;
-        let p_added = crate::utils::clamp_01(elapsed.as_secs_f32() / MAX_HOURS_UNTIL_FULLY_EXHAUSTED_SECS);
+        let p_added = crate::utils::clamp_01(elapsed.as_secs_f32() / max_hours_until_fully_exhausted_secs);
         let mut p_left = 1.; // if player haven't slept yet, no left fatigue
 
         if frame_data.player.last_slept_duration > 0.001
         {
             // He already slept
-            p_left = crate::utils::clamp_01(frame_data.player.last_slept_duration as f32 / MAX_HOURS_UNTIL_FULLY_EXHAUSTED);
+            p_left = crate::utils::clamp_01(frame_data.player.last_slept_duration as f32 / max_hours_until_fully_exhausted);
         }
 
         let left_fatigue = crate::utils::lerp(100., 0., p_left);
