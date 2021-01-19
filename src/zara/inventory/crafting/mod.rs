@@ -49,7 +49,7 @@ impl Inventory {
 
     /// Returns a list of `combination unique keys` for the combinations that can be done
     /// using a set of passed items (**without checking for resources availability**)
-    pub fn get_available_combinations_for(&self, items: Vec<String>) -> Vec<String> {
+    pub fn get_suitable_combinations_for(&self, items: Vec<String>) -> Vec<String> {
         let key_to_check_against = get_match_key(items);
         let mut result = Vec::new();
 

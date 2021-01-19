@@ -56,7 +56,7 @@ fn main() {
             ]
         );
 
-        let res = person.inventory.get_available_combinations_for(vec![
+        let res = person.inventory.get_suitable_combinations_for(vec![
             String::from("Leaf"),
             String::from("NeedleAndThread")
         ]);
