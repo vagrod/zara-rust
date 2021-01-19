@@ -31,7 +31,7 @@ pub struct DynamicVitalsSideEffect {
 /// Side effects monitor that will increase fatigue level according to the player's last sleep time
 /// and last sleep duration. Fatigue value will be calculated as "current fatigue"+"left fatigue"
 pub struct FatigueSideEffects {
-    hours_to_fully_rest: Cell<usize>
+    hours_until_exhausted: Cell<usize>
 }
 
 /// Will enable food drain over time

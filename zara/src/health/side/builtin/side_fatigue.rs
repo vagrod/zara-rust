@@ -6,15 +6,15 @@ use std::time::Duration;
 use std::cell::Cell;
 
 impl FatigueSideEffects {
-    pub fn new(hours_to_fully_rest: usize) -> Self {
+    pub fn new(hours_until_exhausted: usize) -> Self {
         FatigueSideEffects {
-            hours_to_fully_rest: Cell::new(hours_to_fully_rest)
+            hours_until_exhausted: Cell::new(hours_until_exhausted)
         }
     }
 }
 impl SideEffectsMonitor for FatigueSideEffects {
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
-        let max_hours_until_fully_exhausted: f32 = self.hours_to_fully_rest.get() as f32; // game hours
+        let max_hours_until_fully_exhausted: f32 = self.hours_until_exhausted.get() as f32; // game hours
         let max_hours_until_fully_exhausted_secs: f32 = max_hours_until_fully_exhausted *60.*60.; // game seconds
 
         let sleep_time: Duration = frame_data.player.last_slept.to_duration();
