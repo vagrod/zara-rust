@@ -7,7 +7,7 @@ repository = "https://github.com/vagrod/zara-rust/"
 documentation = "https://github.com/vagrod/zara-rust/wiki"
 license-file = "LICENSE"
 keywords = ["gamedev", "survival"]
-exclude = ["target", "CHANGELOG.md", "image.png", "Cargo.lock"]
+exclude = ["target", "Cargo.lock"]
 edition = "2018"
 
 [dependencies]

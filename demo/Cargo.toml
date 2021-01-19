@@ -6,9 +6,14 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[[bin]]
-name="zara-demo"
-path="src/main.rs"
+# If you are building Zara lib separately, comment this lib
+[lib]
+crate-type = ["lib"]
+name="zara"
+bench = false
+path="../zara/src/lib.rs"
 
 [dependencies]
-zara = { path = "../zara" }
+# If you are not using IntelliJ IDEA, uncomment this line and comment out "zand" dependency
+# zara = { path = "../zara" }
+rand = "0.8.2"
