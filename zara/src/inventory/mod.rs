@@ -1,5 +1,6 @@
 use crate::inventory::items::InventoryItem;
 use crate::inventory::crafting::CraftingCombination;
+use crate::inventory::monitors::InventoryMonitor;
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
@@ -11,6 +12,7 @@ mod update;
 
 pub mod items;
 pub mod crafting;
+pub mod monitors;
 
 /// Controls player's inventory
 pub struct Inventory {
@@ -28,7 +30,9 @@ pub struct Inventory {
     /// Weight of all inventory items (in grams)
     weight: Cell<f32>,
     /// Registered crafting combinations (recipes)
-    crafting_combinations: Rc<RefCell<Vec<CraftingCombination>>>
+    crafting_combinations: Rc<RefCell<Vec<CraftingCombination>>>,
+    /// Registered inventory monitors
+    inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
 }
 
 impl Inventory {
@@ -47,6 +51,7 @@ impl Inventory {
         Inventory{
             items: Arc::new(RefCell::new(HashMap::new())),
             crafting_combinations: Rc::new(RefCell::new(Vec::new())),
+            inventory_monitors: Rc::new(RefCell::new(HashMap::new())),
             weight: Cell::new(0.)
         }
     }

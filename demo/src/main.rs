@@ -139,7 +139,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
         y+=1;
     }
 
-    writeln!(stdout, "{}   ____________________________", termion::cursor::Goto(50, y));
+    writeln!(stdout, "{}   _______________________", termion::cursor::Goto(50, y));
     writeln!(stdout, "{}   Total weight: {}g", termion::cursor::Goto(50, y+1), person.inventory.get_weight());
 }
 
