@@ -334,7 +334,11 @@ pub struct ActiveDiseaseC {
 /// Describes initial environment information
 pub struct EnvironmentC {
     /// Wind speed value (m/s)
-    pub wind_speed: f32
+    pub wind_speed: f32,
+    /// Temperature, degrees C
+    pub temperature : f32,
+    /// Rain intensity, 0..1
+    pub rain_intensity : f32
 }
 
 impl EnvironmentC {
@@ -345,6 +349,11 @@ impl EnvironmentC {
     ///
     /// [`empty`]: #method.empty
     ///
+    /// # Parameters
+    /// - `temperature`: temperature, degrees C
+    /// - `rain_intansity`: rain intensity, 0..1
+    /// - `wind_speed`: m/s
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -352,11 +361,13 @@ impl EnvironmentC {
     /// ```
     /// use zara::utils;
     ///
-    /// let env = utils::EnvironmentC::new(wind_speed);
+    /// let env = utils::EnvironmentC::new(25., 3., 0.12);
     /// ```
-    pub fn new(wind_speed: f32) -> EnvironmentC {
+    pub fn new(temperature: f32, wind_speed: f32, rain_intensity: f32) -> EnvironmentC {
         EnvironmentC {
-            wind_speed
+            wind_speed,
+            temperature,
+            rain_intensity
         }
     }
 
@@ -377,7 +388,7 @@ impl EnvironmentC {
     /// let env = utils::EnvironmentC::default();
     /// ```
     pub fn default() -> EnvironmentC {
-        EnvironmentC::new(0.)
+        EnvironmentC::new(26., 0., 0.)
     }
 }
 

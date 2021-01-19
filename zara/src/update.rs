@@ -115,7 +115,9 @@ impl<E: Listener + 'static> ZaraController<E> {
                 last_slept
             },
             environment: EnvironmentC {
-                wind_speed: self.environment.wind_speed.get()
+                wind_speed: self.environment.wind_speed.get(),
+                rain_intensity: self.environment.rain_intensity.get(),
+                temperature: self.environment.temperature.get()
             },
             health: HealthC {
                 body_temperature: self.health.body_temperature.get(),

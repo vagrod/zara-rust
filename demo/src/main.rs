@@ -35,7 +35,7 @@ fn main() {
         let events_listener = ZaraEventsListener;
 
         // Describe environment conditions
-        let environment = zara::utils::EnvironmentC::new(5.4);
+        let environment = zara::utils::EnvironmentC::new(24., 2., 0.);
 
         // Initialize Zara instance
         let person =
@@ -123,7 +123,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
              person.environment.game_time.minute.get(),
              person.environment.game_time.second.get()).unwrap();
 
-    writeln!(stdout, "{}{}Body temp: {:.2} °C", termion::cursor::Goto(1, 2), color::Fg(color::Green), person.health.body_temperature.get()).unwrap();
+    writeln!(stdout, "{}{}Body temp: {:.2}°C", termion::cursor::Goto(1, 2), color::Fg(color::Green), person.health.body_temperature.get()).unwrap();
     writeln!(stdout, "{}Heart rate: {:.0} bpm", termion::cursor::Goto(1, 3), person.health.heart_rate.get()).unwrap();
     writeln!(stdout, "{}Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 4), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
     writeln!(stdout, "{}Water: {:.0}%", termion::cursor::Goto(1, 5), person.health.water_level.get()).unwrap();
@@ -131,7 +131,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
     writeln!(stdout, "{}Stamina: {:.0}%", termion::cursor::Goto(1, 7), person.health.stamina_level.get()).unwrap();
     writeln!(stdout, "{}Fatigue: {:.2}%", termion::cursor::Goto(1, 8), person.health.fatigue_level.get()).unwrap();
 
-    writeln!(stdout, "{}{}Inventory:", color::Fg(color::Blue), termion::cursor::Goto(50, 1));
+    writeln!(stdout, "{}{}Inventory", color::Fg(color::Blue), termion::cursor::Goto(50, 1));
 
     let mut y = 2;
     for (name, item) in person.inventory.items.borrow().iter() {
@@ -141,6 +141,11 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
 
     writeln!(stdout, "{}   _______________________", termion::cursor::Goto(50, y));
     writeln!(stdout, "{}   Total weight: {}g", termion::cursor::Goto(50, y+1), person.inventory.get_weight());
+
+    writeln!(stdout, "{}{}Weather", color::Fg(color::LightMagenta), termion::cursor::Goto(1, 10));
+    writeln!(stdout, "{}  Temp: {}°C", termion::cursor::Goto(1, 11), person.environment.temperature.get());
+    writeln!(stdout, "{}  Wind: {:.1} m/s", termion::cursor::Goto(1, 12), person.environment.wind_speed.get());
+    writeln!(stdout, "{}  Rain (0..1): {}", termion::cursor::Goto(1, 13), person.environment.rain_intensity.get());
 }
 
 struct ZaraEventsListener;

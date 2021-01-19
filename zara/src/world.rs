@@ -9,7 +9,11 @@ pub struct EnvironmentData {
     pub game_time : Rc<GameTime>,
 
     /// Wind speed (m/s)
-    pub wind_speed : Cell<f32>
+    pub wind_speed : Cell<f32>,
+    /// Temperature, degrees C
+    pub temperature : Cell<f32>,
+    /// Rain intensity, 0..1
+    pub rain_intensity : Cell<f32>
 }
 
 impl EnvironmentData {
@@ -30,7 +34,9 @@ impl EnvironmentData {
     pub fn new() -> Self {
         EnvironmentData {
             game_time: Rc::new(GameTime::new()),
-            wind_speed : Cell::new(0.)
+            wind_speed : Cell::new(0.),
+            rain_intensity: Cell::new(0.),
+            temperature: Cell::new(0.)
         }
     }
 
@@ -54,6 +60,8 @@ impl EnvironmentData {
         let e = EnvironmentData::new();
 
         e.wind_speed.set(ed.wind_speed);
+        e.temperature.set(ed.temperature);
+        e.rain_intensity.set(ed.rain_intensity);
 
         return e;
     }
