@@ -8,6 +8,7 @@ mod fluent;
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
+use std::time::Duration;
 
 /// Macro for declaring a disease
 #[macro_export]
@@ -94,6 +95,16 @@ pub struct StageDescription {
     pub target_pressure_bottom: f32
 }
 
+/// Describes active stages
+pub struct ActiveStage {
+    /// Stage data
+    pub info: StageDescription,
+    /// When this stage should start
+    pub start_time: GameTimeC,
+    /// When this stage reaches its peak
+    pub peak_time: GameTimeC,
+}
+
 /// Trait for disease monitors
 pub trait DiseaseMonitor {
     /// Being called once a `UPDATE_INTERVAL` real seconds.
@@ -128,7 +139,7 @@ pub struct ActiveDisease {
     pub activation_time: GameTimeC,
 
     /// Disease stages for lerping
-    stages: Rc<RefCell<HashMap<StageLevel, StageDescription>>>
+    stages: Rc<RefCell<HashMap<StageLevel, ActiveStage>>>
 }
 impl ActiveDisease {
     /// Creates new active disease object
@@ -138,10 +149,21 @@ impl ActiveDisease {
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
-        let mut stages: HashMap<StageLevel, StageDescription> = HashMap::new();
+        let mut stages: HashMap<StageLevel, ActiveStage> = HashMap::new();
+        let mut time_elapsed= activation_time.to_duration();
 
         for stage in disease.get_stages().iter() {
-            stages.insert(stage.level, *stage);
+            let start_time = GameTimeC::from_duration(time_elapsed);
+            let peak_duration = Duration::from_secs_f32(stage.reaches_peak_in_hours*60.*60.);
+            let peak_time = GameTimeC::from_duration(time_elapsed + peak_duration);
+
+            stages.insert(stage.level, ActiveStage {
+                info: *stage,
+                start_time,
+                peak_time
+            });
+
+            time_elapsed = time_elapsed + peak_duration;
         }
 
         ActiveDisease {

@@ -10,8 +10,19 @@ zara::disease!(Flu, "Flu",
                     .with_target_body_temp(37.3)
                     .with_target_heart_rate(85.)
                     .with_target_blood_pressure(130., 90.)
-                    .will_reach_target_in(0.1)
+                    .will_reach_target_in(0.7)
                     .will_end()
+            .build(),
+
+        StageBuilder::start()
+            .build_for(StageLevel::Progressing)
+                .no_self_heal()
+                .vitals()
+                    .with_target_body_temp(37.9)
+                    .with_target_heart_rate(89.)
+                    .with_target_blood_pressure(126., 84.)
+                    .will_reach_target_in(1.2)
+                    .will_last_forever()
             .build()
     ]
 );
