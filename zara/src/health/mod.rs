@@ -83,14 +83,20 @@ impl Health {
         }
     }
 
-    /// Called by zara controller when item is consumed
-    /// as food or water
+    /// Called by zara controller when item is consumed as food or water
     pub fn on_item_consumed(&self, game_time: &GameTimeC, item: &ConsumableC){
         println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
 
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_consumed(self, game_time, item);
+        }
+
+        // Notify diseases
+        for (_, disease) in self.diseases.borrow().iter() {
+            if disease.needs_treatment && disease.get_is_active(game_time) {
+                disease.on_item_consumed(game_time, item);
+            }
         }
     }
 

@@ -14,7 +14,7 @@ pub trait StageInit {
 }
 
 pub trait StageSelfHeal {
-    fn self_heal(&self, hours: f32) -> &dyn StageVitalsNode;
+    fn self_heal(&self, probability: usize) -> &dyn StageVitalsNode;
     fn no_self_heal(&self) -> &dyn StageVitalsNode;
 }
 
@@ -47,8 +47,8 @@ impl StageInit for StageBuilder {
 }
 
 impl StageSelfHeal for StageBuilder {
-    fn self_heal(&self, hours: f32) -> &dyn StageVitalsNode {
-        self.self_heal.replace(Some(hours));
+    fn self_heal(&self, probability: usize) -> &dyn StageVitalsNode {
+        self.self_heal_chance.replace(Some(probability));
 
         self.as_vitals_node()
     }
@@ -103,15 +103,15 @@ impl StageVitalsValues for StageBuilder {
 
 impl StageEnd for StageBuilder {
     fn build(&self) -> StageDescription {
-        let mut self_heal = Option::None;
+        let mut self_heal_chance = Option::None;
 
-        if self.self_heal.borrow().deref().is_some() {
-            self_heal = Option::Some(self.self_heal.borrow().deref().unwrap())
+        if self.self_heal_chance.borrow().deref().is_some() {
+            self_heal_chance = Option::Some(self.self_heal_chance.borrow().deref().unwrap())
         }
 
         StageDescription {
             level: *self.level.borrow().deref(),
-            self_heal,
+            self_heal_chance,
             is_endless: self.is_endless.get(),
             reaches_peak_in_hours: self.reaches_peak_in_hours.get(),
             target_body_temp: self.target_body_temp.get(),

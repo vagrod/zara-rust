@@ -32,13 +32,13 @@ macro_rules! disease(
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
-///         .self_heal(3.5)
+///         .self_heal(15)
 ///         .vitals(); // and so on...
 /// //  .build();
 /// ```
 pub struct StageBuilder {
     level: RefCell<StageLevel>,
-    self_heal: RefCell<Option<f32>>,
+    self_heal_chance: RefCell<Option<usize>>,
     reaches_peak_in_hours: Cell<f32>,
     is_endless: Cell<bool>,
     target_body_temp: Cell<f32>,
@@ -62,7 +62,7 @@ impl StageBuilder {
         Box::new(
             StageBuilder {
                 level: RefCell::new(StageLevel::HealthyStage),
-                self_heal: RefCell::new(None),
+                self_heal_chance: RefCell::new(None),
                 is_endless: Cell::new(false),
                 reaches_peak_in_hours: Cell::new(0.),
                 target_body_temp: Cell::new(0.),
@@ -80,7 +80,7 @@ pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
     /// Will self-heal
-    pub self_heal: Option<f32>,
+    pub self_heal_chance: Option<usize>,
     /// In what time will reach peak values
     pub reaches_peak_in_hours: f32,
     /// How long this stage will last
@@ -141,6 +141,8 @@ pub struct ActiveDisease {
     pub will_end: bool,
     /// Disease end time, if applicable
     pub end_time: Option<GameTimeC>,
+    /// Disease needs treatment or will self-heal
+    pub needs_treatment: bool,
 
     /// Disease stages for lerping
     stages: Rc<RefCell<HashMap<StageLevel, ActiveStage>>>
@@ -156,8 +158,15 @@ impl ActiveDisease {
         let mut stages: HashMap<StageLevel, ActiveStage> = HashMap::new();
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
+        let mut self_heal = false;
 
         for stage in disease.get_stages().iter() {
+            if stage.self_heal_chance.is_some() {
+                if crate::utils::roll_dice(stage.self_heal_chance.unwrap()) {
+                    self_heal = true;
+                }
+            }
+
             let start_time = GameTimeC::from_duration(time_elapsed);
             let peak_duration = Duration::from_secs_f32(stage.reaches_peak_in_hours*60.*60.);
             let peak_time = GameTimeC::from_duration(time_elapsed + peak_duration);
@@ -182,8 +191,13 @@ impl ActiveDisease {
             activation_time,
             stages: Rc::new(RefCell::new(stages)),
             will_end,
-            end_time
+            end_time,
+            needs_treatment: !self_heal
         }
+    }
+
+    pub fn on_item_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
+
     }
 
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
