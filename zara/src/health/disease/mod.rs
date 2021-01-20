@@ -7,6 +7,20 @@ mod fluent;
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::collections::HashMap;
+
+/// Macro for declaring a disease
+#[macro_export]
+macro_rules! disease(
+    ($t:ty, $nm:expr, $st:expr) => (
+        impl zara::health::disease::Disease for $t {
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_stages(&self) -> Vec<zara::health::disease::StageDescription> {
+                $st as Vec<zara::health::disease::StageDescription>
+            }
+        }
+    );
+);
 
 /// Builds a disease stage.
 ///
@@ -33,7 +47,7 @@ pub struct StageBuilder {
 }
 
 /// Disease stage level of seriousness
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum StageLevel {
     HealthyStage,
     InitialStage,
@@ -60,6 +74,7 @@ impl StageBuilder {
 }
 
 /// Describes disease stage
+#[derive(Copy, Clone)]
 pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
@@ -110,7 +125,10 @@ pub struct ActiveDisease {
     /// Disease instance linked to this `ActiveDisease`
     pub disease: Rc<Box<dyn Disease>>,
     /// When this disease will become active
-    pub activation_time: GameTimeC
+    pub activation_time: GameTimeC,
+
+    /// Disease stages for lerping
+    stages: Rc<RefCell<HashMap<StageLevel, StageDescription>>>
 }
 impl ActiveDisease {
     /// Creates new active disease object
@@ -120,9 +138,16 @@ impl ActiveDisease {
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
+        let mut stages: HashMap<StageLevel, StageDescription> = HashMap::new();
+
+        for stage in disease.get_stages().iter() {
+            stages.insert(stage.level, *stage);
+        }
+
         ActiveDisease {
             disease: Rc::new(disease),
-            activation_time
+            activation_time,
+            stages: Rc::new(RefCell::new(stages))
         }
     }
 }

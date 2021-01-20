@@ -19,6 +19,7 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use std::io::{Write, stdout, stdin};
 
+mod diseases;
 mod inventory;
 
 // This will spawn a new thread for the "game loop"
@@ -45,7 +46,7 @@ fn main() {
 
         add_side_effects(&person);
         populate_inventory(&person);
-        register_diseases(&person);
+        spawn_flu(&person);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
@@ -82,19 +83,11 @@ fn main() {
     game_loop.join().unwrap();
 }
 
-fn register_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
-    let d = StageBuilder::start()
-        .build_for(StageLevel::InitialStage)
-            .self_heal(0.5)
-            .vitals()
-                .with_target_body_temp(37.3)
-                .with_target_heart_rate(85.)
-                .with_target_blood_pressure(130., 90.)
-                .will_reach_target_in(0.1)
-                .will_end()
-        .build();
 
-    println!("{}", d.target_body_temp);
+fn spawn_flu(person: &zara::ZaraController<ZaraEventsListener>) {
+    let disease = diseases::Flu;
+
+    person.health.spawn_disease(Box::new(disease), zara::utils::GameTimeC::new(0,0,0,0.));
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {

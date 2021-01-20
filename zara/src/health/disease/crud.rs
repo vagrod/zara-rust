@@ -22,8 +22,6 @@ impl Health {
     /// # Notes
     /// This method borrows the `diseases` collection
     pub fn spawn_disease(&self, disease: Box<dyn Disease>, activation_time: GameTimeC) -> bool {
-        println!("Spawn disease call");
-
         let mut b = self.diseases.borrow_mut();
         let disease_name = disease.get_name();
 

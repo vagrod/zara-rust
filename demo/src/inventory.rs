@@ -1,11 +1,10 @@
 use zara::utils::{GameTimeC};
-
 use std::cell::Cell;
 
 pub struct Knife { pub count: Cell<usize> }
-pub struct Rope { pub count: Cell<usize> }
-
 zara::inv_item!(Knife, "Knife", 432.);
+
+pub struct Rope { pub count: Cell<usize> }
 zara::inv_item!(Rope, "Rope", 328.);
 
 pub struct Meat { pub count: Cell<usize> }
