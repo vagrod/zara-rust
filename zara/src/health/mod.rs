@@ -95,7 +95,7 @@ impl Health {
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
             if disease.needs_treatment && disease.get_is_active(game_time) {
-                disease.on_item_consumed(game_time, item);
+                disease.on_consumed(game_time, item);
             }
         }
     }

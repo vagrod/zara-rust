@@ -196,10 +196,12 @@ impl ActiveDisease {
         }
     }
 
-    pub fn on_item_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
+    /// Is called by Zara from the health engine
+    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
 
     }
 
+    /// Gets whether disease is active or not for the given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
         let activation_secs = self.activation_time.to_duration().as_secs_f32();
         let game_time_secs = game_time.to_duration().as_secs_f32();

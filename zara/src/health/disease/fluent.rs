@@ -1,7 +1,5 @@
 use crate::health::disease::{StageDescription, StageBuilder, StageLevel};
 
-use std::ops::Deref;
-
 impl StageBuilder {
     fn as_stage_self_heal(&self) -> &dyn StageSelfHeal { self }
     fn as_vitals_node(&self) -> &dyn StageVitalsNode { self }
@@ -105,12 +103,12 @@ impl StageEnd for StageBuilder {
     fn build(&self) -> StageDescription {
         let mut self_heal_chance = Option::None;
 
-        if self.self_heal_chance.borrow().deref().is_some() {
-            self_heal_chance = Option::Some(self.self_heal_chance.borrow().deref().unwrap())
+        if self.self_heal_chance.borrow().is_some() {
+            self_heal_chance = Option::Some(self.self_heal_chance.borrow().unwrap())
         }
 
         StageDescription {
-            level: *self.level.borrow().deref(),
+            level: *self.level.borrow(),
             self_heal_chance,
             is_endless: self.is_endless.get(),
             reaches_peak_in_hours: self.reaches_peak_in_hours.get(),
