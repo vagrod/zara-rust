@@ -27,7 +27,9 @@ pub trait StageVitalsValues {
     fn with_target_heart_rate(&self, value: f32) -> &dyn StageVitalsValues;
     fn with_target_blood_pressure(&self, top: f32, bottom: f32) -> &dyn StageVitalsValues;
 
-    fn will_reach_target_in(&self, hours: f32) -> &dyn StageEnd;
+    fn will_reach_target_in(&self, hours: f32) -> &dyn StageVitalsValues;
+    fn will_end(&self) -> &dyn StageEnd;
+    fn will_last_forever(&self) -> &dyn StageEnd;
 }
 
 pub trait StageEnd {
@@ -82,8 +84,18 @@ impl StageVitalsValues for StageBuilder {
         self.as_vitals_values()
     }
 
-    fn will_reach_target_in(&self, hours: f32) -> &dyn StageEnd {
-        self.duration_hours.set(hours);
+    fn will_reach_target_in(&self, hours: f32) -> &dyn StageVitalsValues {
+        self.reaches_peak_in_hours.set(hours);
+
+        self.as_vitals_values()
+    }
+
+    fn will_end(&self) -> &dyn StageEnd {
+        self.as_stage_end()
+    }
+
+    fn will_last_forever(&self) -> &dyn StageEnd {
+        self.is_endless.set(true);
 
         self.as_stage_end()
     }
@@ -100,7 +112,8 @@ impl StageEnd for StageBuilder {
         StageDescription {
             level: *self.level.borrow().deref(),
             self_heal,
-            duration_hours: self.duration_hours.get(),
+            is_endless: self.is_endless.get(),
+            reaches_peak_in_hours: self.reaches_peak_in_hours.get(),
             target_body_temp: self.target_body_temp.get(),
             target_heart_rate: self.target_heart_rate.get(),
             target_pressure_top: self.target_pressure_top.get(),

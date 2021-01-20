@@ -24,7 +24,8 @@ use std::cell::{Cell, RefCell};
 pub struct StageBuilder {
     level: RefCell<StageLevel>,
     self_heal: RefCell<Option<f32>>,
-    duration_hours: Cell<f32>,
+    reaches_peak_in_hours: Cell<f32>,
+    is_endless: Cell<bool>,
     target_body_temp: Cell<f32>,
     target_heart_rate: Cell<f32>,
     target_pressure_top: Cell<f32>,
@@ -47,7 +48,8 @@ impl StageBuilder {
             StageBuilder {
                 level: RefCell::new(StageLevel::HealthyStage),
                 self_heal: RefCell::new(None),
-                duration_hours: Cell::new(0.),
+                is_endless: Cell::new(false),
+                reaches_peak_in_hours: Cell::new(0.),
                 target_body_temp: Cell::new(0.),
                 target_heart_rate: Cell::new(0.),
                 target_pressure_top: Cell::new(0.),
@@ -63,8 +65,10 @@ pub struct StageDescription {
     pub level: StageLevel,
     /// Will self-heal
     pub self_heal: Option<f32>,
+    /// In what time will reach peak values
+    pub reaches_peak_in_hours: f32,
     /// How long this stage will last
-    pub duration_hours: f32,
+    pub is_endless: bool,
     /// Stage's target body temperature
     pub target_body_temp: f32,
     /// Stage's target heart rate

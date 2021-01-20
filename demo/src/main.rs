@@ -91,6 +91,7 @@ fn register_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
                 .with_target_heart_rate(85.)
                 .with_target_blood_pressure(130., 90.)
                 .will_reach_target_in(0.1)
+                .will_end()
         .build();
 
     println!("{}", d.target_body_temp);
