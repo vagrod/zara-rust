@@ -46,7 +46,7 @@ fn main() {
 
         add_side_effects(&person);
         populate_inventory(&person);
-        spawn_flu(&person);
+        spawn_diseases(&person);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
@@ -84,10 +84,9 @@ fn main() {
 }
 
 
-fn spawn_flu(person: &zara::ZaraController<ZaraEventsListener>) {
-    let disease = diseases::Flu;
-
-    person.health.spawn_disease(Box::new(disease), zara::utils::GameTimeC::new(0,0,1,15.));
+fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
+    person.health.spawn_disease(Box::new(diseases::Flu), zara::utils::GameTimeC::new(0,0,1,15.));
+    person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
@@ -197,14 +196,35 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
     let mut diseases_height = 2;
 
     // Show diseases
-    writeln!(stdout, "{}{}Diseases", color::Fg(color::LightGreen), termion::cursor::Goto(160, 1));
+    writeln!(stdout, "{}{}Diseases", color::Fg(color::LightGreen), termion::cursor::Goto(150, 1));
     for (name, disease) in person.health.diseases.borrow().iter() {
-        writeln!(stdout, "{}  {}: active? {}", termion::cursor::Goto(160, diseases_height), name,
-                 disease.get_is_active(&person.environment.game_time.to_contract()));
+        let is_active = disease.get_is_active(&person.environment.game_time.to_contract());
+        if is_active {
+            writeln!(stdout, "{}  {}: active", termion::cursor::Goto(150, diseases_height), name);
+            diseases_height+=1;
+            if disease.will_end {
+                let time = &disease.end_time.as_ref().unwrap();
+                writeln!(stdout, "{}    will end @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height),
+                         time.day,
+                         time.hour,
+                         time.minute,
+                         time.second
+                );
+            } else {
+                writeln!(stdout, "{}    will not end", termion::cursor::Goto(150, diseases_height));
+            }
+        } else {
+            let time = &disease.activation_time;
+            writeln!(stdout, "{}  {}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), name,
+                     time.day,
+                     time.hour,
+                     time.minute,
+                     time.second
+            );
+        }
 
         diseases_height += 1;
     }
-
 }
 
 struct ZaraEventsListener;
