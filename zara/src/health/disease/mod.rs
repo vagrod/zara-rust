@@ -8,6 +8,19 @@ mod fluent;
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
+/// Builds a disease stage.
+///
+/// # Examples
+/// Start with `start` method and call `build` when you're done.
+/// ```
+/// use zara::health::disease::{StageBuilder, StageLevel};
+///
+/// StageBuilder::start()
+///     .build_for(StageLevel::InitialStage)
+///         .self_heal(3.5)
+///         .vitals(); // and so on...
+/// //  .build();
+/// ```
 pub struct StageBuilder {
     level: RefCell<StageLevel>,
     self_heal: RefCell<Option<f32>>,
@@ -18,6 +31,7 @@ pub struct StageBuilder {
     target_pressure_bottom: Cell<f32>
 }
 
+/// Disease stage level of seriousness
 #[derive(Copy, Clone)]
 pub enum StageLevel {
     HealthyStage,
@@ -43,13 +57,21 @@ impl StageBuilder {
     }
 }
 
+/// Describes disease stage
 pub struct StageDescription {
+    /// Level of seriousness (order)
     pub level: StageLevel,
+    /// Will self-heal
     pub self_heal: Option<f32>,
+    /// How long this stage will last
     pub duration_hours: f32,
+    /// Stage's target body temperature
     pub target_body_temp: f32,
+    /// Stage's target heart rate
     pub target_heart_rate: f32,
+    /// Stage's target body pressure (top)
     pub target_pressure_top: f32,
+    /// Stage's target body pressure (bottom)
     pub target_pressure_bottom: f32
 }
 
@@ -74,6 +96,9 @@ pub trait DiseaseMonitor {
 pub trait Disease {
     /// Gets the unique name of this disease kind
     fn get_name(&self) -> String;
+    /// Gets all disease stages. Use [`StageBuilder`](zara::health::disease::StageBuilder) to
+    /// describe a stage
+    fn get_stages(&self) -> Vec<StageDescription>;
 }
 
 /// Describes an active disease that can be also scheduled
