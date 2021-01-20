@@ -11,7 +11,7 @@ zara::inv_item!(Rope, "Rope", 328.);
 pub struct Meat { pub count: Cell<usize> }
 pub struct MeatConsumableOption;
 pub struct MeatSpoilOption;
-zara::inv_cons_item!(Meat, "Meat", 351., Some(&MeatConsumableOption));
+zara::inv_item_cons!(Meat, "Meat", 351., Some(&MeatConsumableOption));
 zara::inv_spoil!(
     MeatSpoilOption,
     /* fresh poisoning chance, 0..100% probability */ 2,
@@ -27,7 +27,7 @@ zara::inv_food!(
 
 pub struct MRE { pub count: Cell<usize> }
 pub struct MREConsumableOption;
-zara::inv_cons_item!(MRE, "MRE", 269., Some(&MREConsumableOption));
+zara::inv_item_cons!(MRE, "MRE", 269., Some(&MREConsumableOption));
 zara::inv_food!(
     MREConsumableOption,
     /* water gain, 0..100% */ 0.,

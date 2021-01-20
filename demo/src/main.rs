@@ -8,7 +8,7 @@ use std::cell::Cell;
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use zara::health::{Health};
-use zara::health::disease::{DiseaseMonitor, Disease};
+use zara::health::disease::{DiseaseMonitor, Disease, StageBuilder, StageLevel};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
@@ -45,6 +45,7 @@ fn main() {
 
         add_side_effects(&person);
         populate_inventory(&person);
+        register_diseases(&person);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
@@ -79,6 +80,20 @@ fn main() {
     });
 
     game_loop.join().unwrap();
+}
+
+fn register_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
+    let d = StageBuilder::start()
+        .build_for(StageLevel::InitialStage)
+            .self_heal(0.5)
+            .vitals()
+                .with_target_body_temp(37.3)
+                .with_target_heart_rate(85.)
+                .with_target_blood_pressure(130., 90.)
+                .will_reach_target_in(0.1)
+        .build();
+
+    println!("{}", d.target_body_temp);
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
@@ -167,7 +182,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
     writeln!(stdout, "{}{}Weather", color::Fg(color::LightMagenta), termion::cursor::Goto(1, vitals_h+2));
     writeln!(stdout, "{}  Temp: {}°C", termion::cursor::Goto(1, vitals_h+3), person.environment.temperature.get());
     writeln!(stdout, "{}  Wind: {:.1} m/s", termion::cursor::Goto(1, vitals_h+4), person.environment.wind_speed.get());
-    writeln!(stdout, "{}  Rain (0..1): {}", termion::cursor::Goto(1, vitals_h+5), person.environment.rain_intensity.get());
+    writeln!(stdout, "{}  Rain (0..1): {:.1}", termion::cursor::Goto(1, vitals_h+5), person.environment.rain_intensity.get());
 
     // Show other player stats
     writeln!(stdout, "{}{}Stats", color::Fg(color::LightYellow), termion::cursor::Goto(50, invent_h+2));

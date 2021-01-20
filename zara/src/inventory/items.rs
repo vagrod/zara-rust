@@ -16,7 +16,7 @@ macro_rules! inv_item(
 
 /// Macro for declaring consumable inventory item
 #[macro_export]
-macro_rules! inv_cons_item(
+macro_rules! inv_item_cons(
     ($t:ty, $nm:expr, $wt:expr, $cons:expr) => (
         impl zara::inventory::items::InventoryItem for $t {
             fn get_count(&self) -> usize { self.count.get() }

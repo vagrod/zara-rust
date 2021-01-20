@@ -8,7 +8,6 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 mod update;
-mod disease_crud;
 mod status_methods;
 mod monitors;
 
