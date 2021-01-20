@@ -137,6 +137,10 @@ pub struct ActiveDisease {
     pub disease: Rc<Box<dyn Disease>>,
     /// When this disease will become active
     pub activation_time: GameTimeC,
+    /// Do this disease have an end
+    pub will_end: bool,
+    /// Disease end time, if applicable
+    pub end_time: Option<GameTimeC>,
 
     /// Disease stages for lerping
     stages: Rc<RefCell<HashMap<StageLevel, ActiveStage>>>
@@ -151,6 +155,7 @@ impl ActiveDisease {
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
         let mut stages: HashMap<StageLevel, ActiveStage> = HashMap::new();
         let mut time_elapsed= activation_time.to_duration();
+        let mut will_end = true;
 
         for stage in disease.get_stages().iter() {
             let start_time = GameTimeC::from_duration(time_elapsed);
@@ -163,13 +168,34 @@ impl ActiveDisease {
                 peak_time
             });
 
+            if stage.is_endless && will_end {
+                will_end = false;
+            }
+
             time_elapsed = time_elapsed + peak_duration;
         }
+
+        let end_time = if will_end { Some(GameTimeC::from_duration(time_elapsed)) } else { None };
 
         ActiveDisease {
             disease: Rc::new(disease),
             activation_time,
-            stages: Rc::new(RefCell::new(stages))
+            stages: Rc::new(RefCell::new(stages)),
+            will_end,
+            end_time
+        }
+    }
+
+    pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
+        let activation_secs = self.activation_time.to_duration().as_secs_f32();
+        let game_time_secs = game_time.to_duration().as_secs_f32();
+
+        if self.will_end {
+            let border_secs = self.end_time.as_ref().unwrap().to_duration().as_secs_f32();
+
+            return game_time_secs >= activation_secs && game_time_secs <= border_secs;
+        } else {
+            return game_time_secs >= activation_secs;
         }
     }
 }

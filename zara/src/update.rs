@@ -77,13 +77,13 @@ impl<E: Listener + 'static> ZaraController<E> {
         let game_time_duration = self.environment.game_time.duration.get();
         let time_delta = game_time_duration - self.last_update_game_time.get();
         let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
-        let current_secs = game_time_duration.as_secs_f64();
+        let game_time_contract = &self.environment.game_time.to_contract();
 
         // Collect active diseases data
         for (_key, active) in self.health.diseases.borrow().iter() {
             active_diseases.push(ActiveDiseaseC {
                 name: active.disease.get_name(),
-                is_active: current_secs >= active.activation_time.to_duration().as_secs_f64(),
+                is_active: active.get_is_active(game_time_contract),
                 scheduled_time: active.activation_time.copy()
             });
         };

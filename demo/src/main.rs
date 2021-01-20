@@ -87,7 +87,7 @@ fn main() {
 fn spawn_flu(person: &zara::ZaraController<ZaraEventsListener>) {
     let disease = diseases::Flu;
 
-    person.health.spawn_disease(Box::new(disease), zara::utils::GameTimeC::new(0,0,0,0.));
+    person.health.spawn_disease(Box::new(disease), zara::utils::GameTimeC::new(0,0,1,15.));
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
@@ -192,6 +192,17 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
                  person.body.last_sleep_duration.get()).unwrap();
     } else {
         writeln!(stdout, "{}  Last time slept: none", termion::cursor::Goto(50, invent_h+4));
+    }
+
+    let mut diseases_height = 2;
+
+    // Show diseases
+    writeln!(stdout, "{}{}Diseases", color::Fg(color::LightGreen), termion::cursor::Goto(160, 1));
+    for (name, disease) in person.health.diseases.borrow().iter() {
+        writeln!(stdout, "{}  {}: active? {}", termion::cursor::Goto(160, diseases_height), name,
+                 disease.get_is_active(&person.environment.game_time.to_contract()));
+
+        diseases_height += 1;
     }
 
 }
