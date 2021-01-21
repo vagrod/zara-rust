@@ -86,7 +86,7 @@ fn main() {
 
 fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
     person.health.spawn_disease(Box::new(diseases::Flu), zara::utils::GameTimeC::new(0,0,1,15.));
-    person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
+    //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {

@@ -13,7 +13,7 @@ impl Health {
     ///
     /// # Parameters
     /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
-    /// - `activation_time`: game time when this disease will start to be active. Use the
+    /// - `activation_time`: game time when this disease will activate. Use the
     ///     current game time to activate immediately (on the next `update` pass)
     ///
     /// # Returns
@@ -48,8 +48,6 @@ impl Health {
     /// # Notes
     /// This method borrows the `diseases` collection
     pub fn remove_disease(&self, disease_name: &String) -> bool {
-        println!("Remove disease call {}", disease_name);
-
         let mut b = self.diseases.borrow_mut();
 
         if !b.contains_key(disease_name) {

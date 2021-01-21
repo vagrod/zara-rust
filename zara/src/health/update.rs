@@ -1,7 +1,8 @@
 use crate::health::Health;
+use crate::health::side::{SideEffectDeltasC};
+use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC};
 use crate::utils::event::{Event, Listener};
-use crate::health::side::SideEffectDeltasC;
 
 /// Contains code related to the `update` method (calculating and updating health state)
 
@@ -52,7 +53,37 @@ impl Health {
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
-        // TODO: collect and apply disease effects
+        // Collect disease deltas
+        let mut disease_deltas = Vec::new();
+        for (_, disease) in self.diseases.borrow().iter() {
+            if disease.get_is_active(&frame.data.game_time) {
+                disease_deltas.push(disease.get_vitals_deltas(&frame.data.game_time));
+            }
+        }
+
+        // Normalize disease deltas
+        let mut max_delta = DiseaseDeltasC::negative();
+        for d in disease_deltas.iter() {
+            max_delta.body_temperature_delta =
+                if max_delta.body_temperature_delta < d.body_temperature_delta
+                { d.body_temperature_delta } else { max_delta.body_temperature_delta };
+            max_delta.heart_rate_delta =
+                if max_delta.heart_rate_delta < d.heart_rate_delta
+                { d.heart_rate_delta } else { max_delta.heart_rate_delta };
+            max_delta.pressure_top_delta =
+                if max_delta.pressure_top_delta < d.pressure_top_delta
+                { d.pressure_top_delta } else { max_delta.pressure_top_delta };
+            max_delta.pressure_bottom_delta =
+                if max_delta.pressure_bottom_delta < d.pressure_bottom_delta
+                { d.pressure_bottom_delta } else { max_delta.pressure_bottom_delta };
+        }
+        max_delta.cleanup();
+
+        // Apply disease deltas
+        snapshot.body_temperature += max_delta.body_temperature_delta;
+        snapshot.heart_rate += max_delta.heart_rate_delta;
+        snapshot.top_pressure += max_delta.pressure_top_delta;
+        snapshot.bottom_pressure += max_delta.pressure_bottom_delta;
 
         // Will always regain stamina. Side effects must "fight" it
         {
