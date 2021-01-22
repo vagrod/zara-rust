@@ -2,14 +2,16 @@ use crate::health::{Health};
 use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC, HealthC, lerp, clamp_01, clamp, clamp_bottom};
 use crate::health::disease::fluent::{StageInit};
 
-mod crud;
-mod fluent;
-
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::time::Duration;
 use std::convert::TryFrom;
+
+mod crud;
+mod fluent;
+mod lerp;
+mod chain;
 
 /// Macro for declaring a disease
 #[macro_export]
@@ -226,19 +228,6 @@ struct LerpDataNodeC {
     pressure_bottom_data: Vec<LerpDataC>,
     is_endless: bool
 }
-impl LerpDataNodeC {
-    fn new() -> Self {
-        LerpDataNodeC {
-            start_time: 0.,
-            end_time: 0.,
-            is_endless: false,
-            body_temp_data: Vec::new(),
-            heart_rate_data: Vec::new(),
-            pressure_top_data: Vec::new(),
-            pressure_bottom_data: Vec::new()
-        }
-    }
-}
 
 struct LerpDataC {
     start_time: f32,
@@ -327,421 +316,6 @@ impl ActiveDisease {
         }
     }
 
-    /// Inverts disease stages so that disease goes from the current state to its beginning.
-    ///
-    /// Use this to start the "curing" process
-    ///
-    /// ## Note
-    /// `HealthyStage` will be added at the end of the stages chain.
-    ///
-    /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
-    /// direction of passing stages again.
-    ///
-    /// [`invert_back`]:#method.invert_back
-    ///
-    /// ## Returns
-    /// `true` on success.
-    ///
-    /// # Parameters
-    /// - `game_time`: the time when inversion occurs
-    pub fn invert(&self, game_time: &GameTimeC) -> bool {
-        if self.is_inverted.get() { return false; }
-        if !self.get_is_active(game_time) { return false; }
-        let active_stage_opt = self.get_active_stage(game_time);
-        if !active_stage_opt.is_some() { return false; }
-
-        let mut stages = HashMap::new();
-        let gt = game_time.to_duration().as_secs_f32();
-        let active_stage = active_stage_opt.unwrap();
-        let pt = active_stage.peak_time.to_duration().as_secs_f32();
-
-        // First of all, we'll calculate bound to the left and to the right of the given
-        // "rotation point" -- gt
-        let level_int = active_stage.info.level as i32;
-        let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
-        let new_start_time = clamp_bottom(gt - d, 0.);
-        let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
-
-        // Add this calculated stage to the list.
-        stages.insert(active_stage.info.level, ActiveStage {
-            info: active_stage.info.copy(),
-            start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
-            peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
-        });
-
-        let mut t = new_start_time;
-        // With this stage timing calculated we'll add all stages "to the left".
-        // Now calculating them is very easy.
-        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
-            let b = self.initial_data.borrow();
-            let ind = b.iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
-            let info_opt = b.get(ind.unwrap());
-            if !info_opt.is_some() { continue; } // same
-            let mut info = info_opt.unwrap().copy();
-            let start_time = clamp_bottom(t - info.reaches_peak_in_hours*60.*60.,0.);
-            let peak_time = t;
-            let level_res = StageLevel::try_from(l);
-
-            if level_res.is_err() { continue; }
-
-            info.is_endless = false;
-            stages.insert(level_res.unwrap(), ActiveStage {
-                info,
-                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
-                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
-            });
-
-            t = start_time;
-        }
-
-        // Same thing with stages "to the right"
-        t = new_peak_time;
-        let mut l = level_int-1;
-        while l > 0 {
-            let b = self.initial_data.borrow();
-            let ind = b.iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
-            let info_opt = b.get(ind.unwrap());
-            if !info_opt.is_some() { continue; } // same
-            let mut info = info_opt.unwrap().copy();
-            let start_time = t;
-            let peak_time = start_time + info.reaches_peak_in_hours*60.*60.;
-            let level_res = StageLevel::try_from(l);
-
-            if level_res.is_err() { continue; }
-
-            info.is_endless = false;
-            stages.insert(level_res.unwrap(), ActiveStage {
-                info,
-                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
-                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
-            });
-
-            t = peak_time;
-            l -= 1;
-        }
-
-        // Add "healthy" node
-        let healthy = HealthC::healthy();
-        let healthy_stage_duration_sec = 5.*60.;
-        stages.insert(StageLevel::HealthyStage, ActiveStage {
-            info: StageDescription{
-                level: StageLevel::HealthyStage,
-                reaches_peak_in_hours: healthy_stage_duration_sec/60./60., // 5 minutes
-                is_endless: false,
-                self_heal_chance: None,
-                target_body_temp: healthy.body_temperature,
-                target_heart_rate: healthy.heart_rate,
-                target_pressure_top: healthy.top_pressure,
-                target_pressure_bottom: healthy.bottom_pressure
-            },
-            start_time: GameTimeC::from_duration(Duration::from_secs_f64(t as f64)),
-            peak_time: GameTimeC::from_duration(Duration::from_secs_f64((t + healthy_stage_duration_sec) as f64)),
-        });
-
-        self.stages.replace(stages);
-        self.is_inverted.set(true);
-
-        return true;
-    }
-
-    /// Inverts disease stages back so that disease goes from the current state to its end.
-    /// Use this to cancel the "curing" process and make disease getting "worse" again.
-    ///
-    /// ## Note
-    /// This method will not invert back disease which time marker (passed `game_time` parameter)
-    /// is on the `HealthyStage`. `false` will be returned in this case.
-    ///
-    /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
-    /// direction of passing stages again.
-    ///
-    /// [`invert`]:#method.invert
-    ///
-    /// ## Returns
-    /// `true` on success.
-    ///
-    /// # Parameters
-    /// - `game_time`: the time when inversion occurs
-    pub fn invert_back(&self, game_time: &GameTimeC) -> bool {
-        if !self.is_inverted.get() { return false; }
-        if !self.get_is_active(game_time) { return false; }
-        let active_stage_opt = self.get_active_stage(game_time);
-        if !active_stage_opt.is_some() { return false; }
-
-        let mut stages = HashMap::new();
-        let gt = game_time.to_duration().as_secs_f32();
-        let active_stage = active_stage_opt.unwrap();
-
-        // We do not roll back when the disease is healed
-        if active_stage.info.level == StageLevel::HealthyStage { return false; }
-
-        let pt = active_stage.peak_time.to_duration().as_secs_f32();
-
-        // First of all, we'll calculate bound to the left and to the right of the given
-        // "rotation point" -- gt
-        let level_int = active_stage.info.level as i32;
-        let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
-        let new_start_time = clamp_bottom(gt - d, 0.);
-        let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
-
-        // Add this calculated stage to the list.
-        stages.insert(active_stage.info.level, ActiveStage {
-            info: active_stage.info.copy(),
-            start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
-            peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
-        });
-
-        let mut t = new_peak_time;
-        // With this stage timing calculated we'll add all stages "to the right".
-        // Now calculating them is very easy.
-        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
-            let b = self.initial_data.borrow();
-            let ind = b.iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
-            let info_opt = b.get(ind.unwrap());
-            if !info_opt.is_some() { continue; } // same
-            let info = info_opt.unwrap();
-
-            let start_time = t;
-            let peak_time = t + info.reaches_peak_in_hours*60.*60.;
-            let level_res = StageLevel::try_from(l);
-
-            if level_res.is_err() { continue; }
-
-            stages.insert(level_res.unwrap(), ActiveStage {
-                info: info.copy(),
-                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
-                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
-            });
-
-            t = peak_time;
-        }
-
-        // Same thing with stages "to the left"
-        t = new_start_time;
-        let mut l = level_int-1;
-        while l > 0 {
-            let b = self.initial_data.borrow();
-            let ind = b.iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
-            let info_opt = b.get(ind.unwrap());
-            if !info_opt.is_some() { continue; } // same
-            let info = info_opt.unwrap();
-
-            let start_time = clamp_bottom(t - info.reaches_peak_in_hours*60.*60., 0.);
-            let peak_time = t;
-
-            let level_res = StageLevel::try_from(l);
-
-            if level_res.is_err() { continue; }
-
-            stages.insert(level_res.unwrap(), ActiveStage {
-                info: info.copy(),
-                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
-                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
-            });
-
-            t = start_time;
-            l -= 1;
-        }
-
-        self.stages.replace(stages);
-        self.is_inverted.set(false);
-
-        return true;
-    }
-
-    fn generate_lerp_data(&self, game_time: &GameTimeC) {
-        self.lerp_data.replace(None);
-
-        let mut lerp_data = LerpDataNodeC::new();
-        let healthy = HealthC::healthy();
-        let gt = game_time.to_duration().as_secs_f32();
-        let mut last_start_body_temp = 0.;
-        let mut last_start_heart_rate = 0.;
-        let mut last_start_pressure_top = 0.;
-        let mut last_start_pressure_bottom = 0.;
-        let mut has_endless_child = false;
-
-        lerp_data.start_time = gt;
-
-        for (_, stage) in self.stages.borrow().iter() {
-            let start = stage.start_time.to_duration().as_secs_f32();
-            let end = stage.peak_time.to_duration().as_secs_f32();
-            let duration = end - start;
-
-            if gt > end { continue; }
-            if stage.info.is_endless { has_endless_child = true; }
-
-            let start_time= if gt > start { gt } else { start };
-            let gt_progress = gt - start;
-            let p = clamp_01(gt_progress/duration);
-
-            if lerp_data.end_time < end { lerp_data.end_time = end; }
-
-            // Body Temperature
-            if stage.info.target_body_temp > 0. {
-                let end_value = stage.info.target_body_temp - healthy.body_temperature;
-                let ld = LerpDataC {
-                    start_time,
-                    end_time: end,
-                    start_value: lerp(last_start_body_temp, end_value, p),
-                    end_value,
-                    duration: end - start_time,
-                    is_endless: stage.info.is_endless
-                };
-
-                last_start_body_temp = ld.end_value;
-                lerp_data.body_temp_data.push(ld);
-            }
-            // Heart Rate
-            if stage.info.target_heart_rate > 0. {
-                let end_value = stage.info.target_heart_rate - healthy.heart_rate;
-                let ld = LerpDataC {
-                    start_time,
-                    end_time: end,
-                    start_value: lerp(last_start_heart_rate, end_value, p),
-                    end_value,
-                    duration: end - start_time,
-                    is_endless: stage.info.is_endless
-                };
-
-                last_start_heart_rate = ld.end_value;
-                lerp_data.heart_rate_data.push(ld);
-            }
-            // Pressure Top
-            if stage.info.target_pressure_top > 0. {
-                let end_value = stage.info.target_pressure_top - healthy.top_pressure;
-                let ld = LerpDataC {
-                    start_time,
-                    end_time: end,
-                    start_value: lerp(last_start_pressure_top, end_value, p),
-                    end_value,
-                    duration: end - start_time,
-                    is_endless: stage.info.is_endless
-                };
-
-                last_start_pressure_top = ld.end_value;
-                lerp_data.pressure_top_data.push(ld);
-            }
-            // Pressure Bottom
-            if stage.info.target_pressure_bottom > 0. {
-                let end_value = stage.info.target_pressure_bottom - healthy.bottom_pressure;
-                let ld = LerpDataC {
-                    start_time,
-                    end_time: end,
-                    start_value: lerp(last_start_pressure_bottom, end_value, p),
-                    end_value,
-                    duration: end - start_time,
-                    is_endless: stage.info.is_endless
-                };
-
-                last_start_pressure_bottom = ld.end_value;
-                lerp_data.pressure_bottom_data.push(ld);
-            }
-        }
-
-        lerp_data.is_endless = has_endless_child;
-
-        self.lerp_data.replace(Some(lerp_data));
-    }
-
-    fn has_lerp_data_for(&self, game_time: &GameTimeC) -> bool {
-        let ld_opt = self.lerp_data.borrow();
-
-        if !ld_opt.is_some() { return false; }
-
-        let gt = game_time.to_duration().as_secs_f32();
-        let ld = ld_opt.as_ref().unwrap();
-
-        if (gt >= ld.start_time && ld.is_endless) || (gt >= ld.start_time && gt <= ld.end_time)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /// Gets disease vitals delta for a given time
-    pub fn get_vitals_deltas(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
-        let mut result = DiseaseDeltasC::empty();
-
-        if !self.has_lerp_data_for(game_time) {
-            self.generate_lerp_data(game_time);
-
-            // Could not calculate lerps for some reason
-            if !self.has_lerp_data_for(game_time) { return DiseaseDeltasC::empty(); }
-        }
-
-        let b = self.lerp_data.borrow();
-        let lerp_data = b.as_ref().unwrap();
-        let gt = game_time.to_duration().as_secs_f32();
-
-        { // Body Temperature
-            let mut ld = None;
-            for data in lerp_data.body_temp_data.iter() {
-                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
-                    ld = Some(data);
-                    break;
-                }
-            }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.body_temperature_delta = lerp(d.start_value, d.end_value, p);
-            }
-        }
-        { // Heart Rate
-            let mut ld = None;
-            for data in lerp_data.heart_rate_data.iter() {
-                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
-                    ld = Some(data);
-                    break;
-                }
-            }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.heart_rate_delta = lerp(d.start_value, d.end_value, p);
-            }
-        }
-        { // Top Pressure
-            let mut ld = None;
-            for data in lerp_data.pressure_top_data.iter() {
-                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
-                    ld = Some(data);
-                    break;
-                }
-            }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.pressure_top_delta = lerp(d.start_value, d.end_value, p);
-            }
-        }
-        { // Bottom Pressure
-            let mut ld = None;
-            for data in lerp_data.pressure_bottom_data.iter() {
-                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
-                    ld = Some(data);
-                    break;
-                }
-            }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
-            }
-        }
-
-        return result;
-    }
-
     /// Gets a copy of active disease stage data for a given time
     pub fn get_active_stage(&self, game_time: &GameTimeC) -> Option<ActiveStage> {
         for (_, stage) in self.stages.borrow().iter() {
@@ -751,18 +325,13 @@ impl ActiveDisease {
         return None;
     }
 
-    /// Returns a copy of stage data if level is found
-    fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
+    /// Returns a copy of stage data by its level
+    pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
         for (l, stage) in self.stages.borrow().iter() {
             if level == *l { return Some(stage.copy()) }
         }
 
         return None;
-    }
-
-    /// Is called by Zara from the health engine when person consumes an item
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
-
     }
 
     /// Gets whether disease is active or not for the given time
@@ -777,5 +346,10 @@ impl ActiveDisease {
         } else {
             return game_time_secs >= activation_secs;
         }
+    }
+
+    /// Is called by Zara from the health engine when person consumes an item
+    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
+
     }
 }
