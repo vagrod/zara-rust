@@ -453,6 +453,16 @@ pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
     return value;
 }
 
+/// Clamps ceiling
+pub fn clamp_bottom(value: f32, floor: f32) -> f32 {
+    if value < floor {
+        return floor;
+    }
+
+    return value;
+}
+
+
 /// Clamps 0..1
 pub fn clamp_01(value: f32) -> f32 {
     if value > 1. {

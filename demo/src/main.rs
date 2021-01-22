@@ -25,6 +25,7 @@ mod inventory;
 // This will spawn a new thread for the "game loop"
 fn main() {
     let game_loop = thread::spawn(|| {
+        let mut is_disease_inverted = false;
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
@@ -66,10 +67,13 @@ fn main() {
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
 
-            /* Disease "invert" test
-            if person.environment.game_time.minute.get() == 10 {
-                person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
-            }*/
+            // Disease "invert" test
+            if person.environment.game_time.minute.get() == 44 {
+                if !is_disease_inverted {
+                    person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
+                    is_disease_inverted = true;
+                }
+            }
 
             // Update Zara state
             person.update(frame_time);

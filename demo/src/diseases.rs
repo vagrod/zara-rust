@@ -22,8 +22,30 @@ zara::disease!(Flu, "Flu",
                     .with_target_heart_rate(89.)
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.2) // 6 + 12min
+                    .will_end()
+            .build(),
+
+        StageBuilder::start()
+            .build_for(StageLevel::Worrying)
+                .no_self_heal()
+                .vitals()
+                    .with_target_body_temp(37.7)
+                    .with_target_heart_rate(89.)
+                    .with_target_blood_pressure(126., 84.)
+                    .will_reach_target_in(0.15) // 18 + 9min
+                    .will_end()
+            .build(),
+
+        StageBuilder::start()
+            .build_for(StageLevel::Critical)
+                .no_self_heal()
+                .vitals()
+                    .with_target_body_temp(37.7)
+                    .with_target_heart_rate(89.)
+                    .with_target_blood_pressure(126., 84.)
+                    .will_reach_target_in(0.1) // 27 + 6min
                     .will_last_forever()
-            .build()
+            .build() // 33 min total
     ]
 );
 

@@ -1,6 +1,5 @@
 use crate::health::{Health};
-use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC, HealthC,
-                   lerp, clamp_01};
+use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC, HealthC, lerp, clamp_01, clamp, clamp_bottom};
 use crate::health::disease::fluent::{StageInit};
 
 mod crud;
@@ -10,7 +9,6 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::time::Duration;
-use std::fs::FileType;
 use std::convert::TryFrom;
 
 /// Macro for declaring a disease
@@ -337,7 +335,7 @@ impl ActiveDisease {
         if !active_stage_opt.is_some() { return; }
 
         let mut stages = HashMap::new();
-        let mut gt = game_time.to_duration().as_secs_f32();
+        let gt = game_time.to_duration().as_secs_f32();
         let active_stage = active_stage_opt.unwrap();
         let pt = active_stage.peak_time.to_duration().as_secs_f32();
 
@@ -345,7 +343,7 @@ impl ActiveDisease {
         // "rotation point" -- gt
         let level_int = active_stage.info.level as i32;
         let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
-        let new_start_time = gt - d;
+        let new_start_time = clamp_bottom(gt - d, 0.);
         let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
 
         // Add this calculated stage to the list.
@@ -358,15 +356,15 @@ impl ActiveDisease {
         let mut t = new_start_time;
         // With this stage timing calculated we'll add all stages "to the left".
         // Now calculating them is very easy.
-        for l in (level_int+1)..(StageLevel::Critical as i32) {
+        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
             let ind = self.initial_data.borrow().iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() || ind.unwrap() < 0 { continue; } // strange case that should never happen, but we know...
+            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
             let b = self.initial_data.borrow();
             let info_opt = b.get(ind.unwrap());
             if !info_opt.is_some() { continue; } // same
             let info = info_opt.unwrap();
 
-            let start_time = t - info.reaches_peak_in_hours*60.*60.;
+            let start_time = clamp_bottom(t - info.reaches_peak_in_hours*60.*60.,0.);
             let peak_time = t;
             let level_res = StageLevel::try_from(l);
 
@@ -386,7 +384,7 @@ impl ActiveDisease {
         let mut l = level_int-1;
         while l > 0 {
             let ind = self.initial_data.borrow().iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() || ind.unwrap() < 0 { continue; } // strange case that should never happen, but we know...
+            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
             let b = self.initial_data.borrow();
             let info_opt = b.get(ind.unwrap());
             if !info_opt.is_some() { continue; } // same
@@ -405,7 +403,7 @@ impl ActiveDisease {
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
             });
 
-            t = start_time;
+            t = peak_time;
             l -= 1;
         }
 
