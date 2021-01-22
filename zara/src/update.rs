@@ -84,7 +84,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             active_diseases.push(ActiveDiseaseC {
                 name: active.disease.get_name(),
                 is_active: active.get_is_active(game_time_contract),
-                scheduled_time: active.activation_time.copy()
+                scheduled_time: active.get_activation_time()
             });
         };
 

@@ -1,5 +1,5 @@
 use crate::health::{Health};
-use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC, HealthC, lerp, clamp_01, clamp, clamp_bottom};
+use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
 
 use std::rc::Rc;
@@ -7,6 +7,8 @@ use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::time::Duration;
 use std::convert::TryFrom;
+use std::ops::Deref;
+use std::borrow::Borrow;
 
 mod crud;
 mod fluent;
@@ -242,25 +244,28 @@ struct LerpDataC {
 pub struct ActiveDisease {
     /// Disease instance linked to this `ActiveDisease`
     pub disease: Rc<Box<dyn Disease>>,
-    /// When this disease will become active
-    pub activation_time: GameTimeC,
-    /// Do this disease have an end
-    pub will_end: bool,
-    /// Disease end time, if applicable
-    pub end_time: Option<GameTimeC>,
     /// Disease needs treatment or will self-heal
     pub needs_treatment: bool,
+    /// Total duration of all stages, from first start to last peak. This duration dos not account
+    /// for the `HealthyStage` that is being added at runtime during the [`invert`] method call.
+    ///
+    /// [`invert`]:#method.invert
+    pub total_duration: Duration,
 
     /// Initial stages data given by user
     initial_data: RefCell<Vec<StageDescription>>,
-    /// Total duration of lerpable data (game seconds)
-    total_duration: f32,
     /// Disease stages with calculated timings and order
     stages: RefCell<HashMap<StageLevel, ActiveStage>>,
     /// Calculated data for lerping
     lerp_data: RefCell<Option<LerpDataNodeC>>,
     /// Is disease chain inverted (`invert` was called)
-    is_inverted: Cell<bool>
+    is_inverted: Cell<bool>,
+    /// When this disease will become active
+    activation_time: RefCell<GameTimeC>,
+    /// Do this disease have an end
+    will_end: Cell<bool>,
+    /// Disease end time, if applicable
+    end_time: RefCell<Option<GameTimeC>>
 }
 impl ActiveDisease {
     /// Creates new active disease object
@@ -306,14 +311,25 @@ impl ActiveDisease {
             disease: Rc::new(disease),
             initial_data: RefCell::new(initial_data),
             is_inverted: Cell::new(false),
-            total_duration: time_elapsed.as_secs_f32(),
-            activation_time,
+            total_duration: time_elapsed,
+            activation_time: RefCell::new(activation_time),
             stages: RefCell::new(stages),
-            will_end,
-            end_time,
+            will_end: Cell::new(will_end),
+            end_time: RefCell::new(end_time),
             needs_treatment: !self_heal,
             lerp_data: RefCell::new(None) // will be calculated on first get_vitals_deltas
         }
+    }
+
+    /// Gets if this disease will end (is it finite)
+    pub fn get_will_end(&self) -> bool {
+        self.will_end.get()
+    }
+
+    pub fn get_end_time(&self) -> Option<GameTimeC> {
+        let b = self.end_time.borrow();
+
+        return if b.is_some() { Some(b.as_ref().unwrap().copy()) } else { None }
     }
 
     /// Gets a copy of active disease stage data for a given time
@@ -323,6 +339,11 @@ impl ActiveDisease {
         }
 
         return None;
+    }
+
+    /// Returns a copy of a game time structure containing data of when this disease was activated
+    pub fn get_activation_time(&self) -> GameTimeC {
+        self.activation_time.borrow().copy()
     }
 
     /// Returns a copy of stage data by its level
@@ -336,11 +357,12 @@ impl ActiveDisease {
 
     /// Gets whether disease is active or not for the given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
-        let activation_secs = self.activation_time.to_duration().as_secs_f32();
+        let activation_secs = self.activation_time.borrow().to_duration().as_secs_f32();
         let game_time_secs = game_time.to_duration().as_secs_f32();
 
-        if self.will_end {
-            let border_secs = self.end_time.as_ref().unwrap().to_duration().as_secs_f32();
+        if self.will_end.get() {
+            let b = self.end_time.borrow();
+            let border_secs = b.as_ref().unwrap().to_duration().as_secs_f32();
 
             return game_time_secs >= activation_secs && game_time_secs <= border_secs;
         } else {

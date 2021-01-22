@@ -40,6 +40,7 @@ impl ActiveDisease {
         let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
         let new_start_time = clamp_bottom(gt - d, 0.);
         let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
+        let mut chain_start_time = new_start_time;
 
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
@@ -72,6 +73,8 @@ impl ActiveDisease {
             });
 
             t = start_time;
+
+            if chain_start_time > t { chain_start_time = t; }
         }
 
         // Same thing with stages "to the right"
@@ -99,11 +102,14 @@ impl ActiveDisease {
 
             t = peak_time;
             l -= 1;
+
+            if chain_start_time > t { chain_start_time = t; }
         }
 
         // Add "healthy" node
         let healthy = HealthC::healthy();
         let healthy_stage_duration_sec = 5.*60.;
+        let new_end_time =  t + healthy_stage_duration_sec;
         stages.insert(StageLevel::HealthyStage, ActiveStage {
             info: StageDescription{
                 level: StageLevel::HealthyStage,
@@ -116,10 +122,13 @@ impl ActiveDisease {
                 target_pressure_bottom: healthy.bottom_pressure
             },
             start_time: GameTimeC::from_duration(Duration::from_secs_f64(t as f64)),
-            peak_time: GameTimeC::from_duration(Duration::from_secs_f64((t + healthy_stage_duration_sec) as f64)),
+            peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_end_time as f64)),
         });
 
         self.stages.replace(stages);
+        self.lerp_data.replace(None);
+        self.activation_time.replace(GameTimeC::from_duration(Duration::from_secs_f32(chain_start_time)));
+        self.end_time.replace(Some(GameTimeC::from_duration(Duration::from_secs_f32(new_end_time))));
         self.is_inverted.set(true);
 
         return true;
@@ -151,6 +160,7 @@ impl ActiveDisease {
         let mut stages = HashMap::new();
         let gt = game_time.to_duration().as_secs_f32();
         let active_stage = active_stage_opt.unwrap();
+        let mut will_end = true;
 
         // We do not roll back when the disease is healed
         if active_stage.info.level == StageLevel::HealthyStage { return false; }
@@ -163,6 +173,7 @@ impl ActiveDisease {
         let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
         let new_start_time = clamp_bottom(gt - d, 0.);
         let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
+        let mut chain_start_time = new_start_time;
 
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
@@ -171,34 +182,9 @@ impl ActiveDisease {
             peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
         });
 
-        let mut t = new_peak_time;
-        // With this stage timing calculated we'll add all stages "to the right".
+        // With this stage timing calculated we'll add all stages "to the left".
         // Now calculating them is very easy.
-        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
-            let b = self.initial_data.borrow();
-            let ind = b.iter().position(|x| (x.level as i32) == l);
-            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
-            let info_opt = b.get(ind.unwrap());
-            if !info_opt.is_some() { continue; } // same
-            let info = info_opt.unwrap();
-
-            let start_time = t;
-            let peak_time = t + info.reaches_peak_in_hours*60.*60.;
-            let level_res = StageLevel::try_from(l);
-
-            if level_res.is_err() { continue; }
-
-            stages.insert(level_res.unwrap(), ActiveStage {
-                info: info.copy(),
-                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
-                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
-            });
-
-            t = peak_time;
-        }
-
-        // Same thing with stages "to the left"
-        t = new_start_time;
+        let mut t = new_start_time;
         let mut l = level_int-1;
         while l > 0 {
             let b = self.initial_data.borrow();
@@ -207,6 +193,8 @@ impl ActiveDisease {
             let info_opt = b.get(ind.unwrap());
             if !info_opt.is_some() { continue; } // same
             let info = info_opt.unwrap();
+
+            if info.is_endless { will_end = false; }
 
             let start_time = clamp_bottom(t - info.reaches_peak_in_hours*60.*60., 0.);
             let peak_time = t;
@@ -223,9 +211,49 @@ impl ActiveDisease {
 
             t = start_time;
             l -= 1;
+
+            if chain_start_time > t { chain_start_time = t; }
         }
 
+        t = new_peak_time;
+        // Same thing with stages "to the right"
+        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
+            let b = self.initial_data.borrow();
+            let ind = b.iter().position(|x| (x.level as i32) == l);
+            if !ind.is_some() { continue; } // strange case that should never happen, but we know...
+            let info_opt = b.get(ind.unwrap());
+            if !info_opt.is_some() { continue; } // same
+            let info = info_opt.unwrap();
+
+            if info.is_endless { will_end = false; }
+
+            let start_time = t;
+            let peak_time = t + info.reaches_peak_in_hours*60.*60.;
+            let level_res = StageLevel::try_from(l);
+
+            if level_res.is_err() { continue; }
+
+            stages.insert(level_res.unwrap(), ActiveStage {
+                info: info.copy(),
+                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
+                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
+            });
+
+            t = peak_time;
+
+            if chain_start_time > t { chain_start_time = t; }
+        }
+
+        let new_end_time = if will_end {
+            Some(GameTimeC::from_duration(Duration::from_secs_f32(t)))
+        } else {
+            None
+        };
+
         self.stages.replace(stages);
+        self.lerp_data.replace(None);
+        self.activation_time.replace(GameTimeC::from_duration(Duration::from_secs_f32(chain_start_time)));
+        self.end_time.replace(new_end_time);
         self.is_inverted.set(false);
 
         return true;

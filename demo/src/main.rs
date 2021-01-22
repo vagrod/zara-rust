@@ -213,8 +213,8 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             writeln!(stdout, "{}  {}: active", termion::cursor::Goto(150, diseases_height), name);
             diseases_height+=1;
             if disease.needs_treatment {
-                if disease.will_end {
-                    let time = disease.end_time.as_ref().unwrap();
+                if disease.get_will_end() {
+                    let time = disease.get_end_time().unwrap();
                     writeln!(stdout, "{}    will end @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height),
                              time.day,
                              time.hour,
@@ -228,7 +228,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
                 writeln!(stdout, "{}    don't need treatment, will self-heal", termion::cursor::Goto(150, diseases_height));
             }
         } else {
-            let time = &disease.activation_time;
+            let time = &disease.get_activation_time();
             writeln!(stdout, "{}  {}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), name,
                      time.day,
                      time.hour,

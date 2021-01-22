@@ -1,4 +1,4 @@
-use zara::health::disease::{Disease, StageLevel, StageBuilder};
+use zara::health::disease::{StageLevel, StageBuilder};
 
 pub struct Flu;
 zara::disease!(Flu, "Flu",
