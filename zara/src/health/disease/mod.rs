@@ -10,6 +10,8 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::time::Duration;
+use std::fs::FileType;
+use std::convert::TryFrom;
 
 /// Macro for declaring a disease
 #[macro_export]
@@ -51,11 +53,25 @@ pub struct StageBuilder {
 /// Disease stage level of seriousness
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum StageLevel {
-    HealthyStage,
-    InitialStage,
-    Progressing,
-    Worrying,
-    Critical
+    HealthyStage = 0,
+    InitialStage = 1,
+    Progressing = 2,
+    Worrying = 3,
+    Critical = 4
+}
+impl TryFrom<i32> for StageLevel {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == StageLevel::HealthyStage as i32 => Ok(StageLevel::HealthyStage),
+            x if x == StageLevel::InitialStage as i32 => Ok(StageLevel::InitialStage),
+            x if x == StageLevel::Progressing as i32 => Ok(StageLevel::Progressing),
+            x if x == StageLevel::Worrying as i32 => Ok(StageLevel::Worrying),
+            x if x == StageLevel::Critical as i32 => Ok(StageLevel::Critical),
+            _ => Err(()),
+        }
+    }
 }
 
 impl StageBuilder {
@@ -248,8 +264,13 @@ pub struct ActiveDisease {
     /// Disease needs treatment or will self-heal
     pub needs_treatment: bool,
 
-    /// Disease stages for lerping
+    /// Initial stages data given by user
+    initial_data: RefCell<Vec<StageDescription>>,
+    /// Total duration of lerpable data (game seconds)
+    total_duration: f32,
+    /// Disease stages with calculated timings and order
     stages: RefCell<HashMap<StageLevel, ActiveStage>>,
+    /// Calculated data for lerping
     lerp_data: RefCell<Option<LerpDataNodeC>>
 }
 impl ActiveDisease {
@@ -264,6 +285,7 @@ impl ActiveDisease {
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
         let mut self_heal = false;
+        let initial_data = disease.get_stages();
 
         for stage in disease.get_stages().iter() {
             if stage.self_heal_chance.is_some() {
@@ -293,6 +315,8 @@ impl ActiveDisease {
 
         ActiveDisease {
             disease: Rc::new(disease),
+            initial_data: RefCell::new(initial_data),
+            total_duration: time_elapsed.as_secs_f32(),
             activation_time,
             stages: RefCell::new(stages),
             will_end,
@@ -300,6 +324,92 @@ impl ActiveDisease {
             needs_treatment: !self_heal,
             lerp_data: RefCell::new(None) // will be calculated on first get_vitals_deltas
         }
+    }
+
+    /// Inverts disease stages so that disease goes from the current state to its beginning.
+    /// Use this to start the "curing" process
+    ///
+    /// # Parameters
+    /// - `game_time`: the time when inversion occurs
+    pub fn invert(&self, game_time: &GameTimeC) {
+        if !self.get_is_active(game_time) { return; }
+        let active_stage_opt = self.get_active_stage(game_time);
+        if !active_stage_opt.is_some() { return; }
+
+        let mut stages = HashMap::new();
+        let mut gt = game_time.to_duration().as_secs_f32();
+        let active_stage = active_stage_opt.unwrap();
+        let pt = active_stage.peak_time.to_duration().as_secs_f32();
+
+        // First of all, we'll calculate bound to the left and to the right of the given
+        // "rotation point" -- gt
+        let level_int = active_stage.info.level as i32;
+        let d = if gt > pt { 0. } else { pt - gt }; // case for "endless" stages
+        let new_start_time = gt - d;
+        let new_peak_time = new_start_time + active_stage.info.reaches_peak_in_hours*60.*60.;
+
+        // Add this calculated stage to the list.
+        stages.insert(active_stage.info.level, ActiveStage {
+            info: active_stage.info.copy(),
+            start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
+            peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
+        });
+
+        let mut t = new_start_time;
+        // With this stage timing calculated we'll add all stages "to the left".
+        // Now calculating them is very easy.
+        for l in (level_int+1)..(StageLevel::Critical as i32) {
+            let ind = self.initial_data.borrow().iter().position(|x| (x.level as i32) == l);
+            if !ind.is_some() || ind.unwrap() < 0 { continue; } // strange case that should never happen, but we know...
+            let b = self.initial_data.borrow();
+            let info_opt = b.get(ind.unwrap());
+            if !info_opt.is_some() { continue; } // same
+            let info = info_opt.unwrap();
+
+            let start_time = t - info.reaches_peak_in_hours*60.*60.;
+            let peak_time = t;
+            let level_res = StageLevel::try_from(l);
+
+            if level_res.is_err() { continue; }
+
+            stages.insert(level_res.unwrap(), ActiveStage {
+                info: info.copy(),
+                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
+                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
+            });
+
+            t = start_time;
+        }
+
+        // Same thing with stages "to the right"
+        t = new_peak_time;
+        let mut l = level_int-1;
+        while l > 0 {
+            let ind = self.initial_data.borrow().iter().position(|x| (x.level as i32) == l);
+            if !ind.is_some() || ind.unwrap() < 0 { continue; } // strange case that should never happen, but we know...
+            let b = self.initial_data.borrow();
+            let info_opt = b.get(ind.unwrap());
+            if !info_opt.is_some() { continue; } // same
+            let info = info_opt.unwrap();
+
+            let start_time = t;
+            let peak_time = start_time + info.reaches_peak_in_hours*60.*60.;
+
+            let level_res = StageLevel::try_from(l);
+
+            if level_res.is_err() { continue; }
+
+            stages.insert(level_res.unwrap(), ActiveStage {
+                info: info.copy(),
+                start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
+                peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
+            });
+
+            t = start_time;
+            l -= 1;
+        }
+
+        self.stages.replace(stages);
     }
 
     fn generate_lerp_data(&self, game_time: &GameTimeC) {

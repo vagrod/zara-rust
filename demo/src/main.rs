@@ -66,6 +66,11 @@ fn main() {
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
 
+            /* Disease "invert" test
+            if person.environment.game_time.minute.get() == 10 {
+                person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
+            }*/
+
             // Update Zara state
             person.update(frame_time);
 

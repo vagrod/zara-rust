@@ -10,7 +10,7 @@ zara::disease!(Flu, "Flu",
                     .with_target_body_temp(37.2)
                     .with_target_heart_rate(85.)
                     .with_target_blood_pressure(130., 90.)
-                    .will_reach_target_in(0.1)
+                    .will_reach_target_in(0.1) // 6min
                     .will_end()
             .build(),
 
@@ -21,7 +21,7 @@ zara::disease!(Flu, "Flu",
                     .with_target_body_temp(37.7)
                     .with_target_heart_rate(89.)
                     .with_target_blood_pressure(126., 84.)
-                    .will_reach_target_in(0.2)
+                    .will_reach_target_in(0.2) // 6 + 12min
                     .will_last_forever()
             .build()
     ]
