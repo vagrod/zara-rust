@@ -321,9 +321,8 @@ impl ActiveDisease {
             let end = stage.peak_time.to_duration().as_secs_f32();
             let duration = end - start;
 
-            if stage.info.is_endless { has_endless_child = true; }
-
             if gt > end { continue; }
+            if stage.info.is_endless { has_endless_child = true; }
 
             let start_time= if gt > start { gt } else { start };
             let gt_progress = gt - start;
