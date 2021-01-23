@@ -5,6 +5,7 @@ use std::sync::{Arc, Weak};
 use std::cell::RefCell;
 use super::ConsumableC;
 
+/// All Zara public events
 pub enum Event {
     WokeUp,
     ItemConsumed(ConsumableC),

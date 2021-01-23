@@ -1,5 +1,5 @@
-use crate::health::disease::{ActiveDisease, ActiveStage, StageLevel, StageDescription};
-use crate::utils::{GameTimeC, clamp_bottom, HealthC};
+use crate::health::disease::{ActiveDisease, ActiveStage, StageLevel};
+use crate::utils::{GameTimeC, clamp_bottom};
 use crate::error::{ChainInvertErr, ChainInvertBackErr};
 
 use std::time::Duration;
@@ -12,8 +12,6 @@ impl ActiveDisease {
     /// Use this to start the "curing" process
     ///
     /// ## Note
-    /// `HealthyStage` will be added at the end of the stages chain.
-    ///
     /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
     /// direction of passing stages again.
     ///
@@ -115,29 +113,10 @@ impl ActiveDisease {
             if chain_start_time > t { chain_start_time = t; }
         }
 
-        // Add "healthy" node
-        let healthy = HealthC::healthy();
-        let healthy_stage_duration_sec = 5.*60.;
-        let new_end_time =  t + healthy_stage_duration_sec;
-        stages.insert(StageLevel::HealthyStage, ActiveStage {
-            info: StageDescription{
-                level: StageLevel::HealthyStage,
-                reaches_peak_in_hours: healthy_stage_duration_sec/60./60., // 5 minutes
-                is_endless: false,
-                self_heal_chance: None,
-                target_body_temp: healthy.body_temperature,
-                target_heart_rate: healthy.heart_rate,
-                target_pressure_top: healthy.top_pressure,
-                target_pressure_bottom: healthy.bottom_pressure
-            },
-            start_time: GameTimeC::from_duration(Duration::from_secs_f64(t as f64)),
-            peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_end_time as f64)),
-        });
-
         self.stages.replace(stages);
-        self.lerp_data.replace(None);
         self.activation_time.replace(GameTimeC::from_duration(Duration::from_secs_f32(chain_start_time)));
-        self.end_time.replace(Some(GameTimeC::from_duration(Duration::from_secs_f32(new_end_time))));
+        self.end_time.replace(Some(GameTimeC::from_duration(Duration::from_secs_f32(t))));
+        self.will_end.set(true);
         self.is_inverted.set(true);
 
         return Ok(());
@@ -147,10 +126,6 @@ impl ActiveDisease {
     /// Use this to cancel the "curing" process and make disease getting "worse" again.
     ///
     /// ## Note
-    /// This method will not invert back disease which time marker (passed `game_time` parameter)
-    /// is on the `HealthyStage`. `ChainInvertErr::CannotInvertBackWhenOnHealthyStage` will be
-    /// returned in this case.
-    ///
     /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
     /// direction of passing stages again.
     ///
@@ -170,11 +145,6 @@ impl ActiveDisease {
             Some(o) => o,
             None => return Err(ChainInvertBackErr::NoActiveStageAtGivenTime)
         };
-
-        // We do not roll back when the disease is healed
-        if active_stage.info.level == StageLevel::HealthyStage {
-            return Err(ChainInvertBackErr::CannotInvertBackWhenOnHealthyStage);
-        }
 
         let mut stages = BTreeMap::new();
         let gt = game_time.to_duration().as_secs_f32();
@@ -265,7 +235,8 @@ impl ActiveDisease {
             if chain_start_time > t { chain_start_time = t; }
         }
 
-        //let new_end_time = will_end.then_some(GameTimeC::from_duration(Duration::from_secs_f32(t)));
+        // Not stable yet unfortunately, will uncomment when it become stable
+        // let new_end_time = will_end.then_some(GameTimeC::from_duration(Duration::from_secs_f32(t)));
         let new_end_time = if will_end {
             Some(GameTimeC::from_duration(Duration::from_secs_f32(t)))
         } else {
@@ -273,9 +244,9 @@ impl ActiveDisease {
         };
 
         self.stages.replace(stages);
-        self.lerp_data.replace(None);
         self.activation_time.replace(GameTimeC::from_duration(Duration::from_secs_f32(chain_start_time)));
         self.end_time.replace(new_end_time);
+        self.will_end.set(will_end);
         self.is_inverted.set(false);
 
         return Ok(());

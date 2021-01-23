@@ -7,7 +7,7 @@ zara::disease!(Flu, "Flu",
             .build_for(StageLevel::InitialStage)
                 .self_heal(15)
                 .vitals()
-                    .with_target_body_temp(37.2)
+                    .with_target_body_temp(37.4)
                     .with_target_heart_rate(85.)
                     .with_target_blood_pressure(130., 90.)
                     .will_reach_target_in(0.1) // 6min
@@ -18,7 +18,7 @@ zara::disease!(Flu, "Flu",
             .build_for(StageLevel::Progressing)
                 .no_self_heal()
                 .vitals()
-                    .with_target_body_temp(37.7)
+                    .with_target_body_temp(37.9)
                     .with_target_heart_rate(89.)
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.2) // 6 + 12min
@@ -29,7 +29,7 @@ zara::disease!(Flu, "Flu",
             .build_for(StageLevel::Worrying)
                 .no_self_heal()
                 .vitals()
-                    .with_target_body_temp(37.7)
+                    .with_target_body_temp(38.8)
                     .with_target_heart_rate(89.)
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.15) // 18 + 9min
@@ -40,7 +40,7 @@ zara::disease!(Flu, "Flu",
             .build_for(StageLevel::Critical)
                 .no_self_heal()
                 .vitals()
-                    .with_target_body_temp(37.7)
+                    .with_target_body_temp(39.2)
                     .with_target_heart_rate(89.)
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.1) // 27 + 6min

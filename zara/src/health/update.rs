@@ -45,7 +45,7 @@ impl Health {
         snapshot.water_level = self.water_level.get();
         snapshot.blood_level = self.blood_level.get();
 
-        // For pretty picture
+        // For pretty picture, freeze fatigue value when sleeping
         if frame.data.player.is_sleeping {
            snapshot.fatigue_level = frame.data.health.fatigue_level;
         }
@@ -53,11 +53,28 @@ impl Health {
         // Apply monitors deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
+        // Clean up garbage diseases
+        let mut diseases_to_remove = Vec::new();
+        {
+            let diseases = self.diseases.borrow();
+            for (name, disease) in diseases.iter() {
+                if disease.get_is_old(&frame.data.game_time) {
+                    diseases_to_remove.push(name.clone());
+                }
+            }
+        }
+        for disease_name in diseases_to_remove {
+            self.remove_disease(&disease_name).ok(); // we don't really care here
+        }
+
         // Collect disease deltas
         let mut disease_deltas = Vec::new();
-        for (_, disease) in self.diseases.borrow().iter() {
-            if disease.get_is_active(&frame.data.game_time) {
-                disease_deltas.push(disease.get_vitals_deltas(&self, &frame.data.game_time));
+        {
+            let diseases = self.diseases.borrow();
+            for (_, disease) in diseases.iter() {
+                if disease.get_is_active(&frame.data.game_time) {
+                    disease_deltas.push(disease.get_vitals_deltas(&frame.data.game_time));
+                }
             }
         }
 

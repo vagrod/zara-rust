@@ -129,6 +129,8 @@ fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
 }
 
 fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEventsListener>) {
+    let game_time = &person.environment.game_time.to_contract();
+
     // Cls
     write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
 
@@ -210,7 +212,11 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
     for (name, disease) in person.health.diseases.borrow().iter() {
         let is_active = disease.get_is_active(&person.environment.game_time.to_contract());
         if is_active {
-            writeln!(stdout, "{}  {}: active", termion::cursor::Goto(150, diseases_height), name);
+            write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
+            write!(stdout, "{:?}", disease.get_active_level(game_time).unwrap_or(StageLevel::Undefined));
+            if disease.get_is_healing() {
+                write!(stdout, " (now healing)");
+            }
             diseases_height+=1;
             if disease.needs_treatment {
                 if disease.get_will_end() {

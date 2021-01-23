@@ -53,7 +53,7 @@ pub struct StageBuilder {
 /// Disease stage level of seriousness
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum StageLevel {
-    HealthyStage = 0,
+    Undefined = -1,
     InitialStage = 1,
     Progressing = 2,
     Worrying = 3,
@@ -65,7 +65,6 @@ impl TryFrom<i32> for StageLevel {
 
     fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v {
-            x if x == StageLevel::HealthyStage as i32 => Ok(StageLevel::HealthyStage),
             x if x == StageLevel::InitialStage as i32 => Ok(StageLevel::InitialStage),
             x if x == StageLevel::Progressing as i32 => Ok(StageLevel::Progressing),
             x if x == StageLevel::Worrying as i32 => Ok(StageLevel::Worrying),
@@ -79,7 +78,7 @@ impl StageBuilder {
     pub fn start() -> Box<dyn StageInit> {
         Box::new(
             StageBuilder {
-                level: RefCell::new(StageLevel::HealthyStage),
+                level: RefCell::new(StageLevel::Undefined),
                 self_heal_chance: RefCell::new(None),
                 is_endless: Cell::new(false),
                 reaches_peak_in_hours: Cell::new(0.),
@@ -169,6 +168,14 @@ impl DiseaseDeltasC {
         if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
         if self.pressure_bottom_delta < -900. { self.pressure_bottom_delta = 0.; }
     }
+    pub fn copy(&self) -> DiseaseDeltasC {
+        DiseaseDeltasC {
+            body_temperature_delta: self.body_temperature_delta,
+            heart_rate_delta: self.heart_rate_delta,
+            pressure_top_delta: self.pressure_top_delta,
+            pressure_bottom_delta: self.pressure_bottom_delta
+        }
+    }
 }
 
 impl ActiveStage {
@@ -227,9 +234,60 @@ struct LerpDataNodeC {
     heart_rate_data: Vec<LerpDataC>,
     pressure_top_data: Vec<LerpDataC>,
     pressure_bottom_data: Vec<LerpDataC>,
-    is_endless: bool
+    is_endless: bool,
+    is_for_inverted: bool
 }
 
+impl LerpDataNodeC {
+    pub fn get_by_time(&self, game_time: &GameTimeC) -> LerpDataSiceC {
+        let mut body_temp = LerpDataC::default();
+        let mut heart_rate = LerpDataC::default();
+        let mut pressure_top = LerpDataC::default();
+        let mut pressure_bottom = LerpDataC::default();
+        let gt = game_time.to_duration().as_secs_f32();
+
+        for data in self.body_temp_data.iter() {
+            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
+                body_temp = *data;
+                break;
+            }
+        }
+        for data in self.heart_rate_data.iter() {
+            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
+                heart_rate = *data;
+                break;
+            }
+        }
+        for data in self.pressure_top_data.iter() {
+            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
+                pressure_top = *data;
+                break;
+            }
+        }
+        for data in self.pressure_bottom_data.iter() {
+            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
+                pressure_bottom = *data;
+                break;
+            }
+        }
+
+        return LerpDataSiceC {
+            body_temp_data: body_temp,
+            heart_rate_data: heart_rate,
+            pressure_top_data: pressure_top,
+            pressure_bottom_data: pressure_bottom
+        };
+    }
+}
+
+struct LerpDataSiceC {
+    body_temp_data: LerpDataC,
+    heart_rate_data: LerpDataC,
+    pressure_top_data: LerpDataC,
+    pressure_bottom_data: LerpDataC
+}
+
+#[derive(Default, Copy, Clone)]
 struct LerpDataC {
     start_time: f32,
     end_time: f32,
@@ -237,6 +295,24 @@ struct LerpDataC {
     end_value: f32,
     duration: f32,
     is_endless: bool
+}
+impl LerpDataC {
+    pub fn try_lerp(&self, time_secs: f32) -> Result<f32, ()> {
+        if time_secs < self.start_time || time_secs > self.end_time { return Err(()); }
+
+        let d = self.end_time - time_secs;
+        let p = d / self.duration;
+
+        Ok(crate::utils::lerp(self.start_value, self.end_value, p))
+    }
+    pub fn try_lerp_rev(&self, time_secs: f32) -> Result<f32, ()> {
+        if time_secs < self.start_time || time_secs > self.end_time { return Err(()); }
+
+        let d = self.end_time - time_secs;
+        let p = d / self.duration;
+
+        Ok(crate::utils::lerp(self.end_value, self.start_value, p))
+    }
 }
 
 /// Describes an active disease that can be also scheduled
@@ -251,6 +327,7 @@ pub struct ActiveDisease {
     /// [`invert`]:#method.invert
     pub total_duration: Duration,
 
+    // Private fields
     /// Initial stages data given by user
     initial_data: RefCell<Vec<StageDescription>>,
     /// Disease stages with calculated timings and order
@@ -326,6 +403,9 @@ impl ActiveDisease {
     /// Gets if this disease will end (is it finite)
     pub fn get_will_end(&self) -> bool { self.will_end.get() }
 
+    /// Gets if this disease is now healing (is inverted)
+    pub fn get_is_healing(&self) -> bool { self.is_inverted.get() }
+
     /// Gets the end time of this disease, if it is finite
     pub fn get_end_time(&self) -> Option<GameTimeC> {
         let b = self.end_time.borrow();
@@ -345,6 +425,11 @@ impl ActiveDisease {
         return None;
     }
 
+    /// Gets active stage level for a given game time
+    pub fn get_active_level(&self, game_time: &GameTimeC) -> Option<StageLevel> {
+        self.get_active_stage(game_time).map(|st| st.info.level)
+    }
+
     /// Returns a copy of a game time structure containing data of when this disease was activated
     pub fn get_activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
 
@@ -357,7 +442,7 @@ impl ActiveDisease {
         return None;
     }
 
-    /// Gets whether disease is active or not for the given time
+    /// Gets whether disease is active or not for a given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
         let activation_secs = self.activation_time.borrow().to_duration().as_secs_f32();
         let game_time_secs = game_time.to_duration().as_secs_f32();
@@ -372,6 +457,15 @@ impl ActiveDisease {
             return game_time_secs >= activation_secs && game_time_secs <= border_secs;
         } else {
             return game_time_secs >= activation_secs;
+        }
+    }
+
+    /// Returns `true` if this disease already passed and is no longer relevant, for a given game time
+    pub fn get_is_old(&self, game_time: &GameTimeC) -> bool {
+        let gt = game_time.to_duration().as_secs_f32();
+        return match self.end_time.borrow().as_ref() {
+            Some(t) => gt > t.to_duration().as_secs_f32(),
+            None => false
         }
     }
 

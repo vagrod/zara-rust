@@ -1,11 +1,11 @@
 use utils::{GameTime, EnvironmentC, ConsumableC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
+use error::{ItemConsumeErr};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
-use crate::error::ItemConsumeErr;
 
 mod update;
 
@@ -180,7 +180,8 @@ impl<E: Listener + 'static> ZaraController<E> {
         self.health.on_item_consumed(&game_time, &consumable);
 
         // Change items count
-        self.inventory.change_item_count(item_name, new_count);
+        self.inventory.change_item_count(item_name, new_count)
+            .or_else(|err| Err(ItemConsumeErr::CouldNotUpdateItemCount(err)))?;
 
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));

@@ -19,9 +19,7 @@ pub enum ChainInvertBackErr {
     DiseaseNotActiveAtGivenTime,
     /// When calling `invert_back()` with time that cannot be mapped to any
     /// active stage
-    NoActiveStageAtGivenTime,
-    /// When calling `invert_back()` with time that points to the `HealthyStage` as active stage
-    CannotInvertBackWhenOnHealthyStage
+    NoActiveStageAtGivenTime
 }
 
 /// Is used by `Health.spawn_disease` method
@@ -56,5 +54,7 @@ pub enum ItemConsumeErr {
     /// When item `count` is not enough
     NotEnoughResources,
     /// When item has no `consumable` option
-    ItemIsNotConsumable
+    ItemIsNotConsumable,
+    /// When could not update item count
+    CouldNotUpdateItemCount(InventoryItemAccessErr)
 }
