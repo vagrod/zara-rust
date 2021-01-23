@@ -68,11 +68,17 @@ fn main() {
             }
 
             // Disease "invert" test
-            if person.environment.game_time.minute.get() == 20 {
+            if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 35 {
                 if !is_disease_inverted {
                     person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
-                    //person.health.diseases.borrow().get("Flu").unwrap().invert_back(&person.environment.game_time.to_contract());
                     is_disease_inverted = true;
+                }
+            }
+            // Disease "invert back" test
+            if person.environment.game_time.minute.get() == 33 {
+                if is_disease_inverted {
+                    person.health.diseases.borrow().get("Flu").unwrap().invert_back(&person.environment.game_time.to_contract());
+                    is_disease_inverted = false;
                 }
             }
 
@@ -212,8 +218,10 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
     for (name, disease) in person.health.diseases.borrow().iter() {
         let is_active = disease.get_is_active(&person.environment.game_time.to_contract());
         if is_active {
+            let active_stage = disease.get_active_stage(game_time).unwrap();
+            let p = active_stage.get_percent_active(game_time);
             write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
-            write!(stdout, "{:?}", disease.get_active_level(game_time).unwrap_or(StageLevel::Undefined));
+            write!(stdout, "{:?} {}%", disease.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
             if disease.get_is_healing() {
                 write!(stdout, " (now healing)");
             }

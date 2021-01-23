@@ -135,6 +135,8 @@ pub struct ActiveStage {
     pub start_time: GameTimeC,
     /// When this stage reaches its peak
     pub peak_time: GameTimeC,
+    /// Duration of the stage
+    pub duration: Duration
 }
 
 /// Describes deltas calculated by the active diseases
@@ -192,11 +194,28 @@ impl ActiveStage {
         }
     }
 
+    pub fn get_percent_active(&self, game_time: &GameTimeC) -> usize {
+        let gt = game_time.to_duration().as_secs_f32();
+        let start = self.start_time.to_duration().as_secs_f32();
+        let end = self.peak_time.to_duration().as_secs_f32();
+        let d = end - start;
+
+        if d < 0. { return 0; }
+        if gt >= end { return 100; }
+        if gt <= start { return 0; }
+
+        let gt_d = gt - start;
+
+        return ((gt_d/d) * 100.) as usize;
+
+    }
+
     pub fn copy(&self) -> ActiveStage {
         ActiveStage {
             info: self.info.copy(),
             peak_time: self.peak_time.copy(),
             start_time: self.start_time.copy(),
+            duration: self.duration.clone()
         }
     }
 }
@@ -238,55 +257,6 @@ struct LerpDataNodeC {
     is_for_inverted: bool
 }
 
-impl LerpDataNodeC {
-    pub fn get_by_time(&self, game_time: &GameTimeC) -> LerpDataSiceC {
-        let mut body_temp = LerpDataC::default();
-        let mut heart_rate = LerpDataC::default();
-        let mut pressure_top = LerpDataC::default();
-        let mut pressure_bottom = LerpDataC::default();
-        let gt = game_time.to_duration().as_secs_f32();
-
-        for data in self.body_temp_data.iter() {
-            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
-                body_temp = *data;
-                break;
-            }
-        }
-        for data in self.heart_rate_data.iter() {
-            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
-                heart_rate = *data;
-                break;
-            }
-        }
-        for data in self.pressure_top_data.iter() {
-            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
-                pressure_top = *data;
-                break;
-            }
-        }
-        for data in self.pressure_bottom_data.iter() {
-            if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time)  {
-                pressure_bottom = *data;
-                break;
-            }
-        }
-
-        return LerpDataSiceC {
-            body_temp_data: body_temp,
-            heart_rate_data: heart_rate,
-            pressure_top_data: pressure_top,
-            pressure_bottom_data: pressure_bottom
-        };
-    }
-}
-
-struct LerpDataSiceC {
-    body_temp_data: LerpDataC,
-    heart_rate_data: LerpDataC,
-    pressure_top_data: LerpDataC,
-    pressure_bottom_data: LerpDataC
-}
-
 #[derive(Default, Copy, Clone)]
 struct LerpDataC {
     start_time: f32,
@@ -295,24 +265,6 @@ struct LerpDataC {
     end_value: f32,
     duration: f32,
     is_endless: bool
-}
-impl LerpDataC {
-    pub fn try_lerp(&self, time_secs: f32) -> Result<f32, ()> {
-        if time_secs < self.start_time || time_secs > self.end_time { return Err(()); }
-
-        let d = self.end_time - time_secs;
-        let p = d / self.duration;
-
-        Ok(crate::utils::lerp(self.start_value, self.end_value, p))
-    }
-    pub fn try_lerp_rev(&self, time_secs: f32) -> Result<f32, ()> {
-        if time_secs < self.start_time || time_secs > self.end_time { return Err(()); }
-
-        let d = self.end_time - time_secs;
-        let p = d / self.duration;
-
-        Ok(crate::utils::lerp(self.end_value, self.start_value, p))
-    }
 }
 
 /// Describes an active disease that can be also scheduled
@@ -334,6 +286,8 @@ pub struct ActiveDisease {
     stages: RefCell<BTreeMap<StageLevel, ActiveStage>>,
     /// Calculated data for lerping
     lerp_data: RefCell<Option<LerpDataNodeC>>,
+    /// Calculated on the last frame deltas
+    last_deltas: RefCell<DiseaseDeltasC>,
     /// Is disease chain inverted (`invert` was called)
     is_inverted: Cell<bool>,
     /// When this disease will become active
@@ -374,7 +328,8 @@ impl ActiveDisease {
             stages.insert(stage.level, ActiveStage {
                 info: *stage,
                 start_time,
-                peak_time
+                peak_time,
+                duration: peak_duration.clone()
             });
 
             if stage.is_endless && will_end {
@@ -396,7 +351,8 @@ impl ActiveDisease {
             will_end: Cell::new(will_end),
             end_time: RefCell::new(end_time),
             needs_treatment: !self_heal,
-            lerp_data: RefCell::new(None) // will be calculated on first get_vitals_deltas
+            lerp_data: RefCell::new(None), // will be calculated on first get_vitals_deltas
+            last_deltas: RefCell::new(DiseaseDeltasC::empty())
         }
     }
 

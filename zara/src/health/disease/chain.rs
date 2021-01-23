@@ -44,6 +44,7 @@ impl ActiveDisease {
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
             info: active_stage.info.copy(),
+            duration: Duration::from_secs_f32(new_peak_time-new_start_time),
             start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
             peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
         });
@@ -71,6 +72,7 @@ impl ActiveDisease {
             info.is_endless = false;
             stages.insert(level, ActiveStage {
                 info,
+                duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
             });
@@ -103,6 +105,7 @@ impl ActiveDisease {
             info.is_endless = false;
             stages.insert(level, ActiveStage {
                 info,
+                duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
             });
@@ -162,6 +165,7 @@ impl ActiveDisease {
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
             info: active_stage.info.copy(),
+            duration: Duration::from_secs_f32(clamp_bottom(new_peak_time-new_start_time, 0.)),
             start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
             peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
         });
@@ -192,6 +196,7 @@ impl ActiveDisease {
 
             stages.insert(level, ActiveStage {
                 info: info.copy(),
+                duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
             });
@@ -226,6 +231,7 @@ impl ActiveDisease {
 
             stages.insert(level, ActiveStage {
                 info: info.copy(),
+                duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
             });
