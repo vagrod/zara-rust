@@ -7,7 +7,7 @@ use super::ConsumableC;
 
 pub enum Event {
     WokeUp,
-    ItemConsumed { item: ConsumableC },
+    ItemConsumed(ConsumableC),
     StaminaDrained,
     Tired,
     Exhausted

@@ -1,6 +1,7 @@
 use crate::health::Health;
 use crate::health::side::SideEffectsMonitor;
 use crate::health::disease::DiseaseMonitor;
+use crate::error::UnregisterMonitorErr;
 
 impl Health {
     /// Registers new disease monitor instance
@@ -26,17 +27,17 @@ impl Health {
     /// - `key`: unique key given as a result of a [`register_disease_monitor`] method.
     ///
     /// [`register_disease_monitor`]:#method.register_disease_monitor
-    pub fn unregister_disease_monitor(&self, key: usize) -> bool {
+    pub fn unregister_disease_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.disease_monitors.borrow_mut();
 
         if !b.contains_key(&key)
         {
-            return false;
+            return Err(UnregisterMonitorErr::MonitorIdNotFound);
         }
 
         b.remove(&key);
 
-        return true;
+        return Ok(());
     }
 
     /// Registers new side effects monitor instance
@@ -62,16 +63,16 @@ impl Health {
     /// - `key`: unique key given as a result of a [`register_side_effect_monitor`] method.
     ///
     /// [`register_side_effect_monitor`]:#method.register_side_effect_monitor
-    pub fn unregister_side_effect_monitor(&self, key: usize) -> bool {
+    pub fn unregister_side_effect_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.side_effects.borrow_mut();
 
         if !b.contains_key(&key)
         {
-            return false;
+            return Err(UnregisterMonitorErr::MonitorIdNotFound);
         }
 
         b.remove(&key);
 
-        return true;
+        return Ok(());
     }
 }

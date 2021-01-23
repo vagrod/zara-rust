@@ -57,7 +57,7 @@ impl Health {
         let mut disease_deltas = Vec::new();
         for (_, disease) in self.diseases.borrow().iter() {
             if disease.get_is_active(&frame.data.game_time) {
-                disease_deltas.push(disease.get_vitals_deltas(&frame.data.game_time));
+                disease_deltas.push(disease.get_vitals_deltas(&self, &frame.data.game_time));
             }
         }
 

@@ -5,11 +5,13 @@ use player::{PlayerStatus};
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
+use crate::error::ItemConsumeErr;
 
 mod update;
 
 pub mod world;
 pub mod utils;
+pub mod error;
 pub mod health;
 pub mod inventory;
 pub mod body;
@@ -145,28 +147,26 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// zara_controller.consume(item_name);
     /// ```
-    pub fn consume(&self, item_name: &String) -> bool {
+    pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         let items_count: usize;
         let mut consumable = ConsumableC::new();
         let b = self.inventory.items.borrow();
 
-        if !b.contains_key(item_name) {
-            return false;
-        }
-
-        let item = b.get(item_name).unwrap();
+        let item = match b.get(item_name) {
+            Some(o) => o,
+            None => return Err(ItemConsumeErr::ItemNotFound)
+        };
 
         items_count = item.get_count();
 
         if items_count - 1 <= 0 { // 1 so far
-            return false
+            return Err(ItemConsumeErr::NotEnoughResources);
         }
 
-        if !item.consumable().is_some() {
-            return false;
-        }
-
-        let c = item.consumable().unwrap();
+        let c = match item.consumable() {
+            Some(c) => c,
+            None => return Err(ItemConsumeErr::ItemIsNotConsumable)
+        };
 
         consumable.name = item.get_name();
         consumable.is_water = c.is_water();
@@ -183,9 +183,9 @@ impl<E: Listener + 'static> ZaraController<E> {
         self.inventory.change_item_count(item_name, new_count);
 
         // Send the event
-        self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed { item: consumable });
+        self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));
 
-        return true;
+        return Ok(());
     }
 
 }

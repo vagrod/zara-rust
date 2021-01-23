@@ -71,7 +71,7 @@ fn main() {
             if person.environment.game_time.minute.get() == 20 {
                 if !is_disease_inverted {
                     person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
-                    person.health.diseases.borrow().get("Flu").unwrap().invert_back(&person.environment.game_time.to_contract());
+                    //person.health.diseases.borrow().get("Flu").unwrap().invert_back(&person.environment.game_time.to_contract());
                     is_disease_inverted = true;
                 }
             }
@@ -245,7 +245,7 @@ struct ZaraEventsListener;
 impl Listener for ZaraEventsListener {
     fn notify(&mut self, event: &Event) {
         match event {
-            Event::ItemConsumed {item} => {
+            Event::ItemConsumed(item) => {
                 println!("Item {} consumed", item.name);
             },
             Event::WokeUp => {

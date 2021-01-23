@@ -1,5 +1,7 @@
-use crate::health::disease::{ActiveDisease, DiseaseDeltasC, LerpDataNodeC, LerpDataC};
+use crate::health::disease::{ActiveDisease, DiseaseDeltasC, LerpDataNodeC, LerpDataC, ActiveStage};
 use crate::utils::{lerp, clamp_01, GameTimeC, HealthC};
+use crate::health::Health;
+use std::cell::Cell;
 
 impl LerpDataNodeC {
     fn new() -> Self {
@@ -16,26 +18,27 @@ impl LerpDataNodeC {
 }
 
 impl ActiveDisease {
-    fn generate_lerp_data(&self, game_time: &GameTimeC) {
+    fn generate_lerp_data(&self, current_health: &Health, game_time: &GameTimeC) {
         self.lerp_data.replace(None);
 
         let mut lerp_data = LerpDataNodeC::new();
+        let mut has_endless_child = false;
+
         let healthy = HealthC::healthy();
         let gt = game_time.to_duration().as_secs_f32();
-        let mut last_start_body_temp = 0.;
-        let mut last_start_heart_rate = 0.;
-        let mut last_start_pressure_top = 0.;
-        let mut last_start_pressure_bottom = 0.;
-        let mut has_endless_child = false;
+        let last_start_body_temp = Cell::new(0.);
+        let last_start_heart_rate = Cell::new(0.);
+        let last_start_pressure_top = Cell::new(0.);
+        let last_start_pressure_bottom = Cell::new(0.);
 
         lerp_data.start_time = gt;
 
-        for (_, stage) in self.stages.borrow().iter() {
+        let mut process_stage = |stage: &ActiveStage| -> bool {
             let start = stage.start_time.to_duration().as_secs_f32();
             let end = stage.peak_time.to_duration().as_secs_f32();
             let duration = end - start;
 
-            if gt > end { continue; }
+            if gt > end { return false; }
             if stage.info.is_endless { has_endless_child = true; }
 
             let start_time= if gt > start { gt } else { start };
@@ -50,13 +53,13 @@ impl ActiveDisease {
                 let ld = LerpDataC {
                     start_time,
                     end_time: end,
-                    start_value: lerp(last_start_body_temp, end_value, p),
+                    start_value: lerp(last_start_body_temp.get(), end_value, p),
                     end_value,
                     duration: end - start_time,
                     is_endless: stage.info.is_endless
                 };
 
-                last_start_body_temp = ld.end_value;
+                last_start_body_temp.set(ld.end_value);
                 lerp_data.body_temp_data.push(ld);
             }
             // Heart Rate
@@ -65,13 +68,13 @@ impl ActiveDisease {
                 let ld = LerpDataC {
                     start_time,
                     end_time: end,
-                    start_value: lerp(last_start_heart_rate, end_value, p),
+                    start_value: lerp(last_start_heart_rate.get(), end_value, p),
                     end_value,
                     duration: end - start_time,
                     is_endless: stage.info.is_endless
                 };
 
-                last_start_heart_rate = ld.end_value;
+                last_start_heart_rate.set(ld.end_value);
                 lerp_data.heart_rate_data.push(ld);
             }
             // Pressure Top
@@ -80,13 +83,13 @@ impl ActiveDisease {
                 let ld = LerpDataC {
                     start_time,
                     end_time: end,
-                    start_value: lerp(last_start_pressure_top, end_value, p),
+                    start_value: lerp(last_start_pressure_top.get(), end_value, p),
                     end_value,
                     duration: end - start_time,
                     is_endless: stage.info.is_endless
                 };
 
-                last_start_pressure_top = ld.end_value;
+                last_start_pressure_top.set(ld.end_value);
                 lerp_data.pressure_top_data.push(ld);
             }
             // Pressure Bottom
@@ -95,14 +98,33 @@ impl ActiveDisease {
                 let ld = LerpDataC {
                     start_time,
                     end_time: end,
-                    start_value: lerp(last_start_pressure_bottom, end_value, p),
+                    start_value: lerp(last_start_pressure_bottom.get(), end_value, p),
                     end_value,
                     duration: end - start_time,
                     is_endless: stage.info.is_endless
                 };
 
-                last_start_pressure_bottom = ld.end_value;
+                last_start_pressure_bottom.set(ld.end_value);
                 lerp_data.pressure_bottom_data.push(ld);
+            }
+
+            return true;
+        };
+
+        if !self.is_inverted.get() {
+            // Leave "last_start_xxxxxx" at zeros here, it's correct for not-inverted chain
+            for (_, stage) in self.stages.borrow().iter() {
+                if !process_stage(stage) { continue; }
+            }
+        } else {
+            // Must change lerp start values to reflect current ones
+            last_start_body_temp.set(current_health.body_temperature.get() - healthy.body_temperature);
+            last_start_heart_rate.set(current_health.heart_rate.get() - healthy.heart_rate);
+            last_start_pressure_top.set(current_health.top_pressure.get() - healthy.top_pressure);
+            last_start_pressure_bottom.set(current_health.bottom_pressure.get() - healthy.bottom_pressure);
+
+            for (_, stage) in self.stages.borrow().iter().rev() {
+                if !process_stage(stage) { continue; }
             }
         }
 
@@ -112,12 +134,13 @@ impl ActiveDisease {
     }
 
     fn has_lerp_data_for(&self, game_time: &GameTimeC) -> bool {
-        let ld_opt = self.lerp_data.borrow();
-
-        if !ld_opt.is_some() { return false; }
+        let b = self.lerp_data.borrow();
+        let ld = match b.as_ref() {
+            Some(o) => o,
+            None => return false
+        };
 
         let gt = game_time.to_duration().as_secs_f32();
-        let ld = ld_opt.as_ref().unwrap();
 
         if (gt >= ld.start_time && ld.is_endless) || (gt >= ld.start_time && gt <= ld.end_time)
         {
@@ -128,18 +151,21 @@ impl ActiveDisease {
     }
 
     /// Gets disease vitals delta for a given time
-    pub fn get_vitals_deltas(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
+    pub fn get_vitals_deltas(&self, current_health: &Health, game_time: &GameTimeC) -> DiseaseDeltasC {
         let mut result = DiseaseDeltasC::empty();
 
         if !self.has_lerp_data_for(game_time) {
-            self.generate_lerp_data(game_time);
+            self.generate_lerp_data(current_health, game_time);
 
             // Could not calculate lerps for some reason
             if !self.has_lerp_data_for(game_time) { return DiseaseDeltasC::empty(); }
         }
 
         let b = self.lerp_data.borrow();
-        let lerp_data = b.as_ref().unwrap();
+        let lerp_data = match b.as_ref() {
+            Some(o) => o,
+            None => return DiseaseDeltasC::empty()
+        };
         let gt = game_time.to_duration().as_secs_f32();
 
         { // Body Temperature
@@ -150,11 +176,13 @@ impl ActiveDisease {
                     break;
                 }
             }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.body_temperature_delta = lerp(d.start_value, d.end_value, p);
+            match ld {
+                Some(d) => {
+                    let mut p = clamp_01((gt - d.start_time) / d.duration);
+                    if d.is_endless { p = 1.; }
+                    result.body_temperature_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
             }
         }
         { // Heart Rate
@@ -165,11 +193,13 @@ impl ActiveDisease {
                     break;
                 }
             }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.heart_rate_delta = lerp(d.start_value, d.end_value, p);
+            match ld {
+                Some(d) => {
+                    let mut p = clamp_01((gt - d.start_time) / d.duration);
+                    if d.is_endless { p = 1.; }
+                    result.heart_rate_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
             }
         }
         { // Top Pressure
@@ -180,11 +210,13 @@ impl ActiveDisease {
                     break;
                 }
             }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.pressure_top_delta = lerp(d.start_value, d.end_value, p);
+            match ld {
+                Some(d) => {
+                    let mut p = clamp_01((gt - d.start_time) / d.duration);
+                    if d.is_endless { p = 1.; }
+                    result.pressure_top_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
             }
         }
         { // Bottom Pressure
@@ -195,11 +227,13 @@ impl ActiveDisease {
                     break;
                 }
             }
-            if ld.is_some() {
-                let d = ld.unwrap();
-                let mut p = clamp_01((gt - d.start_time) / d.duration);
-                if d.is_endless { p = 1.; }
-                result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
+            match ld {
+                Some(d) => {
+                    let mut p = clamp_01((gt - d.start_time) / d.duration);
+                    if d.is_endless { p = 1.; }
+                    result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
             }
         }
 

@@ -92,9 +92,9 @@ impl<E: Listener + 'static> ZaraController<E> {
         let mut last_slept: GameTimeC = GameTimeC::empty();
         {
             let borrowed_time = self.body.last_sleep_time.borrow();
-
-            if borrowed_time.is_some() {
-                last_slept = borrowed_time.as_ref().unwrap().copy();
+            match borrowed_time.as_ref() {
+                Some(t) => last_slept = t.copy(),
+                None => { }
             }
         }
 

@@ -1,5 +1,6 @@
 use crate::inventory::Inventory;
 use crate::utils::FrameSummaryC;
+use crate::error::UnregisterMonitorErr;
 
 /// Trait for implementing the inventory monitor functionality
 pub trait InventoryMonitor {
@@ -35,16 +36,16 @@ impl Inventory {
     /// - `key`: unique key given as a result of a [`register_monitor`] method.
     ///
     /// [`register_monitor`]:#method.register_monitor
-    pub fn unregister_monitor(&self, key: usize) -> bool {
+    pub fn unregister_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.inventory_monitors.borrow_mut();
 
         if !b.contains_key(&key)
         {
-            return false;
+            return Err(UnregisterMonitorErr::MonitorIdNotFound);
         }
 
         b.remove(&key);
 
-        return true;
+        return Ok(());
     }
 }

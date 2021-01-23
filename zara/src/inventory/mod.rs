@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 use std::rc::Rc;
+use crate::error::InventoryItemAccessErr;
 
 mod crud;
 mod update;
@@ -57,15 +58,17 @@ impl Inventory {
     }
 
     /// Shorthand function to change count of a given kind
-    pub fn change_item_count(&self, name: &String, new_value: usize) {
+    pub fn change_item_count(&self, name: &String, new_value: usize) -> Result<(), InventoryItemAccessErr> {
         let b = self.items.borrow();
-        let res = b.get(name);
+        match b.get(name) {
+            Some(o) => {
+                o.set_count(new_value);
+                self.recalculate_weight();
+            },
+            None => return Err(InventoryItemAccessErr::ItemNotFound)
+        };
 
-        if res.is_some(){
-            res.unwrap().set_count(new_value);
-
-            self.recalculate_weight();
-        }
+        return Ok(());
     }
 
     /// Returns total cached inventory weight (in grams)

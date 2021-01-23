@@ -1,5 +1,6 @@
 use crate::inventory::Inventory;
 use crate::inventory::items::InventoryItem;
+use crate::error::InventoryItemAccessErr;
 
 /// Contains code that adds, remove  or upate the inventory
 
@@ -41,7 +42,7 @@ impl Inventory {
     ///
     /// # Notes
     /// Borrows the `items` collection
-    pub fn remove_item(&self, item_kind: &String) -> bool {
+    pub fn remove_item(&self, item_kind: &String) -> Result<(), InventoryItemAccessErr> {
         let mut b = self.items.borrow_mut();
 
         if b.contains_key(item_kind) {
@@ -49,10 +50,10 @@ impl Inventory {
 
             self.recalculate_weight();
 
-            return true;
+            return Ok(());
         }
 
-        return false;
+        return Err(InventoryItemAccessErr::ItemNotFound)
     }
 
 }

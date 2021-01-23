@@ -4,11 +4,9 @@ use crate::health::disease::fluent::{StageInit};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
-use std::collections::HashMap;
+use std::collections::{ BTreeMap};
 use std::time::Duration;
 use std::convert::TryFrom;
-use std::ops::Deref;
-use std::borrow::Borrow;
 
 mod crud;
 mod fluent;
@@ -53,7 +51,7 @@ pub struct StageBuilder {
 }
 
 /// Disease stage level of seriousness
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum StageLevel {
     HealthyStage = 0,
     InitialStage = 1,
@@ -61,6 +59,7 @@ pub enum StageLevel {
     Worrying = 3,
     Critical = 4
 }
+
 impl TryFrom<i32> for StageLevel {
     type Error = ();
 
@@ -118,7 +117,7 @@ impl StageDescription {
     pub fn copy(&self) -> StageDescription {
         StageDescription {
             level: self.level,
-            self_heal_chance: if self.self_heal_chance.is_some() { Some(self.self_heal_chance.unwrap()) } else { None },
+            self_heal_chance: match self.self_heal_chance { Some(o) => Some(o), None => None },
             reaches_peak_in_hours: self.reaches_peak_in_hours,
             is_endless: self.is_endless,
             target_body_temp: self.target_body_temp,
@@ -255,7 +254,7 @@ pub struct ActiveDisease {
     /// Initial stages data given by user
     initial_data: RefCell<Vec<StageDescription>>,
     /// Disease stages with calculated timings and order
-    stages: RefCell<HashMap<StageLevel, ActiveStage>>,
+    stages: RefCell<BTreeMap<StageLevel, ActiveStage>>,
     /// Calculated data for lerping
     lerp_data: RefCell<Option<LerpDataNodeC>>,
     /// Is disease chain inverted (`invert` was called)
@@ -275,17 +274,20 @@ impl ActiveDisease {
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
-        let mut stages: HashMap<StageLevel, ActiveStage> = HashMap::new();
+        let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
         let mut self_heal = false;
         let initial_data = disease.get_stages();
 
         for stage in disease.get_stages().iter() {
-            if stage.self_heal_chance.is_some() {
-                if crate::utils::roll_dice(stage.self_heal_chance.unwrap()) {
-                    self_heal = true;
-                }
+            match stage.self_heal_chance {
+                Some(c) => {
+                    if crate::utils::roll_dice(c) {
+                        self_heal = true;
+                    }
+                },
+                None => { }
             }
 
             let start_time = GameTimeC::from_duration(time_elapsed);
@@ -322,14 +324,16 @@ impl ActiveDisease {
     }
 
     /// Gets if this disease will end (is it finite)
-    pub fn get_will_end(&self) -> bool {
-        self.will_end.get()
-    }
+    pub fn get_will_end(&self) -> bool { self.will_end.get() }
 
+    /// Gets the end time of this disease, if it is finite
     pub fn get_end_time(&self) -> Option<GameTimeC> {
         let b = self.end_time.borrow();
 
-        return if b.is_some() { Some(b.as_ref().unwrap().copy()) } else { None }
+        match b.as_ref() {
+            Some(o) => Some(o.copy()),
+            None => None
+        }
     }
 
     /// Gets a copy of active disease stage data for a given time
@@ -342,14 +346,12 @@ impl ActiveDisease {
     }
 
     /// Returns a copy of a game time structure containing data of when this disease was activated
-    pub fn get_activation_time(&self) -> GameTimeC {
-        self.activation_time.borrow().copy()
-    }
+    pub fn get_activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
 
     /// Returns a copy of stage data by its level
     pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
         for (l, stage) in self.stages.borrow().iter() {
-            if level == *l { return Some(stage.copy()) }
+            if level as i32 == *l as i32 { return Some(stage.copy()) }
         }
 
         return None;
@@ -362,7 +364,10 @@ impl ActiveDisease {
 
         if self.will_end.get() {
             let b = self.end_time.borrow();
-            let border_secs = b.as_ref().unwrap().to_duration().as_secs_f32();
+            let border_secs = match b.as_ref() {
+                Some(t) => t.to_duration().as_secs_f32(),
+                None => game_time_secs
+            };
 
             return game_time_secs >= activation_secs && game_time_secs <= border_secs;
         } else {

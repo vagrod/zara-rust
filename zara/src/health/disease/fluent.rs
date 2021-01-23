@@ -101,11 +101,10 @@ impl StageVitalsValues for StageBuilder {
 
 impl StageEnd for StageBuilder {
     fn build(&self) -> StageDescription {
-        let mut self_heal_chance = Option::None;
-
-        if self.self_heal_chance.borrow().is_some() {
-            self_heal_chance = Option::Some(self.self_heal_chance.borrow().unwrap())
-        }
+        let self_heal_chance = match self.self_heal_chance.borrow().as_ref() {
+            Some(c) => Some(*c),
+            None => None
+        };
 
         StageDescription {
             level: *self.level.borrow(),
