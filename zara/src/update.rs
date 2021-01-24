@@ -1,9 +1,9 @@
 use crate::ZaraController;
 use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC};
 use crate::utils::event::{Listener, Event};
+use crate::error::ZaraUpdateErr;
 
 use std::time::Duration;
-use crate::error::ZaraUpdateErr;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)

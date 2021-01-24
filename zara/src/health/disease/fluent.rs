@@ -101,7 +101,10 @@ pub trait StageDrainsValues {
 }
 
 pub trait StageDeathChance {
+    /// Set chance of death for this stage. This chance will be tested on every Zara pass
+    /// (every real second) while this stage is active
     fn with_chance_of_death(&self, value: usize) -> &dyn StageEnd;
+    /// No death chance for this stage
     fn no_death_probability(&self) -> &dyn StageEnd;
 }
 
