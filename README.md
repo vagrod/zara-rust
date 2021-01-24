@@ -9,7 +9,7 @@ This code is **WIP** and changes all the time.
   + Adding/Removing items
   + Inventory weight support
   + Describing and registering crafting combinations (via fluent interface)
-  + Checking if recipe exist for a given set of items
+  + Getting recipes available for a given set of items
   + Consumables: water and food, consuming items
   + Macros to write less code describing items (one-liners)
   
