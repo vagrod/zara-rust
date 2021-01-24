@@ -510,7 +510,7 @@ impl ActiveDisease {
     /// Is called by Zara from the health engine when person consumes an item
     pub fn on_consumed(&self, game_time: &GameTimeC, item_name: &String,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
-        if !self.needs_treatment || !self.get_is_active(game_time) { return; }
+        if !self.get_is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
