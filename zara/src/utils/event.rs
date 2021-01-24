@@ -1,9 +1,10 @@
 /// Initially by user `locka` as an answer to this stackoverflow question:
 /// https://stackoverflow.com/questions/37572734/how-can-i-implement-the-observer-pattern-in-rust
 
+use super::ConsumableC;
+
 use std::sync::{Arc, Weak};
 use std::cell::RefCell;
-use super::ConsumableC;
 
 /// All Zara public events
 pub enum Event {

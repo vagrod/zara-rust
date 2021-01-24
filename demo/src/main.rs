@@ -26,6 +26,8 @@ mod inventory;
 fn main() {
     let game_loop = thread::spawn(|| {
         let mut is_disease_inverted = false;
+        let mut is_item_consumed = false;
+
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
         let mut now = Instant::now();
@@ -65,6 +67,11 @@ fn main() {
             } else {
                 // Game time is 10x the real one
                 person.environment.game_time.add_seconds(frame_time * 10.);
+            }
+
+            if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
+                person.consume(&format!("Meat"));
+                is_item_consumed = true;
             }
 
             // Disease "invert" test

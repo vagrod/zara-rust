@@ -180,9 +180,10 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         let new_count = items_count - 1;
         let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
+        let items = self.inventory.items.borrow();
 
         // Notify health controller about the event
-        self.health.on_item_consumed(&game_time, &consumable);
+        self.health.on_item_consumed(&game_time, item_name, &consumable, &*items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)

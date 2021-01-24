@@ -52,20 +52,18 @@ impl<E: Listener + 'static> ZaraController<E> {
         if elapsed >= ceiling {
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
-            let mut health_result;
+            let health_result;
 
-            {
                 // Form the frame data structure
-                let mut frame_data = &mut FrameC {
-                    events: &mut self.dispatcher.borrow_mut(),
-                    data: summary
-                };
+            let mut frame_data = &mut FrameC {
+                events: &mut self.dispatcher.borrow_mut(),
+                data: summary
+            };
 
-                // Update all sub-controllers
-                health_result = self.health.update(&mut frame_data);
-                self.inventory.update(&mut frame_data);
-                self.body.update(&mut frame_data);
-            }
+            // Update all sub-controllers
+            health_result = self.health.update(&mut frame_data);
+            self.inventory.update(&mut frame_data);
+            self.body.update(&mut frame_data);
 
             // Reset the counter and set last update game time
             self.last_update_game_time.set(game_time_duration);
@@ -73,7 +71,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             if !health_result.is_alive {
                 self.is_alive.set(false);
-                self.dispatcher.borrow_mut().dispatch(Event::DeathFromDisease(health_result.disease_caused_death))
+                frame_data.events.dispatch(Event::DeathFromDisease(health_result.disease_caused_death))
             }
         } else {
             self.update_counter.set(elapsed);

@@ -1,10 +1,11 @@
 use crate::health::{Health};
 use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
+use crate::inventory::items::InventoryItem;
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
-use std::collections::{ BTreeMap};
+use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 use std::convert::TryFrom;
 
@@ -16,11 +17,14 @@ mod chain;
 /// Macro for declaring a disease
 #[macro_export]
 macro_rules! disease(
-    ($t:ty, $nm:expr, $st:expr) => (
+    ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
         impl zara::health::disease::Disease for $t {
             fn get_name(&self) -> String { String::from($nm) }
             fn get_stages(&self) -> Vec<zara::health::disease::StageDescription> {
                 $st as Vec<zara::health::disease::StageDescription>
+            }
+            fn get_treatment(&self) -> Option<Box<dyn zara::health::disease::DiseaseTreatment>> {
+                $trt
             }
         }
     );
@@ -99,6 +103,22 @@ impl StageBuilder {
             }
         )
     }
+}
+
+/// Here you can describe any disease treatment logic based on the consumed items (food/pills/etc)
+pub trait DiseaseTreatment {
+    /// Called on all active diseases when player eats something
+    ///
+    /// ## Parameters
+    /// - `game_time`: game time when this call happened
+    /// - `item_name`: name of the consumed item
+    /// - `active_stage`: instance of the active stage of a disease
+    /// - `disease`: disease object itself. You can call `invert` or `invert_back` to start or stop
+    ///     "curing" the disease
+    ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+    ///     moment of this call
+    fn on_consumed(&self, game_time: &GameTimeC, item_name: &String, active_stage: &ActiveStage, disease: &ActiveDisease,
+                   inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Describes disease stage
@@ -275,8 +295,13 @@ pub trait DiseaseMonitor {
     ///
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `item`: consumable item summary info
-    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC);
+    /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
+    /// - `item_name`: name of a consumed item
+    /// - `consumable`: consumable part itself
+    ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+    ///     moment of this call
+    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item_name: &String,
+                   consumable: &ConsumableC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Trait that must be implemented by all diseases
@@ -286,6 +311,8 @@ pub trait Disease {
     /// Gets all disease stages. Use [`StageBuilder`](zara::health::disease::StageBuilder) to
     /// describe a stage
     fn get_stages(&self) -> Vec<StageDescription>;
+    /// Treatment instance associated with this disease object
+    fn get_treatment(&self) -> Option<Box<dyn DiseaseTreatment>>;
 }
 
 struct LerpDataNodeC {
@@ -343,7 +370,9 @@ pub struct ActiveDisease {
     /// Do this disease have an end
     will_end: Cell<bool>,
     /// Disease end time, if applicable
-    end_time: RefCell<Option<GameTimeC>>
+    end_time: RefCell<Option<GameTimeC>>,
+    /// Treatment object associated with this disease
+    treatment: Rc<Option<Box<dyn DiseaseTreatment>>>
 }
 impl ActiveDisease {
     /// Creates new active disease object
@@ -390,9 +419,11 @@ impl ActiveDisease {
         }
 
         let end_time = if will_end { Some(GameTimeC::from_duration(time_elapsed)) } else { None };
+        let treatment = disease.get_treatment();
 
         ActiveDisease {
             disease: Rc::new(disease),
+            treatment: Rc::new(treatment),
             initial_data: RefCell::new(initial_data),
             is_inverted: Cell::new(false),
             total_duration: time_elapsed,
@@ -454,16 +485,16 @@ impl ActiveDisease {
         let activation_secs = self.activation_time.borrow().as_secs_f32();
         let game_time_secs = game_time.as_secs_f32();
 
-        if self.will_end.get() {
+        return if self.will_end.get() {
             let b = self.end_time.borrow();
             let border_secs = match b.as_ref() {
                 Some(t) => t.as_secs_f32(),
                 None => game_time_secs
             };
 
-            return game_time_secs >= activation_secs && game_time_secs <= border_secs;
+            game_time_secs >= activation_secs && game_time_secs <= border_secs
         } else {
-            return game_time_secs >= activation_secs;
+            game_time_secs >= activation_secs
         }
     }
 
@@ -477,7 +508,16 @@ impl ActiveDisease {
     }
 
     /// Is called by Zara from the health engine when person consumes an item
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC) {
+    pub fn on_consumed(&self, game_time: &GameTimeC, item_name: &String,
+                       inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+        if !self.needs_treatment || !self.get_is_active(game_time) { return; }
 
+        match self.treatment.as_ref() {
+            Some(t) => match self.get_active_stage(game_time) {
+                Some(st) => t.on_consumed(game_time, item_name, &st, &self, inventory_items),
+                None => { }
+            },
+            None => { }
+        };
     }
 }
