@@ -41,6 +41,7 @@ This code is **WIP** and changes all the time.
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Checking crafting recipe for resources availability
 - Actual getting new item from a crafting combination and spending resources on it
+- Optional easing variants for lerping diseases/injuries/vitals
 
 The demo is built with `termion` which seems like does not support Windows. Maybe later I'll try find another solution for the demo "UI".
 
