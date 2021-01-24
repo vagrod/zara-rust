@@ -51,7 +51,8 @@ pub struct StageBuilder {
     target_fatigue_delta: Cell<f32>,
     target_stamina_drain: Cell<f32>,
     target_food_drain: Cell<f32>,
-    target_water_drain: Cell<f32>
+    target_water_drain: Cell<f32>,
+    chance_of_death: RefCell<Option<usize>>
 }
 
 /// Disease stage level of seriousness
@@ -84,6 +85,7 @@ impl StageBuilder {
             StageBuilder {
                 level: RefCell::new(StageLevel::Undefined),
                 self_heal_chance: RefCell::new(None),
+                chance_of_death: RefCell::new(None),
                 is_endless: Cell::new(false),
                 reaches_peak_in_hours: Cell::new(0.),
                 target_body_temp: Cell::new(0.),
@@ -125,7 +127,9 @@ pub struct StageDescription {
     /// Target water drain for this stage (0..100 percents per game second)
     pub target_water_drain: f32,
     /// Target stamina drain for this stage (0..100 percents per game second)
-    pub target_stamina_drain: f32
+    pub target_stamina_drain: f32,
+    /// Probability of death for this stage.
+    pub chance_of_death: Option<usize>
 }
 
 impl StageDescription {
@@ -133,6 +137,7 @@ impl StageDescription {
         StageDescription {
             level: self.level,
             self_heal_chance: match self.self_heal_chance { Some(o) => Some(o), None => None },
+            chance_of_death: match self.chance_of_death { Some(o) => Some(o), None => None },
             reaches_peak_in_hours: self.reaches_peak_in_hours,
             is_endless: self.is_endless,
             target_body_temp: self.target_body_temp,

@@ -24,6 +24,8 @@ impl Health {
     /// This method borrows the `diseases` collection
     pub fn spawn_disease(&self, disease: Box<dyn Disease>, activation_time: GameTimeC)
                                                                     -> Result<(), SpawnDiseaseErr> {
+        if !self.is_alive.get() { return Err(SpawnDiseaseErr::CharacterIsDead); }
+
         let mut b = self.diseases.borrow_mut();
         let disease_name = disease.get_name();
 
@@ -50,6 +52,8 @@ impl Health {
     /// # Notes
     /// This method borrows the `diseases` collection
     pub fn remove_disease(&self, disease_name: &String) -> Result<(), RemoveDiseaseErr> {
+        if !self.is_alive.get() { return Err(RemoveDiseaseErr::CharacterIsDead); }
+
         let mut b = self.diseases.borrow_mut();
 
         if !b.contains_key(disease_name) {

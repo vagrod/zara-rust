@@ -1,8 +1,9 @@
 use crate::ZaraController;
 use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC};
-use crate::utils::event::{Listener};
+use crate::utils::event::{Listener, Event};
 
 use std::time::Duration;
+use crate::error::ZaraUpdateErr;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
@@ -28,7 +29,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// zara_controller.update(time_delta);
     /// ```
-    pub fn update(&self, frame_time: f32) {
+    pub fn update(&self, frame_time: f32) -> Result<(), ZaraUpdateErr>{
+        if !self.is_alive.get() { return Err(ZaraUpdateErr::CharacterIsDead); }
+
         let elapsed = self.update_counter.get() + frame_time;
         let mut ceiling = UPDATE_INTERVAL;
         let game_time_duration = self.environment.game_time.duration.get();
@@ -49,27 +52,37 @@ impl<E: Listener + 'static> ZaraController<E> {
         if elapsed >= ceiling {
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
+            let mut health_result;
 
-            // Form the frame data structure
-            let mut frame_data = &mut FrameC {
-                events: &mut self.dispatcher.borrow_mut(),
-                data: summary
-            };
+            {
+                // Form the frame data structure
+                let mut frame_data = &mut FrameC {
+                    events: &mut self.dispatcher.borrow_mut(),
+                    data: summary
+                };
 
-            // Update all sub-controllers
-            self.health.update(&mut frame_data);
-            self.inventory.update(&mut frame_data);
-            self.body.update(&mut frame_data);
+                // Update all sub-controllers
+                health_result = self.health.update(&mut frame_data);
+                self.inventory.update(&mut frame_data);
+                self.body.update(&mut frame_data);
+            }
 
             // Reset the counter and set last update game time
             self.last_update_game_time.set(game_time_duration);
             self.update_counter.set(0.);
+
+            if !health_result.is_alive {
+                self.is_alive.set(false);
+                self.dispatcher.borrow_mut().dispatch(Event::DeathFromDisease(health_result.disease_caused_death))
+            }
         } else {
             self.update_counter.set(elapsed);
         }
 
         // Set last frame game time
         self.last_frame_game_time.set(Duration::from(game_time_duration));
+
+        Ok(())
     }
 
     /// Gets all the info needed for all the controllers to process one frame

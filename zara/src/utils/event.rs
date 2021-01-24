@@ -11,7 +11,8 @@ pub enum Event {
     ItemConsumed(ConsumableC),
     StaminaDrained,
     Tired,
-    Exhausted
+    Exhausted,
+    DeathFromDisease(String)
 }
 
 pub trait Listener {

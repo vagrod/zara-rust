@@ -265,6 +265,9 @@ impl Listener for ZaraEventsListener {
             Event::WokeUp => {
                 println!("Woke up!");
             },
+            Event::DeathFromDisease(disease_name) => {
+                println!("Death from {}", disease_name);
+            },
             _ => println!("Other event")
         }
     }

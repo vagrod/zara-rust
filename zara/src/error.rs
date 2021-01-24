@@ -24,12 +24,16 @@ pub enum ChainInvertBackErr {
 
 /// Is used by `Health.spawn_disease` method
 pub enum SpawnDiseaseErr {
+    /// When `spawn_disease` called on a dead character
+    CharacterIsDead,
     /// When disease you trying to spawn was already spawned
     DiseaseAlreadyAdded
 }
 
 /// Is used by `Health.remove_disease` method
 pub enum RemoveDiseaseErr {
+    /// When `spawn_disease` called on a dead character
+    CharacterIsDead,
     /// When disease you trying to delete was not found
     DiseaseNotFound
 }
@@ -49,6 +53,8 @@ pub enum InventoryItemAccessErr {
 
 /// Is used by `ZaraController.consume` method
 pub enum ItemConsumeErr {
+    /// When `consume` called on a dead character
+    CharacterIsDead,
     /// When given item key was not found in the inventory
     ItemNotFound,
     /// When item `count` is not enough
@@ -57,4 +63,10 @@ pub enum ItemConsumeErr {
     ItemIsNotConsumable,
     /// When could not update item count
     CouldNotUpdateItemCount(InventoryItemAccessErr)
+}
+
+/// Is used by `ZaraController.update` method
+pub enum ZaraUpdateErr {
+    /// When `update` called on a dead character
+    CharacterIsDead
 }

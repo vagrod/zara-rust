@@ -6,6 +6,7 @@ impl StageBuilder {
     fn as_vitals_values(&self) -> &dyn StageVitalsValues { self }
     fn as_drains_node(&self) -> &dyn StageDrainsNode { self }
     fn as_drains_values(&self) -> &dyn StageDrainsValues { self }
+    fn as_stage_death_chance(&self) -> &dyn StageDeathChance { self }
     fn as_stage_end(&self) -> &dyn StageEnd { self }
 }
 
@@ -70,7 +71,7 @@ pub trait StageDrainsNode {
     /// Describe how this stage affects other parameters
     fn drains(&self) -> &dyn StageDrainsValues;
     /// This stage has no effect on other parameters
-    fn no_drains(&self) -> &dyn StageEnd;
+    fn no_drains(&self) -> &dyn StageDeathChance;
 }
 
 pub trait StageDrainsValues {
@@ -94,9 +95,14 @@ pub trait StageDrainsValues {
     ///
     /// ## Parameters
     /// - `target_delta`: maximum impact on fatigue at the end of this stage (0..100 percents)
-    fn affects_fatigue(&self, target_delta: f32) -> &dyn StageEnd;
+    fn affects_fatigue(&self, target_delta: f32) -> &dyn StageDeathChance;
     /// This stage does not affect fatigue
-    fn no_fatigue_effect(&self) -> &dyn StageEnd;
+    fn no_fatigue_effect(&self) -> &dyn StageDeathChance;
+}
+
+pub trait StageDeathChance {
+    fn with_chance_of_death(&self, value: usize) -> &dyn StageEnd;
+    fn no_death_probability(&self) -> &dyn StageEnd;
 }
 
 pub trait StageEnd {
@@ -174,12 +180,12 @@ impl StageDrainsNode for StageBuilder {
         self.as_drains_values()
     }
 
-    fn no_drains(&self) -> &dyn StageEnd {
+    fn no_drains(&self) -> &dyn StageDeathChance {
         self.target_stamina_drain.set(0.00001);
         self.target_food_drain.set(0.00001);
         self.target_water_drain.set(0.00001);
 
-        self.as_stage_end()
+        self.as_stage_death_chance()
     }
 }
 
@@ -202,14 +208,28 @@ impl StageDrainsValues for StageBuilder {
         self.as_drains_values()
     }
 
-    fn affects_fatigue(&self, target_delta: f32) -> &dyn StageEnd {
+    fn affects_fatigue(&self, target_delta: f32) -> &dyn StageDeathChance {
         self.target_fatigue_delta.set(target_delta);
+
+        self.as_stage_death_chance()
+    }
+
+    fn no_fatigue_effect(&self) -> &dyn StageDeathChance {
+        self.target_fatigue_delta.set(0.000001);
+
+        self.as_stage_death_chance()
+    }
+}
+
+impl StageDeathChance for StageBuilder {
+    fn with_chance_of_death(&self, value: usize) -> &dyn StageEnd {
+        self.chance_of_death.replace(Some(value));
 
         self.as_stage_end()
     }
 
-    fn no_fatigue_effect(&self) -> &dyn StageEnd {
-        self.target_fatigue_delta.set(0.000001);
+    fn no_death_probability(&self) -> &dyn StageEnd {
+        self.chance_of_death.replace(None);
 
         self.as_stage_end()
     }
@@ -221,10 +241,15 @@ impl StageEnd for StageBuilder {
             Some(c) => Some(*c),
             None => None
         };
+        let chance_of_death = match self.chance_of_death.borrow().as_ref() {
+            Some(c) => Some(*c),
+            None => None
+        };
 
         StageDescription {
             level: *self.level.borrow(),
             self_heal_chance,
+            chance_of_death,
             is_endless: self.is_endless.get(),
             reaches_peak_in_hours: self.reaches_peak_in_hours.get(),
             target_body_temp: self.target_body_temp.get(),

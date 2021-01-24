@@ -67,6 +67,7 @@ impl ActiveDisease {
                 is_endless: false,
                 reaches_peak_in_hours: 0.,
                 self_heal_chance: None,
+                chance_of_death: None,
                 target_fatigue_delta: 0.,
                 target_stamina_drain: 0.,
                 target_food_drain: 0.,

@@ -45,7 +45,9 @@ pub struct Health {
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
     /// Stores all registered side effects monitors
-    side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>
+    side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
+    /// Is character alive
+    is_alive: Cell<bool>
 }
 
 impl Health {
@@ -71,6 +73,7 @@ impl Health {
             blood_regain_rate: Cell::new(0.006),
 
             // Healthy values by default
+            is_alive: Cell::new(true),
             blood_level: Cell::new(healthy.blood_level),
             body_temperature: Cell::new(healthy.body_temperature),
             top_pressure: Cell::new(healthy.top_pressure),
@@ -85,8 +88,6 @@ impl Health {
 
     /// Called by zara controller when item is consumed as food or water
     pub fn on_item_consumed(&self, game_time: &GameTimeC, item: &ConsumableC){
-        println!("consumed {0} (from health): is food {1}", item.name, item.is_food);
-
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_consumed(self, game_time, item);

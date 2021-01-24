@@ -44,6 +44,8 @@ pub struct ZaraController<E: Listener + 'static> {
     ///
     /// Use this to tell Zara state of a player (is he running, walking, swimming etc.)
     pub player_state: Arc<PlayerStatus>,
+    /// Is this character alive
+    pub is_alive: Cell<bool>,
 
     // Private fields
     /// How many seconds passed since last `update` call
@@ -112,6 +114,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         dispatcher.register_listener(listener_rc.clone());
 
         ZaraController {
+            is_alive: Cell::new(true),
             environment: Arc::new(world::EnvironmentData::from_description(env)),
             health: Arc::new(health::Health::new()),
             inventory: Arc::new(inventory::Inventory::new()),
@@ -148,6 +151,8 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// zara_controller.consume(item_name);
     /// ```
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
+        if !self.is_alive.get() { return Err(ItemConsumeErr::CharacterIsDead); }
+
         let items_count: usize;
         let mut consumable = ConsumableC::new();
         let b = self.inventory.items.borrow();

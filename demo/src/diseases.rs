@@ -16,7 +16,8 @@ zara::disease!(Flu, "Flu",
                     .stamina(0.2)
                     .food_level(0.05)
                     .water_level(0.1)
-                    .affects_fatigue(5.)
+                .affects_fatigue(5.)
+                .with_chance_of_death(5)
             .build(),
 
         StageBuilder::start()
@@ -32,7 +33,8 @@ zara::disease!(Flu, "Flu",
                     .stamina(0.025)
                     .food_level(0.055)
                     .water_level(0.15)
-                    .affects_fatigue(10.)
+                .affects_fatigue(10.)
+                .no_death_probability()
             .build(),
 
         StageBuilder::start()
@@ -48,7 +50,8 @@ zara::disease!(Flu, "Flu",
                     .stamina(0.029)
                     .food_level(0.059)
                     .water_level(0.19)
-                    .no_fatigue_effect()
+                .no_fatigue_effect()
+                .no_death_probability()
             .build(),
 
         StageBuilder::start()
@@ -61,6 +64,7 @@ zara::disease!(Flu, "Flu",
                     .will_reach_target_in(0.1) // 27 + 6min
                     .will_last_forever()
                 .no_drains()
+                .no_death_probability()
             .build() // 33 min total
     ]
 );
@@ -78,6 +82,7 @@ zara::disease!(Angina, "Angina",
                     .will_reach_target_in(0.7)
                     .will_end()
                 .no_drains()
+                .no_death_probability()
             .build(),
 
         StageBuilder::start()
@@ -90,6 +95,7 @@ zara::disease!(Angina, "Angina",
                     .will_reach_target_in(1.2)
                     .will_end()
                 .no_drains()
+                .no_death_probability()
             .build()
     ]
 );

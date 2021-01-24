@@ -4,14 +4,23 @@ use crate::health::disease::{DiseaseDeltasC, StageLevel};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
 use crate::utils::event::{Event, Listener, Dispatcher};
 
-/// Contains code related to the `update` method (calculating and updating health state)
+pub struct UpdateResult {
+    pub is_alive: bool,
+    pub disease_caused_death: String
+}
+
+struct ProcessDiseasesResult {
+    deltas: DiseaseDeltasC,
+    is_alive: bool,
+    disease_caused_death: String
+}
 
 impl Health {
     /// This method is called every `UPDATE_INTERVAL` real seconds
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
+    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>) -> UpdateResult {
         // Update disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.check(self, &frame.data);
@@ -37,10 +46,10 @@ impl Health {
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
         // Process diseases and get vitals deltas from them
-        let diseases_deltas = self.process_diseases(&frame.data.game_time, frame.data.game_time_delta);
+        let diseases_result = self.process_diseases(&frame.data.game_time, frame.data.game_time_delta);
 
         // Apply disease deltas
-        self.apply_disease_deltas(&mut snapshot, &diseases_deltas);
+        self.apply_disease_deltas(&mut snapshot, &diseases_result.deltas);
 
         // Will always regain stamina. Side effects must "fight" it
         {
@@ -58,6 +67,13 @@ impl Health {
 
         // Do the events
         self.dispatch_events::<E>(frame.events);
+
+        if !diseases_result.is_alive { self.is_alive.set(false); }
+
+        UpdateResult {
+            is_alive: diseases_result.is_alive,
+            disease_caused_death: diseases_result.disease_caused_death
+        }
     }
 
     fn dispatch_events<E: Listener + 'static>(&self, events: &mut Dispatcher<E>) {
@@ -96,7 +112,10 @@ impl Health {
         return side_effects_summary;
     }
 
-    fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> DiseaseDeltasC {
+    fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessDiseasesResult {
+        let mut is_alive = true;
+        let mut disease_caused_death = format!("");
+
         // Clean up garbage diseases
         let mut diseases_to_remove = Vec::new();
         {
@@ -117,14 +136,29 @@ impl Health {
         let mut disease_deltas = Vec::new();
         {
             let diseases = self.diseases.borrow();
-            for (_, disease) in diseases.iter() {
+            for (disease_name, disease) in diseases.iter() {
                 if disease.get_is_active(game_time) {
                     disease_deltas.push(disease.get_vitals_deltas(game_time));
 
+                    let active_stage = disease.get_active_stage(game_time);
+
+                    // Handling death probabilities
+                    match &active_stage {
+                        Some(st) => {
+                            let chance = st.info.chance_of_death.unwrap_or(0);
+
+                            if crate::utils::roll_dice(chance)
+                            {
+                                is_alive = false;
+                                disease_caused_death = disease_name.to_string();
+                            }
+                        },
+                        _ => { }
+                    }
+
                     // Handling self-heal
                     if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
-                        let stage = disease.get_active_stage(game_time);
-                        match stage {
+                        match &active_stage {
                             Some(st) => {
                                 let p = st.get_percent_active(game_time);
                                 let dice = crate::utils::range(50., 99.) as usize;
@@ -166,7 +200,11 @@ impl Health {
 
         result.cleanup();
 
-        return result;
+        return ProcessDiseasesResult {
+            deltas: result,
+            is_alive,
+            disease_caused_death
+        }
     }
 
     fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC) {
