@@ -39,6 +39,8 @@ This code is **WIP** and changes all the time.
 - Warmth and wetness levels (and optional "side effects" to control them)
 - Injuries (w/fluent), their treatment with appliances (like injections/bandages/splints/etc)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
+- Checking crafting recipe for resources availability
+- Actual getting new item from a crafting combination and spending resources on it
 
 The demo is built with `termion` which seems like does not support Windows. Maybe later I'll try find another solution for the demo "UI".
 
