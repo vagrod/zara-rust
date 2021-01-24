@@ -68,6 +68,29 @@ macro_rules! inv_spoil(
     );
 );
 
+/// Describes consumable contract
+pub struct ConsumableC {
+    /// Unique name of the item
+    pub name: String,
+    /// Is this consumable a food
+    pub is_food: bool,
+    /// Is this consumable a water
+    pub is_water: bool,
+    /// How many items of this type has been consumed
+    pub consumed_count: usize
+}
+
+impl ConsumableC {
+    pub fn new() -> Self {
+        ConsumableC {
+            name: String::new(),
+            is_food: false,
+            is_water: false,
+            consumed_count: 0
+        }
+    }
+}
+
 /// Trait that must be implemented by all inventory items
 pub trait InventoryItem {
     /// Returns count of items of this kind in the inventory

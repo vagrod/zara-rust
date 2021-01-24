@@ -6,11 +6,11 @@ use std::thread::sleep;
 use std::cell::Cell;
 
 use zara::utils::event::{Listener, Event};
-use zara::utils::{FrameSummaryC, ConsumableC, GameTimeC};
+use zara::utils::{FrameSummaryC, GameTimeC};
 use zara::health::{Health};
 use zara::health::disease::{DiseaseMonitor, Disease, StageBuilder, StageLevel};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
-use zara::inventory::items::{InventoryItem, ConsumableBehavior, SpoilingBehavior};
+use zara::inventory::items::{InventoryItem, ConsumableC, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
 
 use termion::{color, style};

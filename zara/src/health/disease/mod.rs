@@ -1,7 +1,7 @@
 use crate::health::{Health};
-use crate::utils::{FrameSummaryC, ConsumableC, GameTimeC};
+use crate::utils::{FrameSummaryC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
-use crate::inventory::items::InventoryItem;
+use crate::inventory::items::{InventoryItem, ConsumableC};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -111,14 +111,14 @@ pub trait DiseaseTreatment {
     ///
     /// ## Parameters
     /// - `game_time`: game time when this call happened
-    /// - `item_name`: name of the consumed item
+    /// - `item`: consumable item description
     /// - `active_stage`: instance of the active stage of a disease
     /// - `disease`: disease object itself. You can call `invert` or `invert_back` to start or stop
     ///     "curing" the disease
     ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
-    fn on_consumed(&self, game_time: &GameTimeC, item_name: &String, active_stage: &ActiveStage, disease: &ActiveDisease,
-                   inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+    fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage,
+                   disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Describes disease stage
@@ -296,12 +296,11 @@ pub trait DiseaseMonitor {
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
     /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `item_name`: name of a consumed item
-    /// - `consumable`: consumable part itself
+    /// - `item`: consumable part description
     ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
-    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item_name: &String,
-                   consumable: &ConsumableC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC,
+                   inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Trait that must be implemented by all diseases
@@ -508,13 +507,13 @@ impl ActiveDisease {
     }
 
     /// Is called by Zara from the health engine when person consumes an item
-    pub fn on_consumed(&self, game_time: &GameTimeC, item_name: &String,
+    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.get_is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_consumed(game_time, item_name, &st, &self, inventory_items),
+                Some(st) => t.on_consumed(game_time, item, &st, &self, inventory_items),
                 None => { }
             },
             None => { }

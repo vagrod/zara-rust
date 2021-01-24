@@ -1,7 +1,7 @@
-use crate::utils::{ConsumableC, GameTimeC, HealthC};
+use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
 use crate::health::side::{SideEffectsMonitor};
-use crate::inventory::items::InventoryItem;
+use crate::inventory::items::{InventoryItem, ConsumableC};
 
 use std::collections::HashMap;
 use std::cell::{RefCell, Cell};
@@ -88,17 +88,16 @@ impl Health {
     }
 
     /// Called by zara controller when item is consumed as food or water
-    pub fn on_item_consumed(&self, game_time: &GameTimeC, item_name: &String,
-                            consumable: &ConsumableC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
-            monitor.on_consumed(self, game_time, item_name, consumable, inventory_items);
+            monitor.on_consumed(self, game_time, item, inventory_items);
         }
 
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
-            if disease.needs_treatment && disease.get_is_active(game_time) {
-                disease.on_consumed(game_time, item_name, inventory_items);
+            if disease.get_is_active(game_time) {
+                disease.on_consumed(game_time, item, inventory_items);
             }
         }
     }

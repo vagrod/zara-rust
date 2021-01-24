@@ -1,13 +1,12 @@
 use zara::health::disease::{StageLevel, StageBuilder, DiseaseTreatment, ActiveStage, ActiveDisease};
 use zara::inventory::{Inventory};
-use zara::inventory::items::{InventoryItem};
+use zara::inventory::items::{InventoryItem, ConsumableC};
 use zara::utils::{GameTimeC};
 
 use std::collections::HashMap;
 
-pub struct FluTreatment;
 pub struct Flu;
-zara::disease!(Flu, "Flu", Some(Box::new(FluTreatment)),
+zara::disease!(Flu, "Flu", Some(Box::new(Flu)),
     vec![
         StageBuilder::start()
             .build_for(StageLevel::InitialStage)
@@ -74,8 +73,8 @@ zara::disease!(Flu, "Flu", Some(Box::new(FluTreatment)),
             .build() // 33 min total
     ]
 );
-impl DiseaseTreatment for FluTreatment {
-    fn on_consumed(&self, game_time: &GameTimeC, item_name: &String, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+impl DiseaseTreatment for Flu {
+    fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         //println!("from treatment");
     }
 }

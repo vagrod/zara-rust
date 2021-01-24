@@ -1,12 +1,12 @@
 use crate::inventory::items::InventoryItem;
 use crate::inventory::crafting::CraftingCombination;
 use crate::inventory::monitors::InventoryMonitor;
+use crate::error::InventoryItemAccessErr;
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 use std::rc::Rc;
-use crate::error::InventoryItemAccessErr;
 
 mod crud;
 mod update;

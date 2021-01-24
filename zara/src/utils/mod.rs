@@ -399,29 +399,6 @@ impl EnvironmentC {
     }
 }
 
-/// Describes consumable contract
-pub struct ConsumableC {
-    /// Unique name of the item
-    pub name: String,
-    /// Is this consumable a food
-    pub is_food: bool,
-    /// Is this consumable a water
-    pub is_water: bool,
-    /// How many items of this type has been consumed
-    pub consumed_count: usize
-}
-
-impl ConsumableC {
-    pub fn new() -> Self {
-        ConsumableC {
-            name: String::new(),
-            is_food: false,
-            is_water: false,
-            consumed_count: 0
-        }
-    }
-}
-
 /// Describes a snapshot of the player state for a single frame
 pub struct PlayerStatusC {
     pub is_walking: bool,

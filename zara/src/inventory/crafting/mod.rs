@@ -1,9 +1,9 @@
 use crate::inventory::crafting::fluent::BuilderStepResultItem;
+use crate::inventory::Inventory;
 
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use crate::inventory::Inventory;
 
 mod fluent;
 

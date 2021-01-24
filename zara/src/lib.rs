@@ -1,7 +1,8 @@
-use utils::{GameTime, EnvironmentC, ConsumableC};
+use utils::{GameTime, EnvironmentC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 use error::{ItemConsumeErr};
+use inventory::items::ConsumableC;
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -138,7 +139,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// - `item_name`: unique name of the item that is being consumed
     ///
     /// # Returns
-    /// `bool`: `true` on success
+    /// Ok on success
     ///
     /// # Notes
     /// This method borrows the `inventory.items` collection
@@ -183,7 +184,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         let items = self.inventory.items.borrow();
 
         // Notify health controller about the event
-        self.health.on_item_consumed(&game_time, item_name, &consumable, &*items);
+        self.health.on_consumed(&game_time, &consumable, &*items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)
