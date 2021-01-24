@@ -175,25 +175,29 @@ impl StageDrainsNode for StageBuilder {
     }
 
     fn no_drains(&self) -> &dyn StageEnd {
+        self.target_stamina_drain.set(0.00001);
+        self.target_food_drain.set(0.00001);
+        self.target_water_drain.set(0.00001);
+
         self.as_stage_end()
     }
 }
 
 impl StageDrainsValues for StageBuilder {
     fn stamina(&self, value: f32) -> &dyn StageDrainsValues {
-        self.stamina_drain.set(value);
+        self.target_stamina_drain.set(value);
 
         self.as_drains_values()
     }
 
     fn food_level(&self, value: f32) -> &dyn StageDrainsValues {
-        self.food_drain.set(value);
+        self.target_food_drain.set(value);
 
         self.as_drains_values()
     }
 
     fn water_level(&self, value: f32) -> &dyn StageDrainsValues {
-        self.water_drain.set(value);
+        self.target_water_drain.set(value);
 
         self.as_drains_values()
     }
@@ -228,9 +232,9 @@ impl StageEnd for StageBuilder {
             target_pressure_top: self.target_pressure_top.get(),
             target_pressure_bottom: self.target_pressure_bottom.get(),
             target_fatigue_delta: self.target_fatigue_delta.get(),
-            stamina_drain: self.stamina_drain.get(),
-            food_drain: self.food_drain.get(),
-            water_drain: self.water_drain.get()
+            target_stamina_drain: self.target_stamina_drain.get(),
+            target_food_drain: self.target_food_drain.get(),
+            target_water_drain: self.target_water_drain.get()
         }
     }
 }

@@ -121,15 +121,6 @@ impl Health {
                 if disease.get_is_active(game_time) {
                     disease_deltas.push(disease.get_vitals_deltas(game_time));
 
-                    match disease.get_active_stage(game_time) {
-                        Some(st) => {
-                            result.stamina_drain += st.info.stamina_drain * game_time_delta; // stamina drain is cumulative
-                            result.food_drain += st.info.food_drain * game_time_delta; // food drain is cumulative
-                            result.water_drain += st.info.water_drain * game_time_delta; // water drain is cumulative
-                        },
-                        _ => { }
-                    };
-
                     // Handling self-heal
                     if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
                         let stage = disease.get_active_stage(game_time);
@@ -166,6 +157,11 @@ impl Health {
                 if result.pressure_bottom_delta < d.pressure_bottom_delta
                 { d.pressure_bottom_delta } else { result.pressure_bottom_delta };
             result.fatigue_delta += d.fatigue_delta; // fatigue is cumulative
+
+            // Those are % per game second drains
+            result.stamina_drain += d.stamina_drain * game_time_delta; // stamina drain is cumulative
+            result.food_drain += d.food_drain * game_time_delta; // food drain is cumulative
+            result.water_drain += d.water_drain * game_time_delta; // water drain is cumulative
         }
 
         result.cleanup();

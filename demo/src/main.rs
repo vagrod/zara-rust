@@ -66,9 +66,9 @@ fn main() {
                 // Game time is 10x the real one
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
-/*
+
             // Disease "invert" test
-            if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 35 {
+            if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 42 {
                 if !is_disease_inverted {
                     person.health.diseases.borrow().get("Flu").unwrap().invert(&person.environment.game_time.to_contract());
                     is_disease_inverted = true;
@@ -81,7 +81,7 @@ fn main() {
                     is_disease_inverted = false;
                 }
             }
-*/
+
             // Update Zara state
             person.update(frame_time);
 

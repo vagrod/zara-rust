@@ -49,9 +49,9 @@ pub struct StageBuilder {
     target_pressure_top: Cell<f32>,
     target_pressure_bottom: Cell<f32>,
     target_fatigue_delta: Cell<f32>,
-    stamina_drain: Cell<f32>,
-    food_drain: Cell<f32>,
-    water_drain: Cell<f32>
+    target_stamina_drain: Cell<f32>,
+    target_food_drain: Cell<f32>,
+    target_water_drain: Cell<f32>
 }
 
 /// Disease stage level of seriousness
@@ -91,9 +91,9 @@ impl StageBuilder {
                 target_pressure_top: Cell::new(0.),
                 target_pressure_bottom: Cell::new(0.),
                 target_fatigue_delta: Cell::new(0.),
-                stamina_drain: Cell::new(0.),
-                food_drain: Cell::new(0.),
-                water_drain: Cell::new(0.)
+                target_stamina_drain: Cell::new(0.),
+                target_food_drain: Cell::new(0.),
+                target_water_drain: Cell::new(0.)
             }
         )
     }
@@ -120,12 +120,12 @@ pub struct StageDescription {
     pub target_pressure_bottom: f32,
     /// Target fatigue delta value (0..100 percents) at the end of this stage
     pub target_fatigue_delta: f32,
-    /// Food drain for this stage (0..100 percents per game second)
-    pub food_drain: f32,
-    /// Water drain for this stage (0..100 percents per game second)
-    pub water_drain: f32,
-    /// Stamina drain for this stage (0..100 percents per game second)
-    pub stamina_drain: f32
+    /// Target food drain for this stage (0..100 percents per game second)
+    pub target_food_drain: f32,
+    /// Target water drain for this stage (0..100 percents per game second)
+    pub target_water_drain: f32,
+    /// Target stamina drain for this stage (0..100 percents per game second)
+    pub target_stamina_drain: f32
 }
 
 impl StageDescription {
@@ -140,9 +140,9 @@ impl StageDescription {
             target_pressure_top: self.target_pressure_top,
             target_pressure_bottom: self.target_pressure_bottom,
             target_fatigue_delta: self.target_fatigue_delta,
-            stamina_drain: self.stamina_drain,
-            food_drain: self.food_drain,
-            water_drain: self.water_drain
+            target_stamina_drain: self.target_stamina_drain,
+            target_food_drain: self.target_food_drain,
+            target_water_drain: self.target_water_drain
         }
     }
 }
@@ -291,6 +291,9 @@ struct LerpDataNodeC {
     pressure_top_data: Vec<LerpDataC>,
     pressure_bottom_data: Vec<LerpDataC>,
     fatigue_data: Vec<LerpDataC>,
+    stamina_data: Vec<LerpDataC>,
+    food_data: Vec<LerpDataC>,
+    water_data: Vec<LerpDataC>,
     is_endless: bool,
     is_for_inverted: bool
 }
@@ -355,7 +358,7 @@ impl ActiveDisease {
         for stage in disease.get_stages().iter() {
             match stage.self_heal_chance {
                 Some(c) => {
-                    if crate::utils::roll_dice(c) {
+                    if !self_heal && crate::utils::roll_dice(c) {
                         self_heal_level = stage.level;
                         self_heal = true;
                     }

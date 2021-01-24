@@ -16,6 +16,9 @@ impl LerpDataNodeC {
             heart_rate_data: Vec::new(),
             pressure_top_data: Vec::new(),
             pressure_bottom_data: Vec::new(),
+            stamina_data: Vec::new(),
+            food_data: Vec::new(),
+            water_data: Vec::new(),
             fatigue_data: Vec::new()
         }
     }
@@ -33,6 +36,9 @@ impl ActiveDisease {
         let mut last_start_pressure_top = last_deltas.pressure_top_delta;
         let mut last_start_pressure_bottom = last_deltas.pressure_bottom_delta;
         let mut last_start_fatigue_delta = last_deltas.fatigue_delta;
+        let mut last_start_stamina_delta = last_deltas.stamina_drain;
+        let mut last_start_food_delta = last_deltas.food_drain;
+        let mut last_start_water_delta = last_deltas.water_drain;
 
         // Creating our lerp data object
         let mut lerp_data = LerpDataNodeC::new();
@@ -47,6 +53,9 @@ impl ActiveDisease {
                 m.pressure_top_data.clear();
                 m.pressure_bottom_data.clear();
                 m.fatigue_data.clear();
+                m.stamina_data.clear();
+                m.food_data.clear();
+                m.water_data.clear();
             },
             None => { }
         };
@@ -59,9 +68,9 @@ impl ActiveDisease {
                 reaches_peak_in_hours: 0.,
                 self_heal_chance: None,
                 target_fatigue_delta: 0.,
-                stamina_drain: 0.,
-                food_drain: 0.,
-                water_drain: 0.,
+                target_stamina_drain: 0.,
+                target_food_drain: 0.,
+                target_water_drain: 0.,
                 target_body_temp: healthy.body_temperature,
                 target_heart_rate: healthy.heart_rate,
                 target_pressure_top: healthy.top_pressure,
@@ -192,6 +201,60 @@ impl ActiveDisease {
 
                 last_start_fatigue_delta = ld.end_value;
                 lerp_data.fatigue_data.push(ld);
+            }
+            // Stamina
+            if stage.info.target_stamina_drain > 0. {
+                let end_value = match next_stage {
+                    Some(st) => st.info.target_stamina_drain,
+                    None => stage.info.target_stamina_drain
+                };
+                let ld = LerpDataC {
+                    start_time,
+                    end_time: end,
+                    start_value: last_start_stamina_delta,
+                    end_value,
+                    duration: end - start_time,
+                    is_endless: stage.info.is_endless
+                };
+
+                last_start_stamina_delta = ld.end_value;
+                lerp_data.stamina_data.push(ld);
+            }
+            // Food
+            if stage.info.target_food_drain > 0. {
+                let end_value = match next_stage {
+                    Some(st) => st.info.target_food_drain,
+                    None => stage.info.target_food_drain
+                };
+                let ld = LerpDataC {
+                    start_time,
+                    end_time: end,
+                    start_value: last_start_food_delta,
+                    end_value,
+                    duration: end - start_time,
+                    is_endless: stage.info.is_endless
+                };
+
+                last_start_food_delta = ld.end_value;
+                lerp_data.food_data.push(ld);
+            }
+            // Water
+            if stage.info.target_water_drain > 0. {
+                let end_value = match next_stage {
+                    Some(st) => st.info.target_water_drain,
+                    None => stage.info.target_water_drain
+                };
+                let ld = LerpDataC {
+                    start_time,
+                    end_time: end,
+                    start_value: last_start_water_delta,
+                    end_value,
+                    duration: end - start_time,
+                    is_endless: stage.info.is_endless
+                };
+
+                last_start_water_delta = ld.end_value;
+                lerp_data.water_data.push(ld);
             }
 
             return true;
@@ -329,6 +392,54 @@ impl ActiveDisease {
                 Some(d) => {
                     let p = clamp_01((gt - d.start_time) / d.duration);
                     result.fatigue_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
+            }
+        }
+        { // Stamina
+            let mut ld = None;
+            for data in lerp_data.stamina_data.iter() {
+                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
+                    ld = Some(data);
+                    break;
+                }
+            }
+            match ld {
+                Some(d) => {
+                    let p = clamp_01((gt - d.start_time) / d.duration);
+                    result.stamina_drain = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
+            }
+        }
+        { // Food
+            let mut ld = None;
+            for data in lerp_data.food_data.iter() {
+                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
+                    ld = Some(data);
+                    break;
+                }
+            }
+            match ld {
+                Some(d) => {
+                    let p = clamp_01((gt - d.start_time) / d.duration);
+                    result.food_drain = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
+            }
+        }
+        { // Water
+            let mut ld = None;
+            for data in lerp_data.water_data.iter() {
+                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
+                    ld = Some(data);
+                    break;
+                }
+            }
+            match ld {
+                Some(d) => {
+                    let p = clamp_01((gt - d.start_time) / d.duration);
+                    result.water_drain = lerp(d.start_value, d.end_value, p);
                 },
                 None => { }
             }

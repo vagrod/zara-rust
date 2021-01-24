@@ -5,7 +5,7 @@ zara::disease!(Flu, "Flu",
     vec![
         StageBuilder::start()
             .build_for(StageLevel::InitialStage)
-                .self_heal(15)
+                .no_self_heal()
                 .vitals()
                     .with_target_body_temp(37.6)
                     .with_target_heart_rate(85.)
@@ -21,7 +21,7 @@ zara::disease!(Flu, "Flu",
 
         StageBuilder::start()
             .build_for(StageLevel::Progressing)
-                .no_self_heal()
+                .self_heal(20)
                 .vitals()
                     .with_target_body_temp(38.2)
                     .with_target_heart_rate(89.)
