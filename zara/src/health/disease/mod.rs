@@ -47,7 +47,8 @@ pub struct StageBuilder {
     target_body_temp: Cell<f32>,
     target_heart_rate: Cell<f32>,
     target_pressure_top: Cell<f32>,
-    target_pressure_bottom: Cell<f32>
+    target_pressure_bottom: Cell<f32>,
+    target_fatigue_delta: Cell<f32>
 }
 
 /// Disease stage level of seriousness
@@ -85,7 +86,8 @@ impl StageBuilder {
                 target_body_temp: Cell::new(0.),
                 target_heart_rate: Cell::new(0.),
                 target_pressure_top: Cell::new(0.),
-                target_pressure_bottom: Cell::new(0.)
+                target_pressure_bottom: Cell::new(0.),
+                target_fatigue_delta: Cell::new(0.)
             }
         )
     }
@@ -109,7 +111,12 @@ pub struct StageDescription {
     /// Stage's target body pressure (top)
     pub target_pressure_top: f32,
     /// Stage's target body pressure (bottom)
-    pub target_pressure_bottom: f32
+    pub target_pressure_bottom: f32,
+    /// Target fatigue delta value (0..100 percents) at the end of this stage
+    pub target_fatigue_delta: f32,
+   // pub food_drain: f32,
+    //pub water_drain: f32,
+   // pub stamina_drain: f32
 }
 
 impl StageDescription {
@@ -122,7 +129,8 @@ impl StageDescription {
             target_body_temp: self.target_body_temp,
             target_heart_rate: self.target_heart_rate,
             target_pressure_top: self.target_pressure_top,
-            target_pressure_bottom: self.target_pressure_bottom
+            target_pressure_bottom: self.target_pressure_bottom,
+            target_fatigue_delta: self.target_fatigue_delta
         }
     }
 }
@@ -144,7 +152,8 @@ pub struct DiseaseDeltasC {
     pub body_temperature_delta: f32,
     pub heart_rate_delta: f32,
     pub pressure_top_delta: f32,
-    pub pressure_bottom_delta: f32
+    pub pressure_bottom_delta: f32,
+    pub fatigue_delta: f32
 }
 
 impl DiseaseDeltasC {
@@ -153,15 +162,17 @@ impl DiseaseDeltasC {
             body_temperature_delta: 0.,
             heart_rate_delta: 0.,
             pressure_top_delta: 0.,
-            pressure_bottom_delta: 0.
+            pressure_bottom_delta: 0.,
+            fatigue_delta: 0.
         }
     }
-    pub fn negative() -> Self {
+    pub fn for_related() -> Self {
         DiseaseDeltasC {
             body_temperature_delta: -1000.,
             heart_rate_delta: -1000.,
             pressure_top_delta: -1000.,
-            pressure_bottom_delta: -1000.
+            pressure_bottom_delta: -1000.,
+            fatigue_delta: 0.
         }
     }
     pub fn cleanup(&mut self){
@@ -169,19 +180,21 @@ impl DiseaseDeltasC {
         if self.body_temperature_delta < -900. { self.body_temperature_delta = 0.; }
         if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
         if self.pressure_bottom_delta < -900. { self.pressure_bottom_delta = 0.; }
+        if self.fatigue_delta < -900. { self.fatigue_delta = 0.; }
     }
     pub fn copy(&self) -> DiseaseDeltasC {
         DiseaseDeltasC {
             body_temperature_delta: self.body_temperature_delta,
             heart_rate_delta: self.heart_rate_delta,
             pressure_top_delta: self.pressure_top_delta,
-            pressure_bottom_delta: self.pressure_bottom_delta
+            pressure_bottom_delta: self.pressure_bottom_delta,
+            fatigue_delta: self.fatigue_delta
         }
     }
 }
 
 impl ActiveStage {
-    /// Checks if stage if active for a given time
+    /// Checks if stage is active for a given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
         let start = self.start_time.as_secs_f32();
         let peak = self.peak_time.as_secs_f32();
@@ -194,6 +207,7 @@ impl ActiveStage {
         }
     }
 
+    /// Returns percent of activity of this stage. Always in 0..100 range.
     pub fn get_percent_active(&self, game_time: &GameTimeC) -> usize {
         let gt = game_time.as_secs_f32();
         let start = self.start_time.as_secs_f32();
@@ -253,6 +267,7 @@ struct LerpDataNodeC {
     heart_rate_data: Vec<LerpDataC>,
     pressure_top_data: Vec<LerpDataC>,
     pressure_bottom_data: Vec<LerpDataC>,
+    fatigue_data: Vec<LerpDataC>,
     is_endless: bool,
     is_for_inverted: bool
 }

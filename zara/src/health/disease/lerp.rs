@@ -15,7 +15,8 @@ impl LerpDataNodeC {
             body_temp_data: Vec::new(),
             heart_rate_data: Vec::new(),
             pressure_top_data: Vec::new(),
-            pressure_bottom_data: Vec::new()
+            pressure_bottom_data: Vec::new(),
+            fatigue_data: Vec::new()
         }
     }
 }
@@ -31,6 +32,7 @@ impl ActiveDisease {
         let mut last_start_heart_rate = last_deltas.heart_rate_delta;
         let mut last_start_pressure_top = last_deltas.pressure_top_delta;
         let mut last_start_pressure_bottom = last_deltas.pressure_bottom_delta;
+        let mut last_start_fatigue_delta = last_deltas.fatigue_delta;
 
         // Creating our lerp data object
         let mut lerp_data = LerpDataNodeC::new();
@@ -44,6 +46,7 @@ impl ActiveDisease {
                 m.heart_rate_data.clear();
                 m.pressure_top_data.clear();
                 m.pressure_bottom_data.clear();
+                m.fatigue_data.clear();
             },
             None => { }
         };
@@ -55,6 +58,7 @@ impl ActiveDisease {
                 is_endless: false,
                 reaches_peak_in_hours: 0.,
                 self_heal_chance: None,
+                target_fatigue_delta: 0.,
                 target_body_temp: healthy.body_temperature,
                 target_heart_rate: healthy.heart_rate,
                 target_pressure_top: healthy.top_pressure,
@@ -168,6 +172,24 @@ impl ActiveDisease {
                 last_start_pressure_bottom = ld.end_value;
                 lerp_data.pressure_bottom_data.push(ld);
             }
+            // Fatigue
+            if stage.info.target_fatigue_delta > 0. {
+                let end_value = match next_stage {
+                    Some(st) => st.info.target_fatigue_delta,
+                    None => stage.info.target_fatigue_delta
+                };
+                let ld = LerpDataC {
+                    start_time,
+                    end_time: end,
+                    start_value: last_start_fatigue_delta,
+                    end_value,
+                    duration: end - start_time,
+                    is_endless: stage.info.is_endless
+                };
+
+                last_start_fatigue_delta = ld.end_value;
+                lerp_data.fatigue_data.push(ld);
+            }
 
             return true;
         };
@@ -175,12 +197,12 @@ impl ActiveDisease {
         if !inverted {
             let b = self.stages.borrow();
             for (_, stage) in b.iter() {
-                if !process_stage(stage, &b) { continue; }
+                process_stage(stage, &b);
             }
         } else {
             let b = self.stages.borrow();
             for (_, stage) in b.iter().rev() {
-                if !process_stage(stage, &b) { continue; }
+                process_stage(stage, &b);
             }
         }
 
@@ -288,6 +310,22 @@ impl ActiveDisease {
                 Some(d) => {
                     let p = clamp_01((gt - d.start_time) / d.duration);
                     result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
+                },
+                None => { }
+            }
+        }
+        { // Fatigue
+            let mut ld = None;
+            for data in lerp_data.fatigue_data.iter() {
+                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
+                    ld = Some(data);
+                    break;
+                }
+            }
+            match ld {
+                Some(d) => {
+                    let p = clamp_01((gt - d.start_time) / d.duration);
+                    result.fatigue_delta = lerp(d.start_value, d.end_value, p);
                 },
                 None => { }
             }

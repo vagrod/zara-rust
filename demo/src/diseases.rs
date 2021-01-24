@@ -12,6 +12,8 @@ zara::disease!(Flu, "Flu",
                     .with_target_blood_pressure(130., 90.)
                     .will_reach_target_in(0.1) // 6min
                     .will_end()
+                .drains()
+                    .fatigue_target_delta(5.)
             .build(),
 
         StageBuilder::start()
@@ -23,6 +25,8 @@ zara::disease!(Flu, "Flu",
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.2) // 6 + 12min
                     .will_end()
+                .drains()
+                    .fatigue_target_delta(14.)
             .build(),
 
         StageBuilder::start()
@@ -34,6 +38,8 @@ zara::disease!(Flu, "Flu",
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.15) // 18 + 9min
                     .will_end()
+                .drains()
+                    .fatigue_target_delta(0.001)
             .build(),
 
         StageBuilder::start()
@@ -45,6 +51,7 @@ zara::disease!(Flu, "Flu",
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(0.1) // 27 + 6min
                     .will_last_forever()
+                .no_drains()
             .build() // 33 min total
     ]
 );
@@ -61,6 +68,7 @@ zara::disease!(Angina, "Angina",
                     .with_target_blood_pressure(130., 90.)
                     .will_reach_target_in(0.7)
                     .will_end()
+                .no_drains()
             .build(),
 
         StageBuilder::start()
@@ -72,6 +80,7 @@ zara::disease!(Angina, "Angina",
                     .with_target_blood_pressure(126., 84.)
                     .will_reach_target_in(1.2)
                     .will_end()
+                .no_drains()
             .build()
     ]
 );

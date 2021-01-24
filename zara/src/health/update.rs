@@ -141,7 +141,7 @@ impl Health {
         }
 
         // Normalize disease deltas
-        let mut max_delta = DiseaseDeltasC::negative();
+        let mut max_delta = DiseaseDeltasC::for_related();
         for d in disease_deltas.iter() {
             max_delta.body_temperature_delta =
                 if max_delta.body_temperature_delta < d.body_temperature_delta
@@ -155,6 +155,7 @@ impl Health {
             max_delta.pressure_bottom_delta =
                 if max_delta.pressure_bottom_delta < d.pressure_bottom_delta
                 { d.pressure_bottom_delta } else { max_delta.pressure_bottom_delta };
+            max_delta.fatigue_delta += d.fatigue_delta; // fatigue is cumulative
         }
         max_delta.cleanup();
 
@@ -177,6 +178,7 @@ impl Health {
         snapshot.heart_rate += deltas.heart_rate_delta;
         snapshot.top_pressure += deltas.pressure_top_delta;
         snapshot.bottom_pressure += deltas.pressure_bottom_delta;
+        snapshot.fatigue_level += deltas.fatigue_delta;
     }
 
     fn apply_health_snapshot(&self, snapshot: &HealthC) {

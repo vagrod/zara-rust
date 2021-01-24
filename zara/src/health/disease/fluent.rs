@@ -4,6 +4,8 @@ impl StageBuilder {
     fn as_stage_self_heal(&self) -> &dyn StageSelfHeal { self }
     fn as_vitals_node(&self) -> &dyn StageVitalsNode { self }
     fn as_vitals_values(&self) -> &dyn StageVitalsValues { self }
+    fn as_drains_node(&self) -> &dyn StageDrainsNode { self }
+    fn as_drains_values(&self) -> &dyn StageDrainsValues { self }
     fn as_stage_end(&self) -> &dyn StageEnd { self }
 }
 
@@ -26,8 +28,17 @@ pub trait StageVitalsValues {
     fn with_target_blood_pressure(&self, top: f32, bottom: f32) -> &dyn StageVitalsValues;
 
     fn will_reach_target_in(&self, hours: f32) -> &dyn StageVitalsValues;
-    fn will_end(&self) -> &dyn StageEnd;
-    fn will_last_forever(&self) -> &dyn StageEnd;
+    fn will_end(&self) -> &dyn StageDrainsNode;
+    fn will_last_forever(&self) -> &dyn StageDrainsNode;
+}
+
+pub trait StageDrainsNode {
+    fn drains(&self) -> &dyn StageDrainsValues;
+    fn no_drains(&self) -> &dyn StageEnd;
+}
+
+pub trait StageDrainsValues {
+    fn fatigue_target_delta(&self, value: f32) -> &dyn StageEnd;
 }
 
 pub trait StageEnd {
@@ -88,12 +99,30 @@ impl StageVitalsValues for StageBuilder {
         self.as_vitals_values()
     }
 
-    fn will_end(&self) -> &dyn StageEnd {
-        self.as_stage_end()
+    fn will_end(&self) -> &dyn StageDrainsNode {
+        self.as_drains_node()
     }
 
-    fn will_last_forever(&self) -> &dyn StageEnd {
+    fn will_last_forever(&self) -> &dyn StageDrainsNode {
         self.is_endless.set(true);
+
+        self.as_drains_node()
+    }
+}
+
+impl StageDrainsNode for StageBuilder {
+    fn drains(&self) -> &dyn StageDrainsValues {
+        self.as_drains_values()
+    }
+
+    fn no_drains(&self) -> &dyn StageEnd {
+        self.as_stage_end()
+    }
+}
+
+impl StageDrainsValues for StageBuilder {
+    fn fatigue_target_delta(&self, value: f32) -> &dyn StageEnd {
+        self.target_fatigue_delta.set(value);
 
         self.as_stage_end()
     }
@@ -115,6 +144,7 @@ impl StageEnd for StageBuilder {
             target_heart_rate: self.target_heart_rate.get(),
             target_pressure_top: self.target_pressure_top.get(),
             target_pressure_bottom: self.target_pressure_bottom.get(),
+            target_fatigue_delta: self.target_fatigue_delta.get()
         }
     }
 }
