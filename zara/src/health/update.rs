@@ -37,7 +37,7 @@ impl Health {
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
         // Process diseases and get vitals deltas from them
-        let diseases_deltas = self.process_diseases(&frame.data.game_time);
+        let diseases_deltas = self.process_diseases(&frame.data.game_time, frame.data.game_time_delta);
 
         // Apply disease deltas
         self.apply_disease_deltas(&mut snapshot, &diseases_deltas);
@@ -96,7 +96,7 @@ impl Health {
         return side_effects_summary;
     }
 
-    fn process_diseases(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
+    fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> DiseaseDeltasC {
         // Clean up garbage diseases
         let mut diseases_to_remove = Vec::new();
         {
@@ -111,6 +111,8 @@ impl Health {
             self.remove_disease(&disease_name).ok(); // we don't really care here
         }
 
+        let mut result = DiseaseDeltasC::for_related();
+
         // Collect disease deltas
         let mut disease_deltas = Vec::new();
         {
@@ -119,15 +121,24 @@ impl Health {
                 if disease.get_is_active(game_time) {
                     disease_deltas.push(disease.get_vitals_deltas(game_time));
 
+                    match disease.get_active_stage(game_time) {
+                        Some(st) => {
+                            result.stamina_drain += st.info.stamina_drain * game_time_delta; // stamina drain is cumulative
+                            result.food_drain += st.info.food_drain * game_time_delta; // food drain is cumulative
+                            result.water_drain += st.info.water_drain * game_time_delta; // water drain is cumulative
+                        },
+                        _ => { }
+                    };
+
                     // Handling self-heal
-                    if !disease.needs_treatment && !disease.get_is_healing() {
+                    if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
                         let stage = disease.get_active_stage(game_time);
                         match stage {
                             Some(st) => {
                                 let p = st.get_percent_active(game_time);
                                 let dice = crate::utils::range(50., 99.) as usize;
-                                if (st.info.level == StageLevel::InitialStage && p > dice) ||
-                                    st.info.level != StageLevel::InitialStage
+                                if (st.info.level == disease.will_self_heal_on && p > dice) ||
+                                    st.info.level as i32 > disease.will_self_heal_on as i32
                                 {
                                     // Invoke the healing process
                                     disease.invert(game_time).ok(); // aren't interested in result
@@ -141,25 +152,25 @@ impl Health {
         }
 
         // Normalize disease deltas
-        let mut max_delta = DiseaseDeltasC::for_related();
         for d in disease_deltas.iter() {
-            max_delta.body_temperature_delta =
-                if max_delta.body_temperature_delta < d.body_temperature_delta
-                { d.body_temperature_delta } else { max_delta.body_temperature_delta };
-            max_delta.heart_rate_delta =
-                if max_delta.heart_rate_delta < d.heart_rate_delta
-                { d.heart_rate_delta } else { max_delta.heart_rate_delta };
-            max_delta.pressure_top_delta =
-                if max_delta.pressure_top_delta < d.pressure_top_delta
-                { d.pressure_top_delta } else { max_delta.pressure_top_delta };
-            max_delta.pressure_bottom_delta =
-                if max_delta.pressure_bottom_delta < d.pressure_bottom_delta
-                { d.pressure_bottom_delta } else { max_delta.pressure_bottom_delta };
-            max_delta.fatigue_delta += d.fatigue_delta; // fatigue is cumulative
+            result.body_temperature_delta =
+                if result.body_temperature_delta < d.body_temperature_delta
+                { d.body_temperature_delta } else { result.body_temperature_delta };
+            result.heart_rate_delta =
+                if result.heart_rate_delta < d.heart_rate_delta
+                { d.heart_rate_delta } else { result.heart_rate_delta };
+            result.pressure_top_delta =
+                if result.pressure_top_delta < d.pressure_top_delta
+                { d.pressure_top_delta } else { result.pressure_top_delta };
+            result.pressure_bottom_delta =
+                if result.pressure_bottom_delta < d.pressure_bottom_delta
+                { d.pressure_bottom_delta } else { result.pressure_bottom_delta };
+            result.fatigue_delta += d.fatigue_delta; // fatigue is cumulative
         }
-        max_delta.cleanup();
 
-        return max_delta;
+        result.cleanup();
+
+        return result;
     }
 
     fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC) {
@@ -178,6 +189,9 @@ impl Health {
         snapshot.heart_rate += deltas.heart_rate_delta;
         snapshot.top_pressure += deltas.pressure_top_delta;
         snapshot.bottom_pressure += deltas.pressure_bottom_delta;
+        snapshot.food_level -= deltas.food_drain;
+        snapshot.water_level -= deltas.water_drain;
+        snapshot.stamina_level -= deltas.stamina_drain;
         snapshot.fatigue_level += deltas.fatigue_delta;
     }
 

@@ -13,7 +13,10 @@ zara::disease!(Flu, "Flu",
                     .will_reach_target_in(0.1) // 6min
                     .will_end()
                 .drains()
-                    .fatigue_target_delta(5.)
+                    .stamina(0.2)
+                    .food_level(0.05)
+                    .water_level(0.1)
+                    .affects_fatigue(5.)
             .build(),
 
         StageBuilder::start()
@@ -26,7 +29,10 @@ zara::disease!(Flu, "Flu",
                     .will_reach_target_in(0.2) // 6 + 12min
                     .will_end()
                 .drains()
-                    .fatigue_target_delta(14.)
+                    .stamina(0.025)
+                    .food_level(0.055)
+                    .water_level(0.15)
+                    .affects_fatigue(10.)
             .build(),
 
         StageBuilder::start()
@@ -39,7 +45,10 @@ zara::disease!(Flu, "Flu",
                     .will_reach_target_in(0.15) // 18 + 9min
                     .will_end()
                 .drains()
-                    .fatigue_target_delta(0.001)
+                    .stamina(0.029)
+                    .food_level(0.059)
+                    .water_level(0.19)
+                    .no_fatigue_effect()
             .build(),
 
         StageBuilder::start()

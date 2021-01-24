@@ -48,7 +48,10 @@ pub struct StageBuilder {
     target_heart_rate: Cell<f32>,
     target_pressure_top: Cell<f32>,
     target_pressure_bottom: Cell<f32>,
-    target_fatigue_delta: Cell<f32>
+    target_fatigue_delta: Cell<f32>,
+    stamina_drain: Cell<f32>,
+    food_drain: Cell<f32>,
+    water_drain: Cell<f32>
 }
 
 /// Disease stage level of seriousness
@@ -87,7 +90,10 @@ impl StageBuilder {
                 target_heart_rate: Cell::new(0.),
                 target_pressure_top: Cell::new(0.),
                 target_pressure_bottom: Cell::new(0.),
-                target_fatigue_delta: Cell::new(0.)
+                target_fatigue_delta: Cell::new(0.),
+                stamina_drain: Cell::new(0.),
+                food_drain: Cell::new(0.),
+                water_drain: Cell::new(0.)
             }
         )
     }
@@ -114,9 +120,12 @@ pub struct StageDescription {
     pub target_pressure_bottom: f32,
     /// Target fatigue delta value (0..100 percents) at the end of this stage
     pub target_fatigue_delta: f32,
-   // pub food_drain: f32,
-    //pub water_drain: f32,
-   // pub stamina_drain: f32
+    /// Food drain for this stage (0..100 percents per game second)
+    pub food_drain: f32,
+    /// Water drain for this stage (0..100 percents per game second)
+    pub water_drain: f32,
+    /// Stamina drain for this stage (0..100 percents per game second)
+    pub stamina_drain: f32
 }
 
 impl StageDescription {
@@ -130,7 +139,10 @@ impl StageDescription {
             target_heart_rate: self.target_heart_rate,
             target_pressure_top: self.target_pressure_top,
             target_pressure_bottom: self.target_pressure_bottom,
-            target_fatigue_delta: self.target_fatigue_delta
+            target_fatigue_delta: self.target_fatigue_delta,
+            stamina_drain: self.stamina_drain,
+            food_drain: self.food_drain,
+            water_drain: self.water_drain
         }
     }
 }
@@ -153,7 +165,10 @@ pub struct DiseaseDeltasC {
     pub heart_rate_delta: f32,
     pub pressure_top_delta: f32,
     pub pressure_bottom_delta: f32,
-    pub fatigue_delta: f32
+    pub fatigue_delta: f32,
+    pub stamina_drain: f32,
+    pub food_drain: f32,
+    pub water_drain: f32
 }
 
 impl DiseaseDeltasC {
@@ -163,7 +178,10 @@ impl DiseaseDeltasC {
             heart_rate_delta: 0.,
             pressure_top_delta: 0.,
             pressure_bottom_delta: 0.,
-            fatigue_delta: 0.
+            fatigue_delta: 0.,
+            stamina_drain: 0.,
+            food_drain: 0.,
+            water_drain: 0.
         }
     }
     pub fn for_related() -> Self {
@@ -172,7 +190,10 @@ impl DiseaseDeltasC {
             heart_rate_delta: -1000.,
             pressure_top_delta: -1000.,
             pressure_bottom_delta: -1000.,
-            fatigue_delta: 0.
+            fatigue_delta: 0.,
+            stamina_drain: 0.,
+            food_drain: 0.,
+            water_drain: 0.
         }
     }
     pub fn cleanup(&mut self){
@@ -180,7 +201,6 @@ impl DiseaseDeltasC {
         if self.body_temperature_delta < -900. { self.body_temperature_delta = 0.; }
         if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
         if self.pressure_bottom_delta < -900. { self.pressure_bottom_delta = 0.; }
-        if self.fatigue_delta < -900. { self.fatigue_delta = 0.; }
     }
     pub fn copy(&self) -> DiseaseDeltasC {
         DiseaseDeltasC {
@@ -188,7 +208,10 @@ impl DiseaseDeltasC {
             heart_rate_delta: self.heart_rate_delta,
             pressure_top_delta: self.pressure_top_delta,
             pressure_bottom_delta: self.pressure_bottom_delta,
-            fatigue_delta: self.fatigue_delta
+            fatigue_delta: self.fatigue_delta,
+            stamina_drain: self.stamina_drain,
+            food_drain: self.food_drain,
+            water_drain: self.water_drain
         }
     }
 }
@@ -288,6 +311,8 @@ pub struct ActiveDisease {
     pub disease: Rc<Box<dyn Disease>>,
     /// Disease needs treatment or will self-heal
     pub needs_treatment: bool,
+    /// On which stage level disease will start self-healing (`StageLevel::Undefined` if none)
+    pub will_self_heal_on: StageLevel,
     /// Total duration of all stages, from first start to last peak. This duration dos not account
     /// for the `HealthyStage` that is being added at runtime during the [`invert`] method call.
     ///
@@ -324,12 +349,14 @@ impl ActiveDisease {
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
         let mut self_heal = false;
+        let mut self_heal_level = StageLevel::Undefined;
         let initial_data = disease.get_stages();
 
         for stage in disease.get_stages().iter() {
             match stage.self_heal_chance {
                 Some(c) => {
                     if crate::utils::roll_dice(c) {
+                        self_heal_level = stage.level;
                         self_heal = true;
                     }
                 },
@@ -366,6 +393,7 @@ impl ActiveDisease {
             will_end: Cell::new(will_end),
             end_time: RefCell::new(end_time),
             needs_treatment: !self_heal,
+            will_self_heal_on: self_heal_level,
             lerp_data: RefCell::new(None), // will be calculated on first get_vitals_deltas
             last_deltas: RefCell::new(DiseaseDeltasC::empty())
         }
