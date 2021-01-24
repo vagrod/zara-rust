@@ -16,10 +16,13 @@ This code is **WIP** and changes all the time.
 - Health:
   + Sleeping
   + "Side effects" monitors as traits
-  + Vitals (body temperature, heart rate, blood pressure, stamina, fatigue). Most common "side effects" implemented like "fluctuating vitals", running (stamina and fatigue drain), fatgue based on sleepng time and sleepng duration, food drain, water drain
-  + Diseases as traits (fully implemented, except appliance treatment [like injections]): disease montors as traits, inverting ("curing") a disease, "invertng back"
-  + Disease treatment (by consumable)
+  + Vitals (body temperature, heart rate, blood pressure, stamina, fatigue). 
+  + Most common "side effects" implemented like "fluctuating vitals", running (stamina and fatigue drain), fatgue based on sleepng time and sleepng duration, food drain, water drain
   + Describng diseases via fluent interface
+  + Diseases as traits (fully implemented, except appliance treatment [like injections]). 
+  + Disease montors as traits
+  + Inverting ("curing") a disease, "invertng back"
+  + Disease treatment (by consumable)
   + Spawning/removing a disease
  
 - Player status
