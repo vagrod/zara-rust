@@ -26,7 +26,7 @@ impl Health {
     /// # Parameters
     /// - `key`: unique key given as a result of a [`register_disease_monitor`] method.
     ///
-    /// [`register_disease_monitor`]:#method.register_disease_monitor
+    /// [`register_disease_monitor`]: #method.register_disease_monitor
     pub fn unregister_disease_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.disease_monitors.borrow_mut();
 
@@ -62,7 +62,7 @@ impl Health {
     /// # Parameters
     /// - `key`: unique key given as a result of a [`register_side_effect_monitor`] method.
     ///
-    /// [`register_side_effect_monitor`]:#method.register_side_effect_monitor
+    /// [`register_side_effect_monitor`]: #method.register_side_effect_monitor
     pub fn unregister_side_effect_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.side_effects.borrow_mut();
 

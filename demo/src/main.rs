@@ -66,7 +66,7 @@ fn main() {
                 // Game time is 10x the real one
                 person.environment.game_time.add_seconds(frame_time * 10.);
             }
-
+/*
             // Disease "invert" test
             if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 35 {
                 if !is_disease_inverted {
@@ -81,7 +81,7 @@ fn main() {
                     is_disease_inverted = false;
                 }
             }
-
+*/
             // Update Zara state
             person.update(frame_time);
 

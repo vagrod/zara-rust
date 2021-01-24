@@ -1,8 +1,8 @@
 use crate::health::Health;
 use crate::health::side::{SideEffectDeltasC};
-use crate::health::disease::{DiseaseDeltasC};
-use crate::utils::{HealthC, FrameC};
-use crate::utils::event::{Event, Listener};
+use crate::health::disease::{DiseaseDeltasC, StageLevel};
+use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
+use crate::utils::event::{Event, Listener, Dispatcher};
 
 /// Contains code related to the `update` method (calculating and updating health state)
 
@@ -15,26 +15,6 @@ impl Health {
         // Update disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.check(self, &frame.data);
-        }
-
-        let mut side_effects_summary: SideEffectDeltasC = Default::default();
-
-        // Collect side effects data
-        for (_, side_effect) in self.side_effects.borrow().iter() {
-            let res = side_effect.check(&frame.data);
-
-            side_effects_summary.body_temp_bonus += res.body_temp_bonus;
-            side_effects_summary.heart_rate_bonus += res.heart_rate_bonus;
-            side_effects_summary.top_pressure_bonus += res.top_pressure_bonus;
-            side_effects_summary.bottom_pressure_bonus += res.bottom_pressure_bonus;
-            side_effects_summary.water_level_bonus += res.water_level_bonus;
-            side_effects_summary.food_level_bonus += res.food_level_bonus;
-            side_effects_summary.stamina_bonus += res.stamina_bonus;
-
-            // Just for pretty picture
-            if !frame.data.player.is_sleeping {
-                side_effects_summary.fatigue_bonus += res.fatigue_bonus;
-            }
         }
 
         let mut snapshot = HealthC::healthy();
@@ -50,15 +30,79 @@ impl Health {
            snapshot.fatigue_level = frame.data.health.fatigue_level;
         }
 
-        // Apply monitors deltas
+        // Retrieve side effects deltas
+        let side_effects_summary = self.process_side_effects(&frame.data);
+
+        // Apply side effects deltas
         self.apply_deltas(&mut snapshot, &side_effects_summary);
 
+        // Process diseases and get vitals deltas from them
+        let diseases_deltas = self.process_diseases(&frame.data.game_time);
+
+        // Apply disease deltas
+        self.apply_disease_deltas(&mut snapshot, &diseases_deltas);
+
+        // Will always regain stamina. Side effects must "fight" it
+        {
+            let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
+        }
+        // Will always regain blood. Side effects must "fight" it
+        {
+            let value = snapshot.blood_level + self.blood_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.blood_level = crate::utils::clamp(value, 0., 100.);
+        }
+
+        // Apply the resulted health snapshot
+        self.apply_health_snapshot(&snapshot);
+
+        // Do the events
+        self.dispatch_events::<E>(frame.events);
+    }
+
+    fn dispatch_events<E: Listener + 'static>(&self, events: &mut Dispatcher<E>) {
+        if self.is_no_strength() {
+            events.dispatch(Event::StaminaDrained);
+        }
+        if self.is_tired() {
+            events.dispatch(Event::Tired);
+        }
+        if self.is_exhausted() {
+            events.dispatch(Event::Exhausted);
+        }
+    }
+
+    fn process_side_effects(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
+        let mut side_effects_summary: SideEffectDeltasC = SideEffectDeltasC::default();
+
+        // Collect side effects data
+        for (_, side_effect) in self.side_effects.borrow().iter() {
+            let res = side_effect.check(frame_data);
+
+            side_effects_summary.body_temp_bonus += res.body_temp_bonus;
+            side_effects_summary.heart_rate_bonus += res.heart_rate_bonus;
+            side_effects_summary.top_pressure_bonus += res.top_pressure_bonus;
+            side_effects_summary.bottom_pressure_bonus += res.bottom_pressure_bonus;
+            side_effects_summary.water_level_bonus += res.water_level_bonus;
+            side_effects_summary.food_level_bonus += res.food_level_bonus;
+            side_effects_summary.stamina_bonus += res.stamina_bonus;
+
+            // Just for pretty picture
+            if !frame_data.player.is_sleeping {
+                side_effects_summary.fatigue_bonus += res.fatigue_bonus;
+            }
+        }
+
+        return side_effects_summary;
+    }
+
+    fn process_diseases(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
         // Clean up garbage diseases
         let mut diseases_to_remove = Vec::new();
         {
             let diseases = self.diseases.borrow();
             for (name, disease) in diseases.iter() {
-                if disease.get_is_old(&frame.data.game_time) {
+                if disease.get_is_old(game_time) {
                     diseases_to_remove.push(name.clone());
                 }
             }
@@ -72,8 +116,26 @@ impl Health {
         {
             let diseases = self.diseases.borrow();
             for (_, disease) in diseases.iter() {
-                if disease.get_is_active(&frame.data.game_time) {
-                    disease_deltas.push(disease.get_vitals_deltas(&frame.data.game_time));
+                if disease.get_is_active(game_time) {
+                    disease_deltas.push(disease.get_vitals_deltas(game_time));
+
+                    // Handling self-heal
+                    if !disease.needs_treatment && !disease.get_is_healing() {
+                        let stage = disease.get_active_stage(game_time);
+                        match stage {
+                            Some(st) => {
+                                let p = st.get_percent_active(game_time);
+                                let dice = crate::utils::range(50., 99.) as usize;
+                                if (st.info.level == StageLevel::InitialStage && p > dice) ||
+                                    st.info.level != StageLevel::InitialStage
+                                {
+                                    // Invoke the healing process
+                                    disease.invert(game_time).ok(); // aren't interested in result
+                                }
+                            },
+                            _ => { }
+                        }
+                    }
                 }
             }
         }
@@ -96,38 +158,10 @@ impl Health {
         }
         max_delta.cleanup();
 
-        // Apply disease deltas
-        snapshot.body_temperature += max_delta.body_temperature_delta;
-        snapshot.heart_rate += max_delta.heart_rate_delta;
-        snapshot.top_pressure += max_delta.pressure_top_delta;
-        snapshot.bottom_pressure += max_delta.pressure_bottom_delta;
-
-        // Will always regain stamina. Side effects must "fight" it
-        {
-            let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
-            snapshot.stamina_level = crate::utils::clamp(value, 0., 100.);
-        }
-        // Will always regain blood. Side effects must "fight" it
-        {
-            let value = snapshot.blood_level + self.blood_regain_rate.get() * frame.data.game_time_delta;
-            snapshot.blood_level = crate::utils::clamp(value, 0., 100.);
-        }
-
-        // Apply the resulted health snapshot
-        self.apply_health_snapshot(&snapshot);
-
-        if self.is_no_strength() {
-            frame.events.dispatch(Event::StaminaDrained);
-        }
-        if self.is_tired() {
-            frame.events.dispatch(Event::Tired);
-        }
-        if self.is_exhausted() {
-            frame.events.dispatch(Event::Exhausted);
-        }
+        return max_delta;
     }
 
-    fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC){
+    fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC) {
         snapshot.body_temperature += deltas.body_temp_bonus;
         snapshot.heart_rate += deltas.heart_rate_bonus;
         snapshot.top_pressure += deltas.top_pressure_bonus;
@@ -136,6 +170,13 @@ impl Health {
         snapshot.water_level += deltas.water_level_bonus;
         snapshot.stamina_level += deltas.stamina_bonus;
         snapshot.fatigue_level += deltas.fatigue_bonus;
+    }
+
+    fn apply_disease_deltas(&self, snapshot: &mut HealthC, deltas: &DiseaseDeltasC) {
+        snapshot.body_temperature += deltas.body_temperature_delta;
+        snapshot.heart_rate += deltas.heart_rate_delta;
+        snapshot.top_pressure += deltas.pressure_top_delta;
+        snapshot.bottom_pressure += deltas.pressure_bottom_delta;
     }
 
     fn apply_health_snapshot(&self, snapshot: &HealthC) {

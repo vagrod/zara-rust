@@ -183,9 +183,9 @@ impl DiseaseDeltasC {
 impl ActiveStage {
     /// Checks if stage if active for a given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
-        let start = self.start_time.to_duration().as_secs_f32();
-        let peak = self.peak_time.to_duration().as_secs_f32();
-        let gt = game_time.to_duration().as_secs_f32();
+        let start = self.start_time.as_secs_f32();
+        let peak = self.peak_time.as_secs_f32();
+        let gt = game_time.as_secs_f32();
 
         return if self.info.is_endless {
             gt >= start
@@ -195,9 +195,9 @@ impl ActiveStage {
     }
 
     pub fn get_percent_active(&self, game_time: &GameTimeC) -> usize {
-        let gt = game_time.to_duration().as_secs_f32();
-        let start = self.start_time.to_duration().as_secs_f32();
-        let end = self.peak_time.to_duration().as_secs_f32();
+        let gt = game_time.as_secs_f32();
+        let start = self.start_time.as_secs_f32();
+        let end = self.peak_time.as_secs_f32();
         let d = end - start;
 
         if d < 0. { return 0; }
@@ -276,7 +276,7 @@ pub struct ActiveDisease {
     /// Total duration of all stages, from first start to last peak. This duration dos not account
     /// for the `HealthyStage` that is being added at runtime during the [`invert`] method call.
     ///
-    /// [`invert`]:#method.invert
+    /// [`invert`]: #method.invert
     pub total_duration: Duration,
 
     // Private fields
@@ -400,13 +400,13 @@ impl ActiveDisease {
 
     /// Gets whether disease is active or not for a given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
-        let activation_secs = self.activation_time.borrow().to_duration().as_secs_f32();
-        let game_time_secs = game_time.to_duration().as_secs_f32();
+        let activation_secs = self.activation_time.borrow().as_secs_f32();
+        let game_time_secs = game_time.as_secs_f32();
 
         if self.will_end.get() {
             let b = self.end_time.borrow();
             let border_secs = match b.as_ref() {
-                Some(t) => t.to_duration().as_secs_f32(),
+                Some(t) => t.as_secs_f32(),
                 None => game_time_secs
             };
 
@@ -418,9 +418,9 @@ impl ActiveDisease {
 
     /// Returns `true` if this disease already passed and is no longer relevant, for a given game time
     pub fn get_is_old(&self, game_time: &GameTimeC) -> bool {
-        let gt = game_time.to_duration().as_secs_f32();
+        let gt = game_time.as_secs_f32();
         return match self.end_time.borrow().as_ref() {
-            Some(t) => gt > t.to_duration().as_secs_f32(),
+            Some(t) => gt > t.as_secs_f32(),
             None => false
         }
     }

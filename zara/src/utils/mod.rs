@@ -235,6 +235,13 @@ impl GameTimeC {
         }
     }
 
+    pub fn as_secs_f32(&self) -> f32 {
+        self.second as f32+
+            (self.minute as f32)*60_f32+
+            (self.hour as f32)*60_f32*60_f32+
+            (self.day as f32)*24_f32*60_f32*60_f32
+    }
+
     /// Returns new `GameTimeC` by adding a given amount of minutes
     /// to the current one
     pub fn add_minutes(&self, amount: u64) -> GameTimeC {

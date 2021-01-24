@@ -15,7 +15,7 @@ impl ActiveDisease {
     /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
     /// direction of passing stages again.
     ///
-    /// [`invert_back`]:#method.invert_back
+    /// [`invert_back`]: #method.invert_back
     ///
     /// ## Returns
     /// Ok on success.
@@ -30,8 +30,8 @@ impl ActiveDisease {
             None => return Err(ChainInvertErr::NoActiveStageAtGivenTime)
         };
         let mut stages = BTreeMap::new();
-        let gt = game_time.to_duration().as_secs_f32();
-        let pt = active_stage.peak_time.to_duration().as_secs_f32();
+        let gt = game_time.as_secs_f32();
+        let pt = active_stage.peak_time.as_secs_f32();
 
         // First of all, we'll calculate bound to the left and to the right of the given
         // "rotation point" -- gt
@@ -132,7 +132,7 @@ impl ActiveDisease {
     /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
     /// direction of passing stages again.
     ///
-    /// [`invert`]:#method.invert
+    /// [`invert`]: #method.invert
     ///
     /// ## Returns
     /// Ok on success.
@@ -150,9 +150,9 @@ impl ActiveDisease {
         };
 
         let mut stages = BTreeMap::new();
-        let gt = game_time.to_duration().as_secs_f32();
+        let gt = game_time.as_secs_f32();
         let mut will_end = true;
-        let pt = active_stage.peak_time.to_duration().as_secs_f32();
+        let pt = active_stage.peak_time.as_secs_f32();
 
         // First of all, we'll calculate bound to the left and to the right of the given
         // "rotation point" -- gt

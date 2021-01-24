@@ -35,7 +35,7 @@ impl Inventory {
     /// # Parameters
     /// - `key`: unique key given as a result of a [`register_monitor`] method.
     ///
-    /// [`register_monitor`]:#method.register_monitor
+    /// [`register_monitor`]: #method.register_monitor
     pub fn unregister_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.inventory_monitors.borrow_mut();
 
