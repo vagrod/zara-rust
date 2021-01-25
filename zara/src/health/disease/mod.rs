@@ -1,4 +1,4 @@
-use crate::health::{Health};
+use crate::health::{Health, StageLevel};
 use crate::utils::{FrameSummaryC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
@@ -7,7 +7,6 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
-use std::convert::TryFrom;
 
 mod crud;
 mod fluent;
@@ -35,7 +34,8 @@ macro_rules! disease(
 /// # Examples
 /// Start with `start` method and call `build` when you're done.
 /// ```
-/// use zara::health::disease::{StageBuilder, StageLevel};
+/// use zara::health::disease::{StageBuilder};
+/// use zara::health::{StageLevel};
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
@@ -57,30 +57,6 @@ pub struct StageBuilder {
     target_food_drain: Cell<f32>,
     target_water_drain: Cell<f32>,
     chance_of_death: RefCell<Option<usize>>
-}
-
-/// Disease stage level of seriousness
-#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
-pub enum StageLevel {
-    Undefined = -1,
-    InitialStage = 1,
-    Progressing = 2,
-    Worrying = 3,
-    Critical = 4
-}
-
-impl TryFrom<i32> for StageLevel {
-    type Error = ();
-
-    fn try_from(v: i32) -> Result<Self, Self::Error> {
-        match v {
-            x if x == StageLevel::InitialStage as i32 => Ok(StageLevel::InitialStage),
-            x if x == StageLevel::Progressing as i32 => Ok(StageLevel::Progressing),
-            x if x == StageLevel::Worrying as i32 => Ok(StageLevel::Worrying),
-            x if x == StageLevel::Critical as i32 => Ok(StageLevel::Critical),
-            _ => Err(()),
-        }
-    }
 }
 
 impl StageBuilder {

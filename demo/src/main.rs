@@ -7,7 +7,7 @@ use std::cell::Cell;
 
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, GameTimeC};
-use zara::health::{Health};
+use zara::health::{Health, StageLevel};
 use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableC, ConsumableBehavior, SpoilingBehavior};
@@ -245,7 +245,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             let active_stage = disease.get_active_stage(game_time).unwrap();
             let p = active_stage.get_percent_active(game_time);
             write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
-            write!(stdout, "{:?} {}%", disease.get_active_level(game_time).unwrap_or(zara::health::disease::StageLevel::Undefined), p);
+            write!(stdout, "{:?} {}%", disease.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
             if disease.get_is_healing() {
                 write!(stdout, " (now healing)");
             }
@@ -289,7 +289,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             let active_stage = injury.get_active_stage(game_time).unwrap();
             let p = active_stage.get_percent_active(game_time);
             write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
-            write!(stdout, "{:?} {}%", injury.get_active_level(game_time).unwrap_or(zara::health::injury::StageLevel::Undefined), p);
+            write!(stdout, "{:?} {}%", injury.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
             if injury.get_is_healing() {
                 write!(stdout, " (now healing)");
             }

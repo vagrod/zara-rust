@@ -1,4 +1,4 @@
-use crate::health::Health;
+use crate::health::{Health, StageLevel};
 use crate::health::side::{SideEffectDeltasC};
 use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
@@ -181,7 +181,7 @@ impl Health {
                     }
 
                     // Handling self-heal
-                    if !disease.needs_treatment && disease.will_self_heal_on != crate::health::disease::StageLevel::Undefined && !disease.get_is_healing() {
+                    if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
                         match &active_stage {
                             Some(st) => {
                                 let p = st.get_percent_active(game_time);
@@ -276,7 +276,7 @@ impl Health {
                     }
 
                     // Handling self-heal
-                    if !injury.needs_treatment && injury.will_self_heal_on != crate::health::injury::StageLevel::Undefined && !injury.get_is_healing() {
+                    if !injury.needs_treatment && injury.will_self_heal_on != StageLevel::Undefined && !injury.get_is_healing() {
                         match &active_stage {
                             Some(st) => {
                                 let p = st.get_percent_active(game_time);

@@ -1,4 +1,5 @@
-use zara::health::injury::{StageBuilder, StageLevel};
+use zara::health::{StageLevel};
+use zara::health::injury::{StageBuilder};
 
 pub struct Cut;
 zara::injury!(Cut, "Cut", None,

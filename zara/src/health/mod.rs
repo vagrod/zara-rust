@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
 use std::sync::Arc;
+use std::convert::TryFrom;
 
 mod update;
 mod status_methods;
@@ -53,6 +54,29 @@ pub struct Health {
     side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
     /// Is character alive
     is_alive: Cell<bool>
+}
+
+/// Disease or injury stage level of seriousness
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
+pub enum StageLevel {
+    Undefined = -1,
+    InitialStage = 1,
+    Progressing = 2,
+    Worrying = 3,
+    Critical = 4
+}
+impl TryFrom<i32> for StageLevel {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == StageLevel::InitialStage as i32 => Ok(StageLevel::InitialStage),
+            x if x == StageLevel::Progressing as i32 => Ok(StageLevel::Progressing),
+            x if x == StageLevel::Worrying as i32 => Ok(StageLevel::Worrying),
+            x if x == StageLevel::Critical as i32 => Ok(StageLevel::Critical),
+            _ => Err(()),
+        }
+    }
 }
 
 impl Health {

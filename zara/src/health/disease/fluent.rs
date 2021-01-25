@@ -1,4 +1,5 @@
-use crate::health::disease::{StageDescription, StageBuilder, StageLevel};
+use crate::health::{StageLevel};
+use crate::health::disease::{StageDescription, StageBuilder};
 
 impl StageBuilder {
     fn as_stage_self_heal(&self) -> &dyn StageSelfHeal { self }
