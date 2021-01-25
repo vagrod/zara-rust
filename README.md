@@ -23,12 +23,12 @@ This code is **WIP** and changes all the time.
   + Diseases as traits (fully implemented). 
   + Disease montors as traits
   + Inverting ("curing") a disease, "invertng back"
-  + Disease treatment (by consumable)
+  + Disease treatment (with consumables and appliances)
   + Spawning/removing a disease
-  + Disease treatment with appliances
   + Injuries (w/fluent)
   + Injury treatment with appliances (like injections/bandages/splints/etc)
   + Spawning/removing an injury
+  + Inverting ("curing") an injury, "invertng back"
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
