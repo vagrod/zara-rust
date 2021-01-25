@@ -171,10 +171,14 @@ impl Health {
                         Some(st) => {
                             let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if crate::utils::roll_dice(chance)
-                            {
-                                is_alive = false;
-                                disease_caused_death = disease_name.to_string();
+                            if chance > 0 {
+                                // The further into the stage, the bigger is probability of death
+                                if crate::utils::roll_dice(st.get_percent_active(game_time))
+                                    && crate::utils::roll_dice(chance)
+                                {
+                                    is_alive = false;
+                                    disease_caused_death = disease_name.to_string();
+                                }
                             }
                         },
                         _ => { }
@@ -266,10 +270,14 @@ impl Health {
                         Some(st) => {
                             let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if crate::utils::roll_dice(chance)
-                            {
-                                is_alive = false;
-                                injury_caused_death = injury_name.to_string();
+                            if chance > 0 {
+                                // The further into the stage, the bigger is probability of death
+                                if crate::utils::roll_dice(st.get_percent_active(game_time))
+                                    && crate::utils::roll_dice(chance)
+                                {
+                                    is_alive = false;
+                                    injury_caused_death = injury_name.to_string();
+                                }
                             }
                         },
                         _ => { }
