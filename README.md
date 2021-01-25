@@ -30,6 +30,7 @@ This code is **WIP** and changes all the time.
   + Spawning/removing an injury
   + Inverting ("curing") an injury, "invertng back"
   + Body parts for injuries and treatment with appliances
+  + Injury can be a fracture
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
