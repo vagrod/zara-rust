@@ -26,6 +26,9 @@ This code is **WIP** and changes all the time.
   + Disease treatment (by consumable)
   + Spawning/removing a disease
   + Disease treatment with appliances
+  + Injuries (w/fluent)
+  + Injury treatment with appliances (like injections/bandages/splints/etc)
+  + Spawning/removing an injury
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -36,11 +39,11 @@ This code is **WIP** and changes all the time.
 - Game events system
 
 ## What's in progress
+- Body parts for injuries
 - Medical agents
 - Clothes and body appliances
 - Oxygen level (and optional "side effect" to control it)
 - Warmth and wetness levels (and optional "side effects" to control them)
-- Injuries (w/fluent), their treatment with appliances (like injections/bandages/splints/etc)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Checking crafting recipe for resources availability
 - Actual getting new item from a crafting combination and spending resources on it
