@@ -2,9 +2,9 @@ use crate::ZaraController;
 use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC, ActiveInjuryC};
 use crate::utils::event::{Listener, Event};
 use crate::error::ZaraUpdateErr;
+use crate::health::StageLevel;
 
 use std::time::Duration;
-use crate::health::StageLevel;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
@@ -107,7 +107,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                         needs_treatment: disease.needs_treatment
                     });
                 },
-                _ => {
+                None => {
                     active_diseases.push(ActiveDiseaseC {
                         name: disease.disease.get_name(),
                         is_active: false,
@@ -138,7 +138,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                         is_blood_stopped: injury.get_is_blood_stopped()
                     });
                 },
-                _ => {
+                None => {
                     active_injuries.push(ActiveInjuryC {
                         name: injury.injury.get_name(),
                         is_active: false,
