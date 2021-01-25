@@ -116,6 +116,10 @@ impl Body {
 }
 
 impl MessageQueue for Body {
+    fn has_messages(&self) -> bool {
+        self.message_queue.borrow().len() > 0
+    }
+
     fn queue_message(&self, message: Event) {
         let mut q = self.message_queue.borrow_mut();
         let id = q.len();

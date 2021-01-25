@@ -52,6 +52,8 @@ pub struct ZaraController<E: Listener + 'static> {
     // Private fields
     /// How many seconds passed since last `update` call
     update_counter: Cell<f32>,
+    /// How many seconds passed since last queue check
+    queue_counter: Cell<f32>,
     /// Game time snapshot at the time of the last `update` call
     last_update_game_time: Cell<Duration>,
     /// Game time of the last update frame
@@ -123,6 +125,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             body: Arc::new(body::Body::new()),
 
             update_counter: Cell::new(0.),
+            queue_counter: Cell::new(0.),
             last_update_game_time: Cell::new(Duration::new(0,0)),
             last_frame_game_time: Cell::new(Duration::new(0,0)),
             player_state: Arc::new(PlayerStatus::empty()),

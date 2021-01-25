@@ -9,6 +9,7 @@ use std::cell::{RefCell, RefMut};
 use std::collections::BTreeMap;
 
 pub trait MessageQueue {
+    fn has_messages(&self) -> bool;
     fn queue_message(&self, message: Event);
     fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>>;
 }

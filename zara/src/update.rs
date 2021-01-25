@@ -16,6 +16,8 @@ const UPDATE_INTERVAL: f32 = 1.;
 /// recalculate values and check monitors (real seconds)
 /// when player is sleeping
 const SLEEPING_UPDATE_INTERVAL: f32 = UPDATE_INTERVAL / 5.;
+/// How frequently should Zara process message queue (real seconds)
+const MESSAGE_QUEUE_CHECK_PERIOD: f32 = UPDATE_INTERVAL / 3.;
 
 impl<E: Listener + 'static> ZaraController<E> {
     /// Progresses Zara controller state.
@@ -36,8 +38,20 @@ impl<E: Listener + 'static> ZaraController<E> {
         if !self.is_alive.get() { return Err(ZaraUpdateErr::CharacterIsDead); }
 
         let elapsed = self.update_counter.get() + frame_time;
+        let elapsed_for_queue = self.queue_counter.get() + frame_time;
         let mut ceiling = UPDATE_INTERVAL;
         let game_time_duration = self.environment.game_time.duration.get();
+
+        if elapsed_for_queue >= MESSAGE_QUEUE_CHECK_PERIOD {
+            self.queue_counter.set(0.);
+
+            // Send pending events
+            self.process_health_events();
+            self.process_inventory_events();
+            self.process_body_events();
+        } else {
+            self.queue_counter.set(elapsed_for_queue);
+        }
 
         // When sleeping, our checks are more frequent
         if self.body.is_sleeping.get() {
@@ -53,11 +67,6 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         if elapsed >= ceiling {
-            // Send pending events
-            self.process_health_events();
-            self.process_inventory_events();
-            self.process_body_events();
-
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
             let health_result;
@@ -209,15 +218,21 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     fn process_body_events(&self) {
-        self.process_events(self.body.get_message_queue());
+        if self.body.has_messages() {
+            self.process_events(self.body.get_message_queue());
+        }
     }
 
     fn process_inventory_events(&self) {
-        self.process_events(self.inventory.get_message_queue());
+        if self.inventory.has_messages() {
+            self.process_events(self.inventory.get_message_queue());
+        }
     }
 
     fn process_health_events(&self) {
-        self.process_events(self.health.get_message_queue());
+        if self.health.has_messages() {
+            self.process_events(self.health.get_message_queue());
+        }
     }
 
     fn process_events(&self, mut q: RefMut<BTreeMap<usize, Event>>) {
