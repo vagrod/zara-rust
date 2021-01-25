@@ -262,7 +262,6 @@ impl ActiveStage {
         let gt_d = gt - start;
 
         return ((gt_d/d) * 100.) as usize;
-
     }
 
     pub fn copy(&self) -> ActiveStage {
@@ -341,8 +340,6 @@ pub struct ActiveDisease {
     /// On which stage level disease will start self-healing (`StageLevel::Undefined` if none)
     pub will_self_heal_on: StageLevel,
     /// Total duration of all stages, from first start to last peak
-    ///
-    /// [`invert`]: #method.invert
     pub total_duration: Duration,
 
     // Private fields

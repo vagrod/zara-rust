@@ -99,7 +99,7 @@ pub trait InjuryTreatment {
     /// - `active_stage`: instance of the active stage of an injury
     /// - `injury`: injury object itself. You can call `invert` or `invert_back` to start or stop
     ///     "curing" the injury
-    ///  - `inventory_items`: all inventory items. Used item is still in this list at the
+    /// - `inventory_items`: all inventory items. Used item is still in this list at the
     ///     moment of this call
     fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                           active_stage: &ActiveStage, injury: &ActiveInjury,
@@ -263,8 +263,6 @@ pub struct ActiveInjury {
     /// On which stage level injury will start self-healing (`StageLevel::Undefined` if none)
     pub will_self_heal_on: StageLevel,
     /// Total duration of all stages, from first start to last peak.
-    ///
-    /// [`invert`]: #method.invert
     pub total_duration: Duration,
     /// Body part associated with this injury
     pub body_part: BodyParts,
@@ -356,7 +354,7 @@ impl ActiveInjury {
             end_time: RefCell::new(end_time),
             needs_treatment: !self_heal,
             will_self_heal_on: self_heal_level,
-            lerp_data: RefCell::new(None), // will be calculated on first get_injury_deltas
+            lerp_data: RefCell::new(None), // will be calculated on first get_drain_deltas
             last_deltas: RefCell::new(InjuryDeltasC::empty()),
             blood_loss_stop: Cell::new(false)
         }
