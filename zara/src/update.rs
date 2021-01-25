@@ -99,7 +99,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         Ok(())
     }
 
-    /// Gets all the info needed for all the controllers to process one frame
+    /// Gets all the info needed for all the controllers and monitors to process one frame
     fn get_summary(&self) -> FrameSummaryC {
         let game_time_duration = self.environment.game_time.duration.get();
         let time_delta = game_time_duration - self.last_update_game_time.get();
@@ -108,7 +108,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         let game_time_contract = &self.environment.game_time.to_contract();
 
         // Collect active diseases data
-        for (_key, disease) in self.health.diseases.borrow().iter() {
+        for (_, disease) in self.health.diseases.borrow().iter() {
             match disease.get_active_stage(game_time_contract) {
                 Some(st) => {
                     active_diseases.push(ActiveDiseaseC {
@@ -138,7 +138,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         };
 
         // Collect active injuries data
-        for (_key, injury) in self.health.injuries.borrow().iter() {
+        for (_, injury) in self.health.injuries.borrow().iter() {
             match injury.get_active_stage(game_time_contract) {
                 Some(st) => {
                     active_injuries.push(ActiveInjuryC {

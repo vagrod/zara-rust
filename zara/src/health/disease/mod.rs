@@ -509,7 +509,7 @@ impl ActiveDisease {
         };
     }
 
-    // Is called by Zara from the health engine when appliance is taken
+    /// Is called by Zara from the health engine when appliance is taken
     pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.get_is_active(game_time) { return; }

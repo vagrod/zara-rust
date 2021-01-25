@@ -6,20 +6,17 @@ use crate::utils::event::{Event, Listener, Dispatcher, MessageQueue};
 use crate::health::injury::InjuryDeltasC;
 
 pub struct UpdateResult {
-    pub is_alive: bool,
-    pub disease_caused_death: String
+    pub is_alive: bool
 }
 
 struct ProcessDiseasesResult {
     deltas: DiseaseDeltasC,
-    is_alive: bool,
-    disease_caused_death: String
+    is_alive: bool
 }
 
 struct ProcessInjuriesResult {
     deltas: InjuryDeltasC,
-    is_alive: bool,
-    injury_caused_death: String
+    is_alive: bool
 }
 
 impl Health {
@@ -81,22 +78,8 @@ impl Health {
         // Do the external events
         self.dispatch_events::<E>(frame.events);
 
-        if !diseases_result.is_alive {
-            return UpdateResult {
-                is_alive: diseases_result.is_alive,
-                disease_caused_death: diseases_result.disease_caused_death
-            }
-        }
-        if !injuries_result.is_alive {
-            return UpdateResult {
-                is_alive: injuries_result.is_alive,
-                disease_caused_death: injuries_result.injury_caused_death
-            }
-        }
-
         UpdateResult {
-            is_alive: true,
-            disease_caused_death: format!("")
+            is_alive: diseases_result.is_alive && injuries_result.is_alive
         }
     }
 
@@ -138,7 +121,6 @@ impl Health {
 
     fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessDiseasesResult {
         let mut is_alive = true;
-        let mut disease_caused_death = format!("");
 
         // Clean up garbage diseases
         let mut diseases_to_remove = Vec::new();
@@ -177,9 +159,8 @@ impl Health {
                                     && crate::utils::roll_dice(chance)
                                 {
                                     is_alive = false;
-                                    disease_caused_death = disease_name.to_string();
 
-                                    self.queue_message(Event::DeathFromDisease(disease_caused_death.to_string()))
+                                    self.queue_message(Event::DeathFromDisease(disease_name.to_string()))
                                 }
                             }
                         },
@@ -197,7 +178,7 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     disease.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::DiseaseSelfHealStarted(disease.disease.get_name().to_string()));
+                                    self.queue_message(Event::DiseaseSelfHealStarted(disease_name.to_string()));
                                 }
                             },
                             _ => { }
@@ -233,14 +214,12 @@ impl Health {
 
         return ProcessDiseasesResult {
             deltas: result,
-            is_alive,
-            disease_caused_death
+            is_alive
         }
     }
 
     fn process_injuries(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessInjuriesResult {
         let mut is_alive = true;
-        let mut injury_caused_death = format!("");
 
         // Clean up garbage injuries
         let mut injuries_to_remove = Vec::new();
@@ -279,9 +258,8 @@ impl Health {
                                     && crate::utils::roll_dice(chance)
                                 {
                                     is_alive = false;
-                                    injury_caused_death = injury_name.to_string();
 
-                                    self.queue_message(Event::DeathFromInjury(injury_caused_death.to_string()))
+                                    self.queue_message(Event::DeathFromInjury(injury_name.to_string()))
                                 }
                             }
                         },
@@ -299,7 +277,7 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     injury.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::InjurySelfHealStarted(injury.injury.get_name().to_string()));
+                                    self.queue_message(Event::InjurySelfHealStarted(injury_name.to_string()));
                                 }
                             },
                             _ => { }
@@ -320,8 +298,7 @@ impl Health {
 
         return ProcessInjuriesResult {
             deltas: result,
-            is_alive,
-            injury_caused_death
+            is_alive
         }
     }
 

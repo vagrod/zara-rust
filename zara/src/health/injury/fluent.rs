@@ -76,14 +76,14 @@ pub trait StageTargets {
 }
 
 pub trait StageDuration {
-    /// Tells that disease will move on when `will_reach_target_in` time ends.
+    /// Tells that injury will move on when `will_reach_target_in` time ends.
     ///
-    /// Choosing `will_end` on the last stage will cause disease to disappear after last stage ends
+    /// Choosing `will_end` on the last stage will cause injury to disappear after last stage ends
     fn will_end(&self) -> &dyn StageEnd;
-    /// Tells that disease will stay on this stage as long as this disease is not removed and
+    /// Tells that injury will stay on this stage as long as this injury is not removed and
     /// will not move on to the next stage.
     ///
-    /// Usually `will_last_forever` appears on a last disease stage.
+    /// Usually `will_last_forever` appears on a last injury stage.
     fn will_last_forever(&self) -> &dyn StageEnd;
 }
 
