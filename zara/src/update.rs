@@ -62,7 +62,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             let summary = &self.get_summary();
             let health_result;
 
-                // Form the frame data structure
+            // Form the frame data structure
             let mut frame_data = &mut FrameC {
                 events: &mut self.dispatcher.borrow_mut(),
                 data: summary
@@ -79,7 +79,6 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             if !health_result.is_alive {
                 self.is_alive.set(false);
-                frame_data.events.dispatch(Event::DeathFromDisease(health_result.disease_caused_death))
             }
         } else {
             self.update_counter.set(elapsed);

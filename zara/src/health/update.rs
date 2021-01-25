@@ -178,6 +178,8 @@ impl Health {
                                 {
                                     is_alive = false;
                                     disease_caused_death = disease_name.to_string();
+
+                                    self.queue_message(Event::DeathFromDisease(disease_caused_death.to_string()))
                                 }
                             }
                         },
@@ -278,6 +280,8 @@ impl Health {
                                 {
                                     is_alive = false;
                                     injury_caused_death = injury_name.to_string();
+
+                                    self.queue_message(Event::DeathFromInjury(injury_caused_death.to_string()))
                                 }
                             }
                         },

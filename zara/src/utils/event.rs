@@ -24,6 +24,7 @@ pub enum Event {
     Exhausted,
 
     DeathFromDisease(String),
+    DeathFromInjury(String),
 
     DiseaseSpawned(String),
     DiseaseRemoved(String),
