@@ -1,3 +1,4 @@
+use crate::utils::event::{Event, MessageQueue};
 use crate::health::Health;
 use crate::health::injury::{ActiveInjury, Injury};
 use crate::utils::GameTimeC;
@@ -30,6 +31,7 @@ impl Health {
 
         let mut b = self.injuries.borrow_mut();
         let injury_name = injury.get_name();
+        let name_for_message= injury.get_name().to_string();
 
         if b.contains_key(&injury_name) {
             return Err(SpawnInjuryErr::InjuryAlreadyAdded);
@@ -40,6 +42,8 @@ impl Health {
             body_part,
             activation_time
         )));
+
+        self.queue_message(Event::InjurySpawned(name_for_message, body_part));
 
         return Ok(());
     }
@@ -64,6 +68,8 @@ impl Health {
         }
 
         b.remove(injury_name);
+
+        self.queue_message(Event::InjuryRemoved(injury_name.to_string()));
 
         return Ok(());
     }

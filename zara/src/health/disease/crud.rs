@@ -1,3 +1,4 @@
+use crate::utils::event::{Event, MessageQueue};
 use crate::health::Health;
 use crate::health::disease::{ActiveDisease, Disease};
 use crate::utils::GameTimeC;
@@ -33,6 +34,8 @@ impl Health {
             return Err(SpawnDiseaseErr::DiseaseAlreadyAdded);
         }
 
+        self.queue_message(Event::DiseaseSpawned(disease_name.to_string()));
+
         b.insert(disease_name, Rc::new(ActiveDisease::new(
             disease,
             activation_time
@@ -61,6 +64,8 @@ impl Health {
         }
 
         b.remove(disease_name);
+
+        self.queue_message(Event::DiseaseRemoved(disease_name.to_string()));
 
         return Ok(());
     }

@@ -1,3 +1,4 @@
+use crate::utils::event::{Event, MessageQueue};
 use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
 use crate::health::injury::ActiveInjury;
@@ -5,8 +6,8 @@ use crate::health::side::{SideEffectsMonitor};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use crate::body::BodyParts;
 
-use std::collections::HashMap;
-use std::cell::{RefCell, Cell};
+use std::collections::{HashMap, BTreeMap};
+use std::cell::{RefCell, Cell, RefMut};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::convert::TryFrom;
@@ -54,7 +55,10 @@ pub struct Health {
     /// Stores all registered side effects monitors
     side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
     /// Is character alive
-    is_alive: Cell<bool>
+    is_alive: Cell<bool>,
+
+    /// Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
 /// Disease or injury stage level of seriousness
@@ -102,6 +106,7 @@ impl Health {
             injuries: Arc::new(RefCell::new(HashMap::new())),
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
+            message_queue: RefCell::new(BTreeMap::new()),
 
             // Healthy values by default
             is_alive: Cell::new(true),
@@ -148,5 +153,17 @@ impl Health {
             }
         }
     }
+}
 
+impl MessageQueue for Health {
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
+    }
 }

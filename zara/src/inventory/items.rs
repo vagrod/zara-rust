@@ -108,6 +108,7 @@ macro_rules! inv_spoil(
 );
 
 /// Describes consumable contract
+#[derive(Clone)]
 pub struct ConsumableC {
     /// Unique name of the item
     pub name: String,
@@ -130,6 +131,7 @@ impl ConsumableC {
 }
 
 /// Describes appliance  contract
+#[derive(Clone)]
 pub struct ApplianceC {
     /// Unique name of the item
     pub name: String,

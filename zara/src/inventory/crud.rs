@@ -1,8 +1,9 @@
 use crate::inventory::Inventory;
 use crate::inventory::items::InventoryItem;
 use crate::error::InventoryItemAccessErr;
+use crate::utils::event::{MessageQueue, Event};
 
-/// Contains code that adds, remove  or upate the inventory
+/// Contains code that adds, remove  or update the inventory
 
 impl Inventory {
 
@@ -25,9 +26,12 @@ impl Inventory {
     /// Borrows the `items` collection
     pub fn add_item(&self, item: Box<dyn InventoryItem>) {
         let key = item.get_name();
+        let key_for_message = item.get_name().to_string();
 
         self.items.borrow_mut().insert(key, item);
         self.recalculate_weight();
+
+        self.queue_message(Event::InventoryItemAdded(key_for_message));
     }
 
     /// Removes item kind from the inventory and recalculates inventory weight
@@ -49,6 +53,8 @@ impl Inventory {
             b.remove(item_kind);
 
             self.recalculate_weight();
+
+            self.queue_message(Event::InventoryItemRemoved(item_kind.to_string()));
 
             return Ok(());
         }

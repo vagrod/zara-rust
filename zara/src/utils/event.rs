@@ -5,9 +5,16 @@ use crate::inventory::items::{ConsumableC, ApplianceC};
 use crate::body::BodyParts;
 
 use std::sync::{Arc, Weak};
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
+use std::collections::BTreeMap;
+
+pub trait MessageQueue {
+    fn queue_message(&self, message: Event);
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>>;
+}
 
 /// All Zara public events
+#[derive(Clone)]
 pub enum Event {
     WokeUp,
     ItemConsumed(ConsumableC),
@@ -15,7 +22,19 @@ pub enum Event {
     StaminaDrained,
     Tired,
     Exhausted,
-    DeathFromDisease(String)
+
+    DeathFromDisease(String),
+
+    DiseaseSpawned(String),
+    DiseaseRemoved(String),
+    DiseaseSelfHealStarted(String),
+
+    InjurySpawned(String, BodyParts),
+    InjuryRemoved(String),
+    InjurySelfHealStarted(String),
+
+    InventoryItemAdded(String),
+    InventoryItemRemoved(String)
 }
 
 pub trait Listener {

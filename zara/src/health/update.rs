@@ -2,7 +2,7 @@ use crate::health::{Health, StageLevel};
 use crate::health::side::{SideEffectDeltasC};
 use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
-use crate::utils::event::{Event, Listener, Dispatcher};
+use crate::utils::event::{Event, Listener, Dispatcher, MessageQueue};
 use crate::health::injury::InjuryDeltasC;
 
 pub struct UpdateResult {
@@ -78,7 +78,7 @@ impl Health {
         // Apply the resulted health snapshot
         self.apply_health_snapshot(&snapshot);
 
-        // Do the events
+        // Do the external events
         self.dispatch_events::<E>(frame.events);
 
         if !diseases_result.is_alive {
@@ -195,6 +195,7 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     disease.invert(game_time).ok(); // aren't interested in result
+                                    self.queue_message(Event::DiseaseSelfHealStarted(disease.disease.get_name().to_string()));
                                 }
                             },
                             _ => { }
@@ -294,6 +295,7 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     injury.invert(game_time).ok(); // aren't interested in result
+                                    self.queue_message(Event::InjurySelfHealStarted(injury.injury.get_name().to_string()));
                                 }
                             },
                             _ => { }

@@ -1,10 +1,12 @@
 use crate::ZaraController;
 use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC, ActiveInjuryC};
-use crate::utils::event::{Listener, Event};
+use crate::utils::event::{Listener, Event, MessageQueue};
 use crate::error::ZaraUpdateErr;
 use crate::health::StageLevel;
 
 use std::time::Duration;
+use std::collections::BTreeMap;
+use std::cell::RefMut;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
@@ -36,6 +38,11 @@ impl<E: Listener + 'static> ZaraController<E> {
         let elapsed = self.update_counter.get() + frame_time;
         let mut ceiling = UPDATE_INTERVAL;
         let game_time_duration = self.environment.game_time.duration.get();
+
+        // Send pending events -- checking every frame
+        self.process_health_events();
+        self.process_inventory_events();
+        self.process_body_events();
 
         // When sleeping, our checks are more frequent
         if self.body.is_sleeping.get() {
@@ -201,4 +208,37 @@ impl<E: Listener + 'static> ZaraController<E> {
             game_time_delta: time_delta.as_secs_f32()
         }
     }
+
+    fn process_body_events(&self) {
+        self.process_events(self.body.get_message_queue());
+    }
+
+    fn process_inventory_events(&self) {
+        self.process_events(self.inventory.get_message_queue());
+    }
+
+    fn process_health_events(&self) {
+        self.process_events(self.health.get_message_queue());
+    }
+
+    fn process_events(&self, mut q: RefMut<BTreeMap<usize, Event>>) {
+        if q.len() == 0 { return }
+
+        let mut dispatcher = self.dispatcher.borrow_mut();
+        let mut key = 0;
+
+        loop {
+            match q.get(&key) {
+                Some(event) => {
+                    dispatcher.dispatch(event.clone());
+
+                    q.remove(&key);
+                },
+                None => break
+            }
+
+            key += 1;
+        }
+    }
+
 }

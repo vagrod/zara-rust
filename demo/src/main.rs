@@ -51,7 +51,7 @@ fn main() {
 
         add_side_effects(&person);
         populate_inventory(&person);
-        spawn_diseases(&person);
+
         spawn_injuries(&person);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
@@ -70,6 +70,10 @@ fn main() {
             } else {
                 // Game time is 10x the real one
                 person.environment.game_time.add_seconds(frame_time * 10.);
+            }
+
+            if person.environment.game_time.minute.get() == 3 {
+                spawn_diseases(&person);
             }
 
             if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
@@ -109,9 +113,8 @@ fn main() {
     game_loop.join().unwrap();
 }
 
-
 fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
-    person.health.spawn_disease(Box::new(diseases::Flu), zara::utils::GameTimeC::new(0,0,1,15.));
+    person.health.spawn_disease(Box::new(diseases::Flu), zara::utils::GameTimeC::new(0,0,3,30.));
     //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
@@ -337,6 +340,12 @@ impl Listener for ZaraEventsListener {
             Event::DeathFromDisease(disease_name) => {
                 println!("Death from {}", disease_name);
             },
+            Event::DiseaseSpawned(disease_name) => {
+                println!("Disease spawned: {}", disease_name)
+            }
+            Event::InventoryItemAdded(item_name) => {
+                println!("Item added: {}", item_name)
+            }
             _ => println!("Other event")
         }
     }

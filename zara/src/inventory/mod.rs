@@ -1,10 +1,11 @@
+use crate::utils::event::{Event, MessageQueue};
 use crate::inventory::items::InventoryItem;
 use crate::inventory::crafting::CraftingCombination;
 use crate::inventory::monitors::InventoryMonitor;
 use crate::error::InventoryItemAccessErr;
 
-use std::collections::HashMap;
-use std::cell::{Cell, RefCell};
+use std::collections::{HashMap, BTreeMap};
+use std::cell::{Cell, RefCell, RefMut};
 use std::sync::Arc;
 use std::rc::Rc;
 
@@ -34,6 +35,8 @@ pub struct Inventory {
     crafting_combinations: Rc<RefCell<Vec<CraftingCombination>>>,
     /// Registered inventory monitors
     inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
+    /// Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
 impl Inventory {
@@ -53,7 +56,8 @@ impl Inventory {
             items: Arc::new(RefCell::new(HashMap::new())),
             crafting_combinations: Rc::new(RefCell::new(Vec::new())),
             inventory_monitors: Rc::new(RefCell::new(HashMap::new())),
-            weight: Cell::new(0.)
+            weight: Cell::new(0.),
+            message_queue: RefCell::new(BTreeMap::new())
         }
     }
 
@@ -85,5 +89,18 @@ impl Inventory {
         }
 
         self.weight.set(total_weight);
+    }
+}
+
+impl MessageQueue for Inventory {
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
     }
 }

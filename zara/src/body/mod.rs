@@ -1,8 +1,9 @@
 use crate::utils::{FrameC, GameTimeC};
-use crate::utils::event::{Dispatcher, Listener, Event};
+use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
 
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
+use std::collections::BTreeMap;
 
 pub struct Body {
     /// Game time when player slept last time
@@ -13,7 +14,9 @@ pub struct Body {
     pub is_sleeping: Cell<bool>,
 
     // Private fields
-    sleeping_counter: Cell<f64>
+    sleeping_counter: Cell<f64>,
+    /// Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
 /// All body parts enum
@@ -65,7 +68,8 @@ impl Body {
             last_sleep_time: RefCell::new(Option::None),
             is_sleeping: Cell::new(false),
             sleeping_counter: Cell::new(0.),
-            last_sleep_duration: Cell::new(0.)
+            last_sleep_duration: Cell::new(0.),
+            message_queue: RefCell::new(BTreeMap::new())
         }
     }
 
@@ -109,5 +113,17 @@ impl Body {
 
         return true;
     }
+}
 
+impl MessageQueue for Body {
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
+    }
 }
