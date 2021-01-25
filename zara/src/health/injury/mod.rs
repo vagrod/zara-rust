@@ -285,7 +285,9 @@ pub struct ActiveInjury {
     /// Disease end time, if applicable
     end_time: RefCell<Option<GameTimeC>>,
     /// Treatment object associated with this disease
-    treatment: Rc<Option<Box<dyn InjuryTreatment>>>
+    treatment: Rc<Option<Box<dyn InjuryTreatment>>>,
+    /// Blood loss stopped from "outside"
+    blood_loss_stop: Cell<bool>
 }
 impl ActiveInjury {
     /// Creates new active disease object
@@ -347,7 +349,8 @@ impl ActiveInjury {
             needs_treatment: !self_heal,
             will_self_heal_on: self_heal_level,
             lerp_data: RefCell::new(None), // will be calculated on first get_injury_deltas
-            last_deltas: RefCell::new(InjuryDeltasC::empty())
+            last_deltas: RefCell::new(InjuryDeltasC::empty()),
+            blood_loss_stop: Cell::new(false)
         }
     }
 
@@ -432,5 +435,26 @@ impl ActiveInjury {
             },
             None => { }
         };
+    }
+
+    /// Temporary stop blood drain. You can call [`resume_blood_loss`] to resume it
+    ///
+    /// [`resume_blood_loss`]: #method.resume_blood_loss
+    pub fn stop_blood_loss(&self) {
+        self.blood_loss_stop.set(true);
+    }
+
+    /// Resumes stopped by the [`stop_blood_loss`] call blood drain
+    ///
+    /// [`stop_blood_loss`]: #method.stop_blood_loss
+    pub fn resume_blood_loss(&self) {
+        self.blood_loss_stop.set(false);
+    }
+
+    /// Gets if blood loss has been temporary stopped by the [`stop_blood_loss`] call
+    ///
+    /// [`stop_blood_loss`]: #method.stop_blood_loss
+    pub fn get_is_blood_stopped(&self) -> bool {
+        self.blood_loss_stop.get()
     }
 }

@@ -201,19 +201,23 @@ impl ActiveInjury {
             }
         }
         { // Blood
-            let mut ld = None;
-            for data in lerp_data.blood_data.iter() {
-                if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
-                    ld = Some(data);
-                    break;
+            if self.blood_loss_stop.get() {
+                result.blood_drain = 0.;
+            } else {
+                let mut ld = None;
+                for data in lerp_data.blood_data.iter() {
+                    if (gt >= data.start_time && data.is_endless) || (gt >= data.start_time && gt <= data.end_time) {
+                        ld = Some(data);
+                        break;
+                    }
                 }
-            }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.blood_drain = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+                match ld {
+                    Some(d) => {
+                        let p = clamp_01((gt - d.start_time) / d.duration);
+                        result.blood_drain = lerp(d.start_value, d.end_value, p);
+                    },
+                    None => { }
+                }
             }
         }
 
