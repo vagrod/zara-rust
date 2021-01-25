@@ -34,7 +34,7 @@ This code is **WIP** and changes all the time.
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
 
 - Weather status
-  + Rain intensty, temperature, wind speed that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
+  + Rain intensity, temperature, wind speed that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
 
 - Game events system
 
