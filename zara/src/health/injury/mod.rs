@@ -14,7 +14,7 @@ mod fluent;
 mod lerp;
 mod chain;
 
-/// Macro for declaring a disease
+/// Macro for declaring a simple injury
 #[macro_export]
 macro_rules! injury(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
@@ -26,6 +26,24 @@ macro_rules! injury(
             fn get_treatment(&self) -> Option<Box<dyn zara::health::injury::InjuryTreatment>> {
                 $trt
             }
+            fn get_is_fracture(&self) -> bool { false }
+        }
+    );
+);
+
+/// Macro for declaring a fracture injury
+#[macro_export]
+macro_rules! fracture(
+    ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
+        impl zara::health::injury::Injury for $t {
+            fn get_name(&self) -> String { format!($nm) }
+            fn get_stages(&self) -> Vec<zara::health::injury::StageDescription> {
+                $st as Vec<zara::health::injury::StageDescription>
+            }
+            fn get_treatment(&self) -> Option<Box<dyn zara::health::injury::InjuryTreatment>> {
+                $trt
+            }
+            fn get_is_fracture(&self) -> bool { true }
         }
     );
 );
@@ -213,6 +231,8 @@ pub trait Injury {
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this injury object
     fn get_treatment(&self) -> Option<Box<dyn InjuryTreatment>>;
+    /// True if injury is a fracture
+    fn get_is_fracture(&self) -> bool;
 }
 
 struct LerpDataNodeC {
@@ -248,6 +268,8 @@ pub struct ActiveInjury {
     pub total_duration: Duration,
     /// Body part associated with this injury
     pub body_part: BodyParts,
+    /// Is this injury a fracture
+    pub is_fracture: bool,
 
     // Private fields
     /// Initial stages data given by user
@@ -318,10 +340,12 @@ impl ActiveInjury {
 
         let end_time = if will_end { Some(GameTimeC::from_duration(time_elapsed)) } else { None };
         let treatment = injury.get_treatment();
+        let is_fracture= injury.get_is_fracture();
 
         ActiveInjury {
             injury: Rc::new(injury),
             body_part,
+            is_fracture,
             treatment: Rc::new(treatment),
             initial_data: RefCell::new(initial_data),
             is_inverted: Cell::new(false),

@@ -136,7 +136,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                         is_healing: injury.get_is_healing(),
                         needs_treatment: injury.needs_treatment,
                         is_blood_stopped: injury.get_is_blood_stopped(),
-                        body_part: injury.body_part
+                        body_part: injury.body_part,
+                        is_fracture: injury.is_fracture
                     });
                 },
                 None => {
@@ -150,7 +151,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                         is_healing: false,
                         needs_treatment: injury.needs_treatment,
                         is_blood_stopped: injury.get_is_blood_stopped(),
-                        body_part: injury.body_part
+                        body_part: injury.body_part,
+                        is_fracture: injury.is_fracture
                     });
                 }
             }

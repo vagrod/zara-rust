@@ -8,7 +8,6 @@ use rand::Rng;
 use event::{Dispatcher, Listener};
 use core::ops;
 
-
 pub mod event;
 
 /// Structure for storing all needed frame data for controllers
@@ -361,7 +360,8 @@ pub struct ActiveInjuryC {
     pub is_healing: bool,
     pub needs_treatment: bool,
     pub is_blood_stopped: bool,
-    pub body_part: BodyParts
+    pub body_part: BodyParts,
+    pub is_fracture: bool
 }
 
 /// Describes initial environment information
