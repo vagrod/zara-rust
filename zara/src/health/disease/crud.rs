@@ -18,7 +18,7 @@ impl Health {
     ///     current game time to activate immediately (on the next `update` pass)
     ///
     /// # Returns
-    /// Ok on success.
+    /// Ok on success
     ///
     /// # Notes
     /// This method borrows the `diseases` collection

@@ -1,8 +1,8 @@
 use utils::{GameTime, EnvironmentC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
-use error::{ItemConsumeErr};
-use inventory::items::ConsumableC;
+use error::{ItemConsumeErr, ApplianceTakeErr};
+use inventory::items::{ConsumableC, ApplianceC};
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -133,16 +133,13 @@ impl<E: Listener + 'static> ZaraController<E> {
 
     /// Consumes the item. Item which name is passed must have the
     /// [`ConsumableBehavior`](crate::inventory::ConsumableBehavior) option present, or
-    /// `false` will be returned
+    /// `Err` will be returned
     ///
     /// # Parameters
     /// - `item_name`: unique name of the item that is being consumed
     ///
     /// # Returns
     /// Ok on success
-    ///
-    /// # Notes
-    /// This method borrows the `inventory.items` collection
     ///
     /// # Examples
     ///
@@ -156,9 +153,9 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         let items_count: usize;
         let mut consumable = ConsumableC::new();
-        let b = self.inventory.items.borrow();
+        let inv_items = self.inventory.items.borrow();
 
-        let item = match b.get(item_name) {
+        let item = match inv_items.get(item_name) {
             Some(o) => o,
             None => return Err(ItemConsumeErr::ItemNotFound)
         };
@@ -181,10 +178,9 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         let new_count = items_count - 1;
         let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
-        let items = self.inventory.items.borrow();
 
         // Notify health controller about the event
-        self.health.on_consumed(&game_time, &consumable, &*items);
+        self.health.on_consumed(&game_time, &consumable, &*inv_items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)
@@ -192,6 +188,67 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));
+
+        return Ok(());
+    }
+
+    /// Takes an appliance (like bandage or injection). Item which name is passed must have the
+    /// [`ApplianceBehavior`](crate::inventory::ApplianceBehavior) option present, or
+    /// `Err` will be returned
+    ///
+    /// # Parameters
+    /// - `item_name`: unique name of the item that is being applied
+    ///
+    /// # Returns
+    /// Ok on success
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// zara_controller.take_appliance(item_name);
+    /// ```
+    pub fn take_appliance(&self, item_name: &String) -> Result<(), ApplianceTakeErr> {
+        if !self.is_alive.get() { return Err(ApplianceTakeErr::CharacterIsDead); }
+
+        let items_count: usize;
+        let mut appliance = ApplianceC::new();
+        let inv_items = self.inventory.items.borrow();
+
+        let item = match inv_items.get(item_name) {
+            Some(o) => o,
+            None => return Err(ApplianceTakeErr::ItemNotFound)
+        };
+
+        items_count = item.get_count();
+
+        if items_count - 1 <= 0 { // 1 so far
+            return Err(ApplianceTakeErr::NotEnoughResources);
+        }
+
+        let a = match item.appliance() {
+            Some(a) => a,
+            None => return Err(ApplianceTakeErr::ItemIsNotAppliance)
+        };
+
+        appliance.name = item.get_name();
+        appliance.is_body_appliance = a.is_body_appliance();
+        appliance.is_injection = a.is_injection();
+        appliance.taken_count = 1; // so far
+
+        let new_count = items_count - 1;
+        let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
+
+        // Notify health controller about the event
+        self.health.on_appliance_taken(&game_time, &appliance, &*inv_items);
+
+        // Change items count
+        self.inventory.change_item_count(item_name, new_count)
+            .or_else(|err| Err(ApplianceTakeErr::CouldNotUpdateItemCount(err)))?;
+
+        // Send the event
+        self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance));
 
         return Ok(());
     }

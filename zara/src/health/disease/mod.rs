@@ -126,8 +126,10 @@ pub trait DiseaseTreatment {
 pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
-    /// Will self-heal
+    /// Probability of disease start self-healing during this stage
     pub self_heal_chance: Option<usize>,
+    /// Probability of death from this disease during this stage.
+    pub chance_of_death: Option<usize>,
     /// In what time will reach peak values
     pub reaches_peak_in_hours: f32,
     /// How long this stage will last
@@ -147,9 +149,7 @@ pub struct StageDescription {
     /// Target water drain for this stage (0..100 percents per game second)
     pub target_water_drain: f32,
     /// Target stamina drain for this stage (0..100 percents per game second)
-    pub target_stamina_drain: f32,
-    /// Probability of death for this stage.
-    pub chance_of_death: Option<usize>
+    pub target_stamina_drain: f32
 }
 
 impl StageDescription {
@@ -297,7 +297,7 @@ pub trait DiseaseMonitor {
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
     /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
     /// - `item`: consumable part description
-    ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+    /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC,
                    inventory_items: &HashMap<String, Box<dyn InventoryItem>>);

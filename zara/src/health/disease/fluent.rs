@@ -78,17 +78,17 @@ pub trait StageDrainsValues {
     /// Set the static drain rate for the stamina for this stage. 0..100 percents per game second.
     ///
     /// ## Parameters
-    /// - `value`: constant drain value (0..100 percents per game second)
+    /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn stamina(&self, value: f32) -> &dyn StageDrainsValues;
     /// Set the static drain rate for the food level for this stage. 0..100 percents per game second.
     ///
     /// ## Parameters
-    /// - `value`: constant drain value (0..100 percents per game second)
+    /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn food_level(&self, value: f32) -> &dyn StageDrainsValues;
     /// Set the static drain rate for the water level for this stage. 0..100 percents per game second.
     ///
     /// ## Parameters
-    /// - `value`: constant drain value (0..100 percents per game second)
+    /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn water_level(&self, value: f32) -> &dyn StageDrainsValues;
 
     /// Choose this if you want this stage to affect fatigue.

@@ -65,6 +65,20 @@ pub enum ItemConsumeErr {
     CouldNotUpdateItemCount(InventoryItemAccessErr)
 }
 
+/// Is used by `ZaraController.take_appliance` method
+pub enum ApplianceTakeErr {
+    /// When `consume` called on a dead character
+    CharacterIsDead,
+    /// When given item key was not found in the inventory
+    ItemNotFound,
+    /// When item `count` is not enough
+    NotEnoughResources,
+    /// When item has no `appliance` option
+    ItemIsNotAppliance,
+    /// When could not update item count
+    CouldNotUpdateItemCount(InventoryItemAccessErr)
+}
+
 /// Is used by `ZaraController.update` method
 pub enum ZaraUpdateErr {
     /// When `update` called on a dead character

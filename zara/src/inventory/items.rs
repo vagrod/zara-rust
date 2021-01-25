@@ -10,6 +10,7 @@ macro_rules! inv_item(
             fn get_name(&self) -> String { String::from($nm) }
             fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
+            fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
         }
     );
 );
@@ -23,7 +24,45 @@ macro_rules! inv_item_cons(
             fn set_count(&self, new_count: usize) { self.count.set(new_count) }
             fn get_name(&self) -> String { String::from($nm) }
             fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
-            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior>{ $cons }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { $cons }
+            fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
+        }
+    );
+);
+
+/// Macro for declaring an appliance behavior
+#[macro_export]
+macro_rules! inv_item_appl (
+    ($t:ty, $nm:expr, $wt:expr, $appl:expr) => (
+        impl zara::inventory::items::InventoryItem for $t {
+            fn get_count(&self) -> usize { self.count.get() }
+            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
+            fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { $appl }
+        }
+    );
+);
+
+/// Macro for declaring body appliance option
+#[macro_export]
+macro_rules! inv_body_appliance (
+    ($t:ty, $wg:expr) => (
+        impl zara::inventory::items::ConsumableBehavior for $t {
+            fn is_body_appliance(&self) -> bool { true }
+            fn is_injection(&self) -> bool { false }
+        }
+    );
+);
+
+/// Macro for declaring injection appliance option
+#[macro_export]
+macro_rules! inv_injection_appliance (
+    ($t:ty, $wg:expr) => (
+        impl zara::inventory::items::ConsumableBehavior for $t {
+            fn is_body_appliance(&self) -> bool { false }
+            fn is_injection(&self) -> bool { true }
         }
     );
 );
@@ -79,7 +118,6 @@ pub struct ConsumableC {
     /// How many items of this type has been consumed
     pub consumed_count: usize
 }
-
 impl ConsumableC {
     pub fn new() -> Self {
         ConsumableC {
@@ -87,6 +125,28 @@ impl ConsumableC {
             is_food: false,
             is_water: false,
             consumed_count: 0
+        }
+    }
+}
+
+/// Describes appliance  contract
+pub struct ApplianceC {
+    /// Unique name of the item
+    pub name: String,
+    /// Is this item is a body appliance (like bandage)
+    pub is_body_appliance: bool,
+    /// Is this item is an injection (like syringe with something)
+    pub is_injection: bool,
+    /// How many of these items has been applied
+    pub taken_count: usize
+}
+impl ApplianceC {
+    pub fn new() -> Self {
+        ApplianceC {
+            name: String::new(),
+            is_body_appliance: false,
+            is_injection: false,
+            taken_count: 0
         }
     }
 }
@@ -141,6 +201,15 @@ pub trait InventoryItem {
 
     /// Node that describes behavior of this item as a consumable
     fn consumable(&self) -> Option<&dyn ConsumableBehavior>;
+    fn appliance(&self) -> Option<&dyn ApplianceBehavior>;
+}
+
+/// Trait to describe appliance behavior of the inventory item
+pub trait ApplianceBehavior {
+    /// True if this appliance is a body appliance (like bandage)
+    fn is_body_appliance(&self) -> bool;
+    /// True if this appliance is an injection type (like syringe with something)
+    fn is_injection(&self) -> bool;
 }
 
 /// Trait to describe consumable behavior of the inventory item
