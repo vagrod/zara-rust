@@ -1,5 +1,5 @@
 use crate::ZaraController;
-use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC};
+use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC, ActiveInjuryC};
 use crate::utils::event::{Listener, Event};
 use crate::error::ZaraUpdateErr;
 
@@ -88,15 +88,48 @@ impl<E: Listener + 'static> ZaraController<E> {
         let game_time_duration = self.environment.game_time.duration.get();
         let time_delta = game_time_duration - self.last_update_game_time.get();
         let mut active_diseases: Vec<ActiveDiseaseC> = Vec::new();
+        let mut active_injuries: Vec<ActiveInjuryC> = Vec::new();
         let game_time_contract = &self.environment.game_time.to_contract();
 
         // Collect active diseases data
-        for (_key, active) in self.health.diseases.borrow().iter() {
-            active_diseases.push(ActiveDiseaseC {
-                name: active.disease.get_name(),
-                is_active: active.get_is_active(game_time_contract),
-                scheduled_time: active.get_activation_time()
-            });
+        for (_key, disease) in self.health.diseases.borrow().iter() {
+            if !disease.get_is_active(game_time_contract) { continue; }
+            match disease.get_active_stage(game_time_contract) {
+                Some(st) => {
+                    active_diseases.push(ActiveDiseaseC {
+                        name: disease.disease.get_name(),
+                        is_active: true,
+                        scheduled_time: disease.get_activation_time(),
+                        end_time: disease.get_end_time(),
+                        current_level: st.info.level,
+                        current_level_percent: st.get_percent_active(game_time_contract),
+                        is_healing: disease.get_is_healing(),
+                        needs_treatment: disease.needs_treatment
+                    });
+                },
+                _ => { continue; }
+            }
+        };
+
+        // Collect active injuries data
+        for (_key, injury) in self.health.injuries.borrow().iter() {
+            if !injury.get_is_active(game_time_contract) { continue; }
+            match injury.get_active_stage(game_time_contract) {
+                Some(st) => {
+                    active_injuries.push(ActiveInjuryC {
+                        name: injury.injury.get_name(),
+                        is_active: true,
+                        scheduled_time: injury.get_activation_time(),
+                        end_time: injury.get_end_time(),
+                        current_level: st.info.level,
+                        current_level_percent: st.get_percent_active(game_time_contract),
+                        is_healing: injury.get_is_healing(),
+                        needs_treatment: injury.needs_treatment,
+                        is_blood_stopped: injury.get_is_blood_stopped()
+                    });
+                },
+                _ => { continue; }
+            }
         };
 
         // Determine last sleep time
@@ -110,12 +143,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         FrameSummaryC {
-            game_time : GameTimeC {
-                day: self.environment.game_time.day.get(),
-                hour: self.environment.game_time.hour.get(),
-                minute: self.environment.game_time.minute.get(),
-                second: self.environment.game_time.second.get()
-            },
+            game_time : self.environment.game_time.to_contract(),
             player: PlayerStatusC {
                 is_walking: self.player_state.is_walking.get(),
                 is_running: self.player_state.is_running.get(),
@@ -141,7 +169,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                 stamina_level: self.health.stamina_level.get(),
                 fatigue_level: self.health.fatigue_level.get(),
 
-                diseases: active_diseases
+                diseases: active_diseases,
+                injuries: active_injuries
             },
             game_time_delta: time_delta.as_secs_f32()
         }

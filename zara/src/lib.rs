@@ -199,7 +199,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Parameters
     /// - `item_name`: unique name of the item that is being applied
-    /// - `body_part`: part of the body where this item was applied to
+    /// - `body_part`: part of the body where this item needs to be applied to
     ///
     /// # Returns
     /// Ok on success
@@ -209,7 +209,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Basic usage:
     ///
     /// ```
-    /// zara_controller.take_appliance(item_name);
+    /// zara_controller.take_appliance(item_name, body_part);
     /// ```
     pub fn take_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceTakeErr> {
         if !self.is_alive.get() { return Err(ApplianceTakeErr::CharacterIsDead); }

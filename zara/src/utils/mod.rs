@@ -4,6 +4,7 @@ use rand::Rng;
 
 use event::{Dispatcher, Listener};
 use core::ops;
+use crate::health::StageLevel;
 
 pub mod event;
 
@@ -312,7 +313,9 @@ pub struct HealthC {
     /// Fatigue level (0..100)
     pub fatigue_level: f32,
     /// List of active (or scheduled) diseases
-    pub diseases: Vec<ActiveDiseaseC>
+    pub diseases: Vec<ActiveDiseaseC>,
+    /// List of active (or scheduled) injuries
+    pub injuries: Vec<ActiveInjuryC>
 }
 impl HealthC {
     pub fn healthy() -> Self {
@@ -326,7 +329,8 @@ impl HealthC {
             heart_rate: 64.,
             stamina_level: 100.,
             fatigue_level: 0.,
-            diseases: Vec::new()
+            diseases: Vec::new(),
+            injuries: Vec::new()
         }
     }
 }
@@ -335,7 +339,25 @@ impl HealthC {
 pub struct ActiveDiseaseC {
     pub name: String,
     pub scheduled_time: GameTimeC,
-    pub is_active: bool
+    pub end_time: Option<GameTimeC>,
+    pub current_level: StageLevel,
+    pub current_level_percent: usize,
+    pub is_active: bool,
+    pub is_healing: bool,
+    pub needs_treatment: bool
+}
+
+/// Structure for storing active injury snapshot
+pub struct ActiveInjuryC {
+    pub name: String,
+    pub scheduled_time: GameTimeC,
+    pub end_time: Option<GameTimeC>,
+    pub current_level: StageLevel,
+    pub current_level_percent: usize,
+    pub is_active: bool,
+    pub is_healing: bool,
+    pub needs_treatment: bool,
+    pub is_blood_stopped: bool
 }
 
 /// Describes initial environment information
