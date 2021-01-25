@@ -2,6 +2,7 @@ use crate::utils::{GameTimeC};
 use crate::health::StageLevel;
 use crate::health::injury::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ApplianceC};
+use crate::body::BodyParts;
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -76,13 +77,15 @@ pub trait InjuryTreatment {
     /// ## Parameters
     /// - `game_time`: game time when this call happened
     /// - `item`: appliance item description
+    /// - `body_part`: part of the body where this appliance was applied
     /// - `active_stage`: instance of the active stage of an injury
     /// - `injury`: injury object itself. You can call `invert` or `invert_back` to start or stop
     ///     "curing" the injury
     ///  - `inventory_items`: all inventory items. Used item is still in this list at the
     ///     moment of this call
-    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, active_stage: &ActiveStage,
-                   injury: &ActiveInjury, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
+                          active_stage: &ActiveStage, injury: &ActiveInjury,
+                          inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Describes injury stage
@@ -401,13 +404,13 @@ impl ActiveInjury {
     }
 
     /// Is called by Zara from the health engine when person takes an appliance
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.get_is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_appliance_taken(game_time, item, &st, &self, inventory_items),
+                Some(st) => t.on_appliance_taken(game_time, item, body_part, &st, &self, inventory_items),
                 None => { }
             },
             None => { }

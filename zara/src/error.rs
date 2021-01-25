@@ -91,6 +91,8 @@ pub enum ApplianceTakeErr {
     NotEnoughResources,
     /// When item has no `appliance` option
     ItemIsNotAppliance,
+    /// When passed body part is unknown
+    UnknownBodyPart,
     /// When could not update item count
     CouldNotUpdateItemCount(InventoryItemAccessErr)
 }

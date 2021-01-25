@@ -2,6 +2,7 @@
 /// https://stackoverflow.com/questions/37572734/how-can-i-implement-the-observer-pattern-in-rust
 
 use crate::inventory::items::{ConsumableC, ApplianceC};
+use crate::body::BodyParts;
 
 use std::sync::{Arc, Weak};
 use std::cell::RefCell;
@@ -10,7 +11,7 @@ use std::cell::RefCell;
 pub enum Event {
     WokeUp,
     ItemConsumed(ConsumableC),
-    ApplianceTaken(ApplianceC),
+    ApplianceTaken(ApplianceC, BodyParts),
     StaminaDrained,
     Tired,
     Exhausted,

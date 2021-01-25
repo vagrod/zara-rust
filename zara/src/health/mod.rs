@@ -3,6 +3,7 @@ use crate::health::disease::{DiseaseMonitor, ActiveDisease};
 use crate::health::injury::ActiveInjury;
 use crate::health::side::{SideEffectsMonitor};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
+use crate::body::BodyParts;
 
 use std::collections::HashMap;
 use std::cell::{RefCell, Cell};
@@ -132,18 +133,18 @@ impl Health {
     }
 
     /// Called by zara controller when appliance item is taken
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
             if disease.get_is_active(game_time) {
-                disease.on_appliance_taken(game_time, item, inventory_items);
+                disease.on_appliance_taken(game_time, item, body_part, inventory_items);
             }
         }
 
         // Notify injuries
         for (_, injury) in self.injuries.borrow().iter() {
             if injury.get_is_active(game_time) {
-                injury.on_appliance_taken(game_time, item, inventory_items);
+                injury.on_appliance_taken(game_time, item, body_part, inventory_items);
             }
         }
     }

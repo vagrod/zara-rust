@@ -3,6 +3,7 @@ use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 use error::{ItemConsumeErr, ApplianceTakeErr};
 use inventory::items::{ConsumableC, ApplianceC};
+use body::BodyParts;
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -198,6 +199,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Parameters
     /// - `item_name`: unique name of the item that is being applied
+    /// - `body_part`: part of the body where this item was applied to
     ///
     /// # Returns
     /// Ok on success
@@ -209,8 +211,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// zara_controller.take_appliance(item_name);
     /// ```
-    pub fn take_appliance(&self, item_name: &String) -> Result<(), ApplianceTakeErr> {
+    pub fn take_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceTakeErr> {
         if !self.is_alive.get() { return Err(ApplianceTakeErr::CharacterIsDead); }
+        if body_part == BodyParts::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
 
         let items_count: usize;
         let mut appliance = ApplianceC::new();
@@ -241,14 +244,14 @@ impl<E: Listener + 'static> ZaraController<E> {
         let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
 
         // Notify health controller about the event
-        self.health.on_appliance_taken(&game_time, &appliance, &*inv_items);
+        self.health.on_appliance_taken(&game_time, &appliance, body_part, &*inv_items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)
             .or_else(|err| Err(ApplianceTakeErr::CouldNotUpdateItemCount(err)))?;
 
         // Send the event
-        self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance));
+        self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance, body_part));
 
         return Ok(());
     }
