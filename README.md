@@ -29,6 +29,7 @@ This code is **WIP** and changes all the time.
   + Injury treatment with appliances (like injections/bandages/splints/etc)
   + Spawning/removing an injury
   + Inverting ("curing") an injury, "invertng back"
+  + Body parts for injuries and treatment with appliances
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -39,7 +40,6 @@ This code is **WIP** and changes all the time.
 - Game events system
 
 ## What's in progress
-- Body parts for injuries
 - Medical agents
 - Clothes and body appliances
 - Oxygen level (and optional "side effect" to control it)
