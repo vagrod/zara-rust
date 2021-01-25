@@ -22,7 +22,7 @@ zara::disease!(Flu, "Flu", Some(Box::new(Flu)),
                     .food_level(0.05)
                     .water_level(0.1)
                 .affects_fatigue(5.)
-                .with_chance_of_death(5)
+                .with_chance_of_death(0)
             .build(),
 
         StageBuilder::start()

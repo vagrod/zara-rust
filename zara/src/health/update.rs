@@ -1,8 +1,9 @@
 use crate::health::Health;
 use crate::health::side::{SideEffectDeltasC};
-use crate::health::disease::{DiseaseDeltasC, StageLevel};
+use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
 use crate::utils::event::{Event, Listener, Dispatcher};
+use crate::health::injury::InjuryDeltasC;
 
 pub struct UpdateResult {
     pub is_alive: bool,
@@ -13,6 +14,12 @@ struct ProcessDiseasesResult {
     deltas: DiseaseDeltasC,
     is_alive: bool,
     disease_caused_death: String
+}
+
+struct ProcessInjuriesResult {
+    deltas: InjuryDeltasC,
+    is_alive: bool,
+    injury_caused_death: String
 }
 
 impl Health {
@@ -51,6 +58,12 @@ impl Health {
         // Apply disease deltas
         self.apply_disease_deltas(&mut snapshot, &diseases_result.deltas);
 
+        // Process injuries and get drain deltas from them
+        let injuries_result = self.process_injuries(&frame.data.game_time, frame.data.game_time_delta);
+
+        // Apply injuries deltas
+        self.apply_injury_deltas(&mut snapshot, &injuries_result.deltas);
+
         // Will always regain stamina. Side effects must "fight" it
         {
             let value = snapshot.stamina_level + self.stamina_regain_rate.get() * frame.data.game_time_delta;
@@ -68,11 +81,22 @@ impl Health {
         // Do the events
         self.dispatch_events::<E>(frame.events);
 
-        if !diseases_result.is_alive { self.is_alive.set(false); }
+        if !diseases_result.is_alive {
+            return UpdateResult {
+                is_alive: diseases_result.is_alive,
+                disease_caused_death: diseases_result.disease_caused_death
+            }
+        }
+        if !injuries_result.is_alive {
+            return UpdateResult {
+                is_alive: injuries_result.is_alive,
+                disease_caused_death: injuries_result.injury_caused_death
+            }
+        }
 
         UpdateResult {
-            is_alive: diseases_result.is_alive,
-            disease_caused_death: diseases_result.disease_caused_death
+            is_alive: true,
+            disease_caused_death: format!("")
         }
     }
 
@@ -157,7 +181,7 @@ impl Health {
                     }
 
                     // Handling self-heal
-                    if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
+                    if !disease.needs_treatment && disease.will_self_heal_on != crate::health::disease::StageLevel::Undefined && !disease.get_is_healing() {
                         match &active_stage {
                             Some(st) => {
                                 let p = st.get_percent_active(game_time);
@@ -207,6 +231,86 @@ impl Health {
         }
     }
 
+    fn process_injuries(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessInjuriesResult {
+        let mut is_alive = true;
+        let mut injury_caused_death = format!("");
+
+        // Clean up garbage injuries
+        let mut injuries_to_remove = Vec::new();
+        {
+            let injuries = self.injuries.borrow();
+            for (name, injury) in injuries.iter() {
+                if injury.get_is_old(game_time) {
+                    injuries_to_remove.push(name.clone());
+                }
+            }
+        }
+        for injury_name in injuries_to_remove {
+            self.remove_injury(&injury_name).ok(); // we don't really care here
+        }
+
+        let mut result = InjuryDeltasC::for_related();
+
+        // Collect injury deltas
+        let mut injury_deltas = Vec::new();
+        {
+            let injuries = self.injuries.borrow();
+            for (injury_name, injury) in injuries.iter() {
+                if injury.get_is_active(game_time) {
+                    injury_deltas.push(injury.get_drains_deltas(game_time));
+
+                    let active_stage = injury.get_active_stage(game_time);
+
+                    // Handling death probabilities
+                    match &active_stage {
+                        Some(st) => {
+                            let chance = st.info.chance_of_death.unwrap_or(0);
+
+                            if crate::utils::roll_dice(chance)
+                            {
+                                is_alive = false;
+                                injury_caused_death = injury_name.to_string();
+                            }
+                        },
+                        _ => { }
+                    }
+
+                    // Handling self-heal
+                    if !injury.needs_treatment && injury.will_self_heal_on != crate::health::injury::StageLevel::Undefined && !injury.get_is_healing() {
+                        match &active_stage {
+                            Some(st) => {
+                                let p = st.get_percent_active(game_time);
+                                let dice = crate::utils::range(50., 99.) as usize;
+                                if (st.info.level == injury.will_self_heal_on && p > dice) ||
+                                    st.info.level as i32 > injury.will_self_heal_on as i32
+                                {
+                                    // Invoke the healing process
+                                    injury.invert(game_time).ok(); // aren't interested in result
+                                }
+                            },
+                            _ => { }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Normalize injury deltas
+        for d in injury_deltas.iter() {
+            // Those are % per game second drains
+            result.stamina_drain += d.stamina_drain * game_time_delta; // stamina drain is cumulative
+            result.blood_drain += d.blood_drain * game_time_delta; // food drain is cumulative
+        }
+
+        result.cleanup();
+
+        return ProcessInjuriesResult {
+            deltas: result,
+            is_alive,
+            injury_caused_death
+        }
+    }
+
     fn apply_deltas(&self, snapshot: &mut HealthC, deltas: &SideEffectDeltasC) {
         snapshot.body_temperature += deltas.body_temp_bonus;
         snapshot.heart_rate += deltas.heart_rate_bonus;
@@ -223,10 +327,15 @@ impl Health {
         snapshot.heart_rate += deltas.heart_rate_delta;
         snapshot.top_pressure += deltas.pressure_top_delta;
         snapshot.bottom_pressure += deltas.pressure_bottom_delta;
+        snapshot.fatigue_level += deltas.fatigue_delta;
         snapshot.food_level -= deltas.food_drain;
         snapshot.water_level -= deltas.water_drain;
         snapshot.stamina_level -= deltas.stamina_drain;
-        snapshot.fatigue_level += deltas.fatigue_delta;
+    }
+
+    fn apply_injury_deltas(&self, snapshot: &mut HealthC, deltas: &InjuryDeltasC) {
+        snapshot.blood_level -= deltas.blood_drain;
+        snapshot.stamina_level -= deltas.stamina_drain;
     }
 
     fn apply_health_snapshot(&self, snapshot: &HealthC) {
@@ -236,6 +345,7 @@ impl Health {
         self.bottom_pressure.set(snapshot.bottom_pressure);
         self.food_level.set(crate::utils::clamp(snapshot.food_level, 0., 100.));
         self.water_level.set(crate::utils::clamp(snapshot.water_level, 0., 100.));
+        self.blood_level.set(crate::utils::clamp(snapshot.blood_level, 0., 100.));
         self.stamina_level.set(crate::utils::clamp(snapshot.stamina_level, 0., 100.));
         self.fatigue_level.set(crate::utils::clamp(snapshot.fatigue_level, 0., 100.));
     }

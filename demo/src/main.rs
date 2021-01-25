@@ -8,7 +8,7 @@ use std::cell::Cell;
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, GameTimeC};
 use zara::health::{Health};
-use zara::health::disease::{DiseaseMonitor, Disease, StageBuilder, StageLevel};
+use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableC, ConsumableBehavior, SpoilingBehavior};
 use zara::inventory::crafting;
@@ -21,6 +21,7 @@ use std::io::{Write, stdout, stdin};
 
 mod diseases;
 mod inventory;
+mod injuries;
 
 // This will spawn a new thread for the "game loop"
 fn main() {
@@ -50,6 +51,7 @@ fn main() {
         add_side_effects(&person);
         populate_inventory(&person);
         spawn_diseases(&person);
+        spawn_injuries(&person);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
@@ -112,6 +114,11 @@ fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
     //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
+fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
+    person.health.spawn_injury(Box::new(injuries::Cut), zara::utils::GameTimeC::new(0,0,2,25.));
+    //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
+}
+
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let meat = inventory::Meat{ count: Cell::new(2) };
     let knife = inventory::Knife{ count: Cell::new(1) };
@@ -154,17 +161,27 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
              person.environment.game_time.minute.get(),
              person.environment.game_time.second.get()).unwrap();
 
-    // Show vitals
-    writeln!(stdout, "{}{}Vitals", termion::cursor::Goto(1, 2), color::Fg(color::Green)).unwrap();
-    writeln!(stdout, "{}  Body temp: {:.2}°C", termion::cursor::Goto(1, 3), person.health.body_temperature.get()).unwrap();
-    writeln!(stdout, "{}  Heart rate: {:.0} bpm", termion::cursor::Goto(1, 4), person.health.heart_rate.get()).unwrap();
-    writeln!(stdout, "{}  Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 5), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
-    writeln!(stdout, "{}  Water: {:.0}%", termion::cursor::Goto(1, 6), person.health.water_level.get()).unwrap();
-    writeln!(stdout, "{}  Food: {:.0}%", termion::cursor::Goto(1, 7), person.health.food_level.get()).unwrap();
-    writeln!(stdout, "{}  Stamina: {:.0}%", termion::cursor::Goto(1, 8), person.health.stamina_level.get()).unwrap();
-    writeln!(stdout, "{}  Fatigue: {:.2}%", termion::cursor::Goto(1, 9), person.health.fatigue_level.get()).unwrap();
+    let mut vitals_h;
 
-    let vitals_h = 9;
+    if person.is_alive.get() {
+        // Show vitals
+        writeln!(stdout, "{}{}Vitals", termion::cursor::Goto(1, 2), color::Fg(color::Green)).unwrap();
+        writeln!(stdout, "{}  Body temp: {:.2}°C", termion::cursor::Goto(1, 3), person.health.body_temperature.get()).unwrap();
+        writeln!(stdout, "{}  Heart rate: {:.0} bpm", termion::cursor::Goto(1, 4), person.health.heart_rate.get()).unwrap();
+        writeln!(stdout, "{}  Blood pressure: {:.0}/{:.0} mmHg", termion::cursor::Goto(1, 5), person.health.top_pressure.get(), person.health.bottom_pressure.get()).unwrap();
+        writeln!(stdout, "{}  Water: {:.0}%", termion::cursor::Goto(1, 6), person.health.water_level.get()).unwrap();
+        writeln!(stdout, "{}  Food: {:.0}%", termion::cursor::Goto(1, 7), person.health.food_level.get()).unwrap();
+        writeln!(stdout, "{}  Blood: {:.0}%", termion::cursor::Goto(1, 8), person.health.blood_level.get()).unwrap();
+        writeln!(stdout, "{}  Stamina: {:.0}%", termion::cursor::Goto(1, 9), person.health.stamina_level.get()).unwrap();
+        writeln!(stdout, "{}  Fatigue: {:.2}%", termion::cursor::Goto(1, 10), person.health.fatigue_level.get()).unwrap();
+
+        vitals_h = 10;
+    } else {
+        writeln!(stdout, "{}{}Character is dead", termion::cursor::Goto(1, 2), color::Fg(color::Red)).unwrap();
+
+        vitals_h = 2;
+    }
+
 
     // Show inventory
     writeln!(stdout, "{}{}Inventory", color::Fg(color::Blue), termion::cursor::Goto(50, 1));
@@ -228,7 +245,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             let active_stage = disease.get_active_stage(game_time).unwrap();
             let p = active_stage.get_percent_active(game_time);
             write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
-            write!(stdout, "{:?} {}%", disease.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
+            write!(stdout, "{:?} {}%", disease.get_active_level(game_time).unwrap_or(zara::health::disease::StageLevel::Undefined), p);
             if disease.get_is_healing() {
                 write!(stdout, " (now healing)");
             }
@@ -250,6 +267,50 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             }
         } else {
             let time = &disease.get_activation_time();
+            writeln!(stdout, "{}  {}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), name,
+                     time.day,
+                     time.hour,
+                     time.minute,
+                     time.second
+            );
+        }
+
+        diseases_height += 1;
+    }
+
+    diseases_height += 1;
+
+    // Show injuries
+    writeln!(stdout, "{}{}Injuries", color::Fg(color::LightGreen), termion::cursor::Goto(150, diseases_height));
+    diseases_height += 1;
+    for (name, injury) in person.health.injuries.borrow().iter() {
+        let is_active = injury.get_is_active(&person.environment.game_time.to_contract());
+        if is_active {
+            let active_stage = injury.get_active_stage(game_time).unwrap();
+            let p = active_stage.get_percent_active(game_time);
+            write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
+            write!(stdout, "{:?} {}%", injury.get_active_level(game_time).unwrap_or(zara::health::injury::StageLevel::Undefined), p);
+            if injury.get_is_healing() {
+                write!(stdout, " (now healing)");
+            }
+            diseases_height+=1;
+            if injury.needs_treatment {
+                if injury.get_will_end() {
+                    let time = injury.get_end_time().unwrap();
+                    writeln!(stdout, "{}    will end @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height),
+                             time.day,
+                             time.hour,
+                             time.minute,
+                             time.second
+                    );
+                } else {
+                    writeln!(stdout, "{}    will not end", termion::cursor::Goto(150, diseases_height));
+                }
+            } else {
+                writeln!(stdout, "{}    don't need treatment, will self-heal", termion::cursor::Goto(150, diseases_height));
+            }
+        } else {
+            let time = &injury.get_activation_time();
             writeln!(stdout, "{}  {}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), name,
                      time.day,
                      time.hour,

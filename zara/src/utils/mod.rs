@@ -461,10 +461,13 @@ pub fn clamp_01(value: f32) -> f32 {
 
 /// Will return `true` is a given probability is satisfied
 pub fn roll_dice(probability: usize) -> bool {
+    if probability == 0 { return false; }
+    if probability >= 100 { return true; }
+
     let mut rng = rand::thread_rng();
     let r = rng.gen_range(0..100);
 
-    return r <= probability;
+    return r < probability;
 }
 
 /// Will return a random number between this two

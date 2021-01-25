@@ -10,7 +10,7 @@ use std::rc::Rc;
 impl Health {
 
     /// Spawns a new disease. If disease is already scheduled or active, nothing will happen, and
-    /// `false` will be returned
+    /// `Err` will be returned
     ///
     /// # Parameters
     /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
@@ -41,7 +41,7 @@ impl Health {
         return Ok(());
     }
 
-    /// Removes active disease if exists. Returns `false` if not.
+    /// Removes active disease if exists. Returns `Err` if not.
     ///
     /// # Parameters
     /// - `disease_name`: unique name of the disease

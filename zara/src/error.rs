@@ -30,12 +30,28 @@ pub enum SpawnDiseaseErr {
     DiseaseAlreadyAdded
 }
 
+/// Is used by `Health.spawn_injury` method
+pub enum SpawnInjuryErr {
+    /// When `spawn_injury` called on a dead character
+    CharacterIsDead,
+    /// When injury you trying to spawn was already spawned
+    InjuryAlreadyAdded
+}
+
 /// Is used by `Health.remove_disease` method
 pub enum RemoveDiseaseErr {
     /// When `spawn_disease` called on a dead character
     CharacterIsDead,
     /// When disease you trying to delete was not found
     DiseaseNotFound
+}
+
+/// Is used by `Health.remove_injury` method
+pub enum RemoveInjuryErr {
+    /// When `remove_injury` called on a dead character
+    CharacterIsDead,
+    /// When injury you trying to delete was not found
+    InjuryNotFound
 }
 
 /// Is used by `Health.unregister_disease_monitor`, `unregister_side_effect_monitor`,

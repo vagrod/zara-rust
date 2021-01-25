@@ -1,5 +1,6 @@
 use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
+use crate::health::injury::ActiveInjury;
 use crate::health::side::{SideEffectsMonitor};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 
@@ -13,6 +14,7 @@ mod status_methods;
 mod monitors;
 
 pub mod disease;
+pub mod injury;
 pub mod side;
 
 /// Describes and controls player's health
@@ -42,6 +44,8 @@ pub struct Health {
     pub blood_regain_rate: Cell<f32>,
     /// All active or scheduled diseases
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
+    /// All active or scheduled injuries
+    pub injuries: Arc<RefCell<HashMap<String, Rc<ActiveInjury>>>>,
 
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
@@ -70,6 +74,7 @@ impl Health {
             disease_monitors: Rc::new(RefCell::new(HashMap::new())),
             side_effects: Rc::new(RefCell::new(HashMap::new())),
             diseases: Arc::new(RefCell::new(HashMap::new())),
+            injuries: Arc::new(RefCell::new(HashMap::new())),
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
 
@@ -105,11 +110,11 @@ impl Health {
     /// Called by zara controller when appliance item is taken
     pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify injuries
-        /*for (_, injury) in self.injuries.borrow().iter() {
-            if disease.get_is_active(game_time) {
-                disease.on_appliance_taken(game_time, item, inventory_items);
+        for (_, injury) in self.injuries.borrow().iter() {
+            if injury.get_is_active(game_time) {
+                injury.on_appliance_taken(game_time, item, inventory_items);
             }
-        }*/
+        }
     }
 
 }

@@ -1,7 +1,6 @@
-use crate::health::{Health};
-use crate::utils::{FrameSummaryC, GameTimeC};
-use crate::health::disease::fluent::{StageInit};
-use crate::inventory::items::{InventoryItem, ConsumableC};
+use crate::utils::{GameTimeC};
+use crate::health::injury::fluent::{StageInit};
+use crate::inventory::items::{InventoryItem, ApplianceC};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -16,31 +15,31 @@ mod chain;
 
 /// Macro for declaring a disease
 #[macro_export]
-macro_rules! disease(
+macro_rules! injury(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
-        impl zara::health::disease::Disease for $t {
+        impl zara::health::injury::Injury for $t {
             fn get_name(&self) -> String { format!($nm) }
-            fn get_stages(&self) -> Vec<zara::health::disease::StageDescription> {
-                $st as Vec<zara::health::disease::StageDescription>
+            fn get_stages(&self) -> Vec<zara::health::injury::StageDescription> {
+                $st as Vec<zara::health::injury::StageDescription>
             }
-            fn get_treatment(&self) -> Option<Box<dyn zara::health::disease::DiseaseTreatment>> {
+            fn get_treatment(&self) -> Option<Box<dyn zara::health::injury::InjuryTreatment>> {
                 $trt
             }
         }
     );
 );
 
-/// Builds a disease stage.
+/// Builds an injury stage.
 ///
 /// # Examples
 /// Start with `start` method and call `build` when you're done.
 /// ```
-/// use zara::health::disease::{StageBuilder, StageLevel};
+/// use zara::health::injury::{StageBuilder, StageLevel};
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
 ///         .self_heal(15)
-///         .vitals(); // and so on...
+///         .drains(); // and so on...
 /// //  .build();
 /// ```
 pub struct StageBuilder {
@@ -48,14 +47,8 @@ pub struct StageBuilder {
     self_heal_chance: RefCell<Option<usize>>,
     reaches_peak_in_hours: Cell<f32>,
     is_endless: Cell<bool>,
-    target_body_temp: Cell<f32>,
-    target_heart_rate: Cell<f32>,
-    target_pressure_top: Cell<f32>,
-    target_pressure_bottom: Cell<f32>,
-    target_fatigue_delta: Cell<f32>,
     target_stamina_drain: Cell<f32>,
-    target_food_drain: Cell<f32>,
-    target_water_drain: Cell<f32>,
+    target_blood_drain: Cell<f32>,
     chance_of_death: RefCell<Option<usize>>
 }
 
@@ -92,62 +85,44 @@ impl StageBuilder {
                 chance_of_death: RefCell::new(None),
                 is_endless: Cell::new(false),
                 reaches_peak_in_hours: Cell::new(0.),
-                target_body_temp: Cell::new(0.),
-                target_heart_rate: Cell::new(0.),
-                target_pressure_top: Cell::new(0.),
-                target_pressure_bottom: Cell::new(0.),
-                target_fatigue_delta: Cell::new(0.),
                 target_stamina_drain: Cell::new(0.),
-                target_food_drain: Cell::new(0.),
-                target_water_drain: Cell::new(0.)
+                target_blood_drain: Cell::new(0.)
             }
         )
     }
 }
 
 /// Here you can describe any disease treatment logic based on the consumed items (food/pills/etc)
-pub trait DiseaseTreatment {
-    /// Called on all active diseases when player eats something
+pub trait InjuryTreatment {
+    /// Called on all active injuries when player takes an appliance
     ///
     /// ## Parameters
     /// - `game_time`: game time when this call happened
-    /// - `item`: consumable item description
-    /// - `active_stage`: instance of the active stage of a disease
-    /// - `disease`: disease object itself. You can call `invert` or `invert_back` to start or stop
-    ///     "curing" the disease
-    ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+    /// - `item`: appliance item description
+    /// - `active_stage`: instance of the active stage of an injury
+    /// - `injury`: injury object itself. You can call `invert` or `invert_back` to start or stop
+    ///     "curing" the injury
+    ///  - `inventory_items`: all inventory items. Used item is still in this list at the
     ///     moment of this call
-    fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage,
-                   disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, active_stage: &ActiveStage,
+                   injury: &ActiveInjury, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
-/// Describes disease stage
+/// Describes injury stage
 #[derive(Copy, Clone)]
 pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
-    /// Probability of disease start self-healing during this stage
+    /// Probability of injury start self-healing during this stage
     pub self_heal_chance: Option<usize>,
-    /// Probability of death from this disease during this stage.
+    /// Probability of death from this injury during this stage.
     pub chance_of_death: Option<usize>,
     /// In what time will reach peak values
     pub reaches_peak_in_hours: f32,
     /// How long this stage will last
     pub is_endless: bool,
-    /// Stage's target body temperature
-    pub target_body_temp: f32,
-    /// Stage's target heart rate
-    pub target_heart_rate: f32,
-    /// Stage's target body pressure (top)
-    pub target_pressure_top: f32,
-    /// Stage's target body pressure (bottom)
-    pub target_pressure_bottom: f32,
-    /// Target fatigue delta value (0..100 percents) at the end of this stage
-    pub target_fatigue_delta: f32,
-    /// Target food drain for this stage (0..100 percents per game second)
-    pub target_food_drain: f32,
-    /// Target water drain for this stage (0..100 percents per game second)
-    pub target_water_drain: f32,
+    /// Target blood drain for this stage (0..100 percents per game second)
+    pub target_blood_drain: f32,
     /// Target stamina drain for this stage (0..100 percents per game second)
     pub target_stamina_drain: f32
 }
@@ -160,14 +135,8 @@ impl StageDescription {
             chance_of_death: match self.chance_of_death { Some(o) => Some(o), None => None },
             reaches_peak_in_hours: self.reaches_peak_in_hours,
             is_endless: self.is_endless,
-            target_body_temp: self.target_body_temp,
-            target_heart_rate: self.target_heart_rate,
-            target_pressure_top: self.target_pressure_top,
-            target_pressure_bottom: self.target_pressure_bottom,
-            target_fatigue_delta: self.target_fatigue_delta,
             target_stamina_drain: self.target_stamina_drain,
-            target_food_drain: self.target_food_drain,
-            target_water_drain: self.target_water_drain
+            target_blood_drain: self.target_blood_drain,
         }
     }
 }
@@ -184,59 +153,32 @@ pub struct ActiveStage {
     pub duration: Duration
 }
 
-/// Describes deltas calculated by the active diseases
-pub struct DiseaseDeltasC {
-    pub body_temperature_delta: f32,
-    pub heart_rate_delta: f32,
-    pub pressure_top_delta: f32,
-    pub pressure_bottom_delta: f32,
-    pub fatigue_delta: f32,
+/// Describes deltas calculated by the active injury
+pub struct InjuryDeltasC {
     pub stamina_drain: f32,
-    pub food_drain: f32,
-    pub water_drain: f32
+    pub blood_drain: f32
 }
 
-impl DiseaseDeltasC {
+impl InjuryDeltasC {
     pub fn empty() -> Self {
-        DiseaseDeltasC {
-            body_temperature_delta: 0.,
-            heart_rate_delta: 0.,
-            pressure_top_delta: 0.,
-            pressure_bottom_delta: 0.,
-            fatigue_delta: 0.,
+        InjuryDeltasC {
             stamina_drain: 0.,
-            food_drain: 0.,
-            water_drain: 0.
+            blood_drain: 0.
         }
     }
     pub fn for_related() -> Self {
-        DiseaseDeltasC {
-            body_temperature_delta: -1000.,
-            heart_rate_delta: -1000.,
-            pressure_top_delta: -1000.,
-            pressure_bottom_delta: -1000.,
-            fatigue_delta: 0.,
+        InjuryDeltasC {
             stamina_drain: 0.,
-            food_drain: 0.,
-            water_drain: 0.
+            blood_drain: 0.
         }
     }
     pub fn cleanup(&mut self){
-        if self.heart_rate_delta < -900. { self.heart_rate_delta = 0.; }
-        if self.body_temperature_delta < -900. { self.body_temperature_delta = 0.; }
-        if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
-        if self.pressure_bottom_delta < -900. { self.pressure_bottom_delta = 0.; }
+        // No "max" logic here (yet?)
     }
-    pub fn copy(&self) -> DiseaseDeltasC {
-        DiseaseDeltasC {
-            body_temperature_delta: self.body_temperature_delta,
-            heart_rate_delta: self.heart_rate_delta,
-            pressure_top_delta: self.pressure_top_delta,
-            pressure_bottom_delta: self.pressure_bottom_delta,
-            fatigue_delta: self.fatigue_delta,
+    pub fn copy(&self) -> InjuryDeltasC {
+        InjuryDeltasC {
             stamina_drain: self.stamina_drain,
-            food_drain: self.food_drain,
-            water_drain: self.water_drain
+            blood_drain: self.blood_drain
         }
     }
 }
@@ -282,49 +224,22 @@ impl ActiveStage {
     }
 }
 
-/// Trait for disease monitors
-pub trait DiseaseMonitor {
-    /// Being called once a `UPDATE_INTERVAL` real seconds.
-    ///
-    /// # Parameters
-    /// - `health`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `frame_data`: summary containing all environmental data, game time, health snapshot and etc.
-    fn check(&self, health: &Health, frame_data: &FrameSummaryC);
-
-    /// Being called when player consumes food or water
-    ///
-    /// # Parameters
-    /// - `health`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `item`: consumable part description
-    /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
-    ///     moment of this call
-    fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC,
-                   inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
-}
-
-/// Trait that must be implemented by all diseases
-pub trait Disease {
-    /// Gets the unique name of this disease kind
+/// Trait that must be implemented by all injuries
+pub trait Injury {
+    /// Gets the unique name of this injury kind
     fn get_name(&self) -> String;
-    /// Gets all disease stages. Use [`StageBuilder`](zara::health::disease::StageBuilder) to
+    /// Gets all injury stages. Use [`StageBuilder`](zara::health::injury::StageBuilder) to
     /// describe a stage
     fn get_stages(&self) -> Vec<StageDescription>;
-    /// Treatment instance associated with this disease object
-    fn get_treatment(&self) -> Option<Box<dyn DiseaseTreatment>>;
+    /// Treatment instance associated with this injury object
+    fn get_treatment(&self) -> Option<Box<dyn InjuryTreatment>>;
 }
 
 struct LerpDataNodeC {
     start_time: f32,
     end_time: f32,
-    body_temp_data: Vec<LerpDataC>,
-    heart_rate_data: Vec<LerpDataC>,
-    pressure_top_data: Vec<LerpDataC>,
-    pressure_bottom_data: Vec<LerpDataC>,
-    fatigue_data: Vec<LerpDataC>,
     stamina_data: Vec<LerpDataC>,
-    food_data: Vec<LerpDataC>,
-    water_data: Vec<LerpDataC>,
+    blood_data: Vec<LerpDataC>,
     is_endless: bool,
     is_for_inverted: bool
 }
@@ -340,14 +255,14 @@ struct LerpDataC {
 }
 
 /// Describes an active disease that can be also scheduled
-pub struct ActiveDisease {
-    /// Disease instance linked to this `ActiveDisease`
-    pub disease: Rc<Box<dyn Disease>>,
+pub struct ActiveInjury {
+    /// Injury instance linked to this `ActiveDisease`
+    pub injury: Rc<Box<dyn Injury>>,
     /// Disease needs treatment or will self-heal
     pub needs_treatment: bool,
-    /// On which stage level disease will start self-healing (`StageLevel::Undefined` if none)
+    /// On which stage level injury will start self-healing (`StageLevel::Undefined` if none)
     pub will_self_heal_on: StageLevel,
-    /// Total duration of all stages, from first start to last peak
+    /// Total duration of all stages, from first start to last peak.
     ///
     /// [`invert`]: #method.invert
     pub total_duration: Duration,
@@ -360,7 +275,7 @@ pub struct ActiveDisease {
     /// Calculated data for lerping
     lerp_data: RefCell<Option<LerpDataNodeC>>,
     /// Calculated on the last frame deltas
-    last_deltas: RefCell<DiseaseDeltasC>,
+    last_deltas: RefCell<InjuryDeltasC>,
     /// Is disease chain inverted (`invert` was called)
     is_inverted: Cell<bool>,
     /// When this disease will become active
@@ -370,24 +285,24 @@ pub struct ActiveDisease {
     /// Disease end time, if applicable
     end_time: RefCell<Option<GameTimeC>>,
     /// Treatment object associated with this disease
-    treatment: Rc<Option<Box<dyn DiseaseTreatment>>>
+    treatment: Rc<Option<Box<dyn InjuryTreatment>>>
 }
-impl ActiveDisease {
+impl ActiveInjury {
     /// Creates new active disease object
     ///
     /// # Parameters
-    /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
-    /// - `activation_time`: game time when this disease will start to be active. Use the
+    /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
+    /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately
-    pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
+    pub fn new(injury: Box<dyn Injury>, activation_time: GameTimeC) -> Self {
         let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
         let mut self_heal = false;
         let mut self_heal_level = StageLevel::Undefined;
-        let initial_data = disease.get_stages();
+        let initial_data = injury.get_stages();
 
-        for stage in disease.get_stages().iter() {
+        for stage in injury.get_stages().iter() {
             match stage.self_heal_chance {
                 Some(c) => {
                     if !self_heal && crate::utils::roll_dice(c) {
@@ -417,10 +332,10 @@ impl ActiveDisease {
         }
 
         let end_time = if will_end { Some(GameTimeC::from_duration(time_elapsed)) } else { None };
-        let treatment = disease.get_treatment();
+        let treatment = injury.get_treatment();
 
-        ActiveDisease {
-            disease: Rc::new(disease),
+        ActiveInjury {
+            injury: Rc::new(injury),
             treatment: Rc::new(treatment),
             initial_data: RefCell::new(initial_data),
             is_inverted: Cell::new(false),
@@ -431,18 +346,18 @@ impl ActiveDisease {
             end_time: RefCell::new(end_time),
             needs_treatment: !self_heal,
             will_self_heal_on: self_heal_level,
-            lerp_data: RefCell::new(None), // will be calculated on first get_vitals_deltas
-            last_deltas: RefCell::new(DiseaseDeltasC::empty())
+            lerp_data: RefCell::new(None), // will be calculated on first get_injury_deltas
+            last_deltas: RefCell::new(InjuryDeltasC::empty())
         }
     }
 
-    /// Gets if this disease will end (is it finite)
+    /// Gets if this injury will end (is it finite)
     pub fn get_will_end(&self) -> bool { self.will_end.get() }
 
-    /// Gets if this disease is now healing (is inverted)
+    /// Gets if this injury is now healing (is inverted)
     pub fn get_is_healing(&self) -> bool { self.is_inverted.get() }
 
-    /// Gets the end time of this disease, if it is finite
+    /// Gets the end time of this injury, if it is finite
     pub fn get_end_time(&self) -> Option<GameTimeC> {
         let b = self.end_time.borrow();
 
@@ -452,7 +367,7 @@ impl ActiveDisease {
         }
     }
 
-    /// Gets a copy of active disease stage data for a given time
+    /// Gets a copy of active injury stage data for a given time
     pub fn get_active_stage(&self, game_time: &GameTimeC) -> Option<ActiveStage> {
         for (_, stage) in self.stages.borrow().iter() {
             if stage.get_is_active(game_time) { return Some(stage.copy()) }
@@ -466,7 +381,7 @@ impl ActiveDisease {
         self.get_active_stage(game_time).map(|st| st.info.level)
     }
 
-    /// Returns a copy of a game time structure containing data of when this disease was activated
+    /// Returns a copy of a game time structure containing data of when this injury was activated
     pub fn get_activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
 
     /// Returns a copy of stage data by its level
@@ -478,7 +393,7 @@ impl ActiveDisease {
         return None;
     }
 
-    /// Gets whether disease is active or not for a given time
+    /// Gets whether injury is active or not for a given time
     pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
         let activation_secs = self.activation_time.borrow().as_secs_f32();
         let game_time_secs = game_time.as_secs_f32();
@@ -496,7 +411,7 @@ impl ActiveDisease {
         }
     }
 
-    /// Returns `true` if this disease already passed and is no longer relevant, for a given game time
+    /// Returns `true` if this injury already passed and is no longer relevant, for a given game time
     pub fn get_is_old(&self, game_time: &GameTimeC) -> bool {
         let gt = game_time.as_secs_f32();
         return match self.end_time.borrow().as_ref() {
@@ -505,14 +420,14 @@ impl ActiveDisease {
         }
     }
 
-    /// Is called by Zara from the health engine when person consumes an item
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
+    /// Is called by Zara from the health engine when person takes an appliance
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.get_is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_consumed(game_time, item, &st, &self, inventory_items),
+                Some(st) => t.on_appliance_taken(game_time, item, &st, &self, inventory_items),
                 None => { }
             },
             None => { }
