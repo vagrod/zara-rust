@@ -92,9 +92,9 @@ impl StageBuilder {
     }
 }
 
-/// Here you can describe any disease treatment logic based on the consumed items (food/pills/etc)
+/// Here you can describe any injury treatment logic based on the appliances
 pub trait InjuryTreatment {
-    /// Called on all active injuries when player takes an appliance
+    /// Called on all active injuries when player takes an appliance (bandage, injection, etc)
     ///
     /// ## Parameters
     /// - `game_time`: game time when this call happened

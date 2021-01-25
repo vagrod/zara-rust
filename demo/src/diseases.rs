@@ -1,6 +1,6 @@
 use zara::health::disease::{StageLevel, StageBuilder, DiseaseTreatment, ActiveStage, ActiveDisease};
 use zara::inventory::{Inventory};
-use zara::inventory::items::{InventoryItem, ConsumableC};
+use zara::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use zara::utils::{GameTimeC};
 
 use std::collections::HashMap;
@@ -75,6 +75,10 @@ zara::disease!(Flu, "Flu", Some(Box::new(Flu)),
 );
 impl DiseaseTreatment for Flu {
     fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+        //println!("from treatment");
+    }
+
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         //println!("from treatment");
     }
 }

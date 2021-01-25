@@ -1,7 +1,7 @@
 use crate::health::{Health};
 use crate::utils::{FrameSummaryC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
-use crate::inventory::items::{InventoryItem, ConsumableC};
+use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -106,6 +106,7 @@ impl StageBuilder {
 }
 
 /// Here you can describe any disease treatment logic based on the consumed items (food/pills/etc)
+/// or an appliance (bandage, injection, etc)
 pub trait DiseaseTreatment {
     /// Called on all active diseases when player eats something
     ///
@@ -118,6 +119,19 @@ pub trait DiseaseTreatment {
     ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
     fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage,
+                   disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+
+   /// Called on all active diseases when appliance is taken (bandage, injection, etc)
+   ///
+   /// ## Parameters
+   /// - `game_time`: game time when this call happened
+   /// - `item`: appliance item description
+   /// - `active_stage`: instance of the active stage of a disease
+   /// - `disease`: disease object itself. You can call `invert` or `invert_back` to start or stop
+   ///     "curing" the disease
+   ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+   ///     moment of this call
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, active_stage: &ActiveStage,
                    disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
@@ -513,6 +527,20 @@ impl ActiveDisease {
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
                 Some(st) => t.on_consumed(game_time, item, &st, &self, inventory_items),
+                None => { }
+            },
+            None => { }
+        };
+    }
+
+    // Is called by Zara from the health engine when appliance is taken
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
+                       inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+        if !self.get_is_active(game_time) { return; }
+
+        match self.treatment.as_ref() {
+            Some(t) => match self.get_active_stage(game_time) {
+                Some(st) => t.on_appliance_taken(game_time, item, &st, &self, inventory_items),
                 None => { }
             },
             None => { }
