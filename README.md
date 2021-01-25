@@ -12,6 +12,7 @@ This code is **WIP** and changes all the time.
   + Getting recipes available for a given set of items
   + Consumables: water and food, consuming items
   + Macros to write less code describing items (one-liners)
+  + Appliances as inventory item type
   
 - Health:
   + Sleeping
@@ -19,11 +20,12 @@ This code is **WIP** and changes all the time.
   + Vitals (body temperature, heart rate, blood pressure, stamina, fatigue). 
   + Most common "side effects" implemented like "fluctuating vitals", running (stamina and fatigue drain), fatgue based on sleepng time and sleepng duration, food drain, water drain
   + Describng diseases via fluent interface
-  + Diseases as traits (fully implemented, except appliance treatment [like injections]). 
+  + Diseases as traits (fully implemented). 
   + Disease montors as traits
   + Inverting ("curing") a disease, "invertng back"
   + Disease treatment (by consumable)
   + Spawning/removing a disease
+  + Disease treatment with appliances
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -34,8 +36,6 @@ This code is **WIP** and changes all the time.
 - Game events system
 
 ## What's in progress
-- Appliances as inventory item type
-- Disease treatment with appliances
 - Medical agents
 - Clothes and body appliances
 - Oxygen level (and optional "side effect" to control it)
@@ -44,6 +44,7 @@ This code is **WIP** and changes all the time.
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Checking crafting recipe for resources availability
 - Actual getting new item from a crafting combination and spending resources on it
+- Trait to get and restore state of every engine node
 - Optional easing variants for lerping diseases/injuries/vitals
 
 The demo is built with `termion` which seems like does not support Windows. Maybe later I'll try find another solution for the demo "UI".
