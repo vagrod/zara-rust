@@ -39,11 +39,6 @@ impl<E: Listener + 'static> ZaraController<E> {
         let mut ceiling = UPDATE_INTERVAL;
         let game_time_duration = self.environment.game_time.duration.get();
 
-        // Send pending events -- checking every frame
-        self.process_health_events();
-        self.process_inventory_events();
-        self.process_body_events();
-
         // When sleeping, our checks are more frequent
         if self.body.is_sleeping.get() {
             ceiling = SLEEPING_UPDATE_INTERVAL;
@@ -58,6 +53,11 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         if elapsed >= ceiling {
+            // Send pending events
+            self.process_health_events();
+            self.process_inventory_events();
+            self.process_body_events();
+
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
             let health_result;
