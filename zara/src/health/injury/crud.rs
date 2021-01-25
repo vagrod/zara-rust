@@ -2,6 +2,7 @@ use crate::health::Health;
 use crate::health::injury::{ActiveInjury, Injury};
 use crate::utils::GameTimeC;
 use crate::error::{SpawnInjuryErr, RemoveInjuryErr};
+use crate::body::BodyParts;
 
 use std::rc::Rc;
 
@@ -14,6 +15,7 @@ impl Health {
     ///
     /// # Parameters
     /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
+    /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will activate. Use the
     ///     current game time to activate immediately (on the next `update` pass)
     ///
@@ -22,7 +24,7 @@ impl Health {
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
-    pub fn spawn_injury(&self, injury: Box<dyn Injury>, activation_time: GameTimeC)
+    pub fn spawn_injury(&self, injury: Box<dyn Injury>, body_part: BodyParts, activation_time: GameTimeC)
                                                                     -> Result<(), SpawnInjuryErr> {
         if !self.is_alive.get() { return Err(SpawnInjuryErr::CharacterIsDead); }
 
@@ -35,6 +37,7 @@ impl Health {
 
         b.insert(injury_name, Rc::new(ActiveInjury::new(
             injury,
+            body_part,
             activation_time
         )));
 

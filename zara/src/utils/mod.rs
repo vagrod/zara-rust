@@ -1,10 +1,13 @@
+use crate::health::StageLevel;
+use crate::body::BodyParts;
+
 use std::time::{Duration};
 use std::cell::Cell;
 use rand::Rng;
 
 use event::{Dispatcher, Listener};
 use core::ops;
-use crate::health::StageLevel;
+
 
 pub mod event;
 
@@ -357,7 +360,8 @@ pub struct ActiveInjuryC {
     pub is_active: bool,
     pub is_healing: bool,
     pub needs_treatment: bool,
-    pub is_blood_stopped: bool
+    pub is_blood_stopped: bool,
+    pub body_part: BodyParts
 }
 
 /// Describes initial environment information

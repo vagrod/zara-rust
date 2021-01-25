@@ -135,7 +135,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                         current_level_percent: st.get_percent_active(game_time_contract),
                         is_healing: injury.get_is_healing(),
                         needs_treatment: injury.needs_treatment,
-                        is_blood_stopped: injury.get_is_blood_stopped()
+                        is_blood_stopped: injury.get_is_blood_stopped(),
+                        body_part: injury.body_part
                     });
                 },
                 None => {
@@ -148,7 +149,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                         current_level_percent: 0,
                         is_healing: false,
                         needs_treatment: injury.needs_treatment,
-                        is_blood_stopped: injury.get_is_blood_stopped()
+                        is_blood_stopped: injury.get_is_blood_stopped(),
+                        body_part: injury.body_part
                     });
                 }
             }

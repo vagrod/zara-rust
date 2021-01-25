@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 use std::thread::sleep;
 use std::cell::Cell;
 
+use zara::body::{BodyParts};
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, GameTimeC};
 use zara::health::{Health, StageLevel};
@@ -115,7 +116,7 @@ fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
 }
 
 fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
-    person.health.spawn_injury(Box::new(injuries::Cut), zara::utils::GameTimeC::new(0,0,2,25.));
+    person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
     //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
@@ -288,7 +289,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
         if is_active {
             let active_stage = injury.get_active_stage(game_time).unwrap();
             let p = active_stage.get_percent_active(game_time);
-            write!(stdout, "{}  {}: active - ", termion::cursor::Goto(150, diseases_height), name);
+            write!(stdout, "{}  {} on {:?}: active - ", termion::cursor::Goto(150, diseases_height), name, injury.body_part);
             write!(stdout, "{:?} {}%", injury.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
             if injury.get_is_healing() {
                 write!(stdout, " (now healing)");

@@ -2,7 +2,7 @@ use crate::utils::{GameTimeC};
 use crate::health::StageLevel;
 use crate::health::injury::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ApplianceC};
-use crate::body::BodyParts;
+use crate::body::{BodyParts};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
@@ -246,6 +246,8 @@ pub struct ActiveInjury {
     ///
     /// [`invert`]: #method.invert
     pub total_duration: Duration,
+    /// Body part associated with this injury
+    pub body_part: BodyParts,
 
     // Private fields
     /// Initial stages data given by user
@@ -274,9 +276,10 @@ impl ActiveInjury {
     ///
     /// # Parameters
     /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
+    /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately
-    pub fn new(injury: Box<dyn Injury>, activation_time: GameTimeC) -> Self {
+    pub fn new(injury: Box<dyn Injury>, body_part: BodyParts, activation_time: GameTimeC) -> Self {
         let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
@@ -318,6 +321,7 @@ impl ActiveInjury {
 
         ActiveInjury {
             injury: Rc::new(injury),
+            body_part,
             treatment: Rc::new(treatment),
             initial_data: RefCell::new(initial_data),
             is_inverted: Cell::new(false),
