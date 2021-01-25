@@ -4,6 +4,7 @@ use crate::utils::event::{Listener, Event};
 use crate::error::ZaraUpdateErr;
 
 use std::time::Duration;
+use crate::health::StageLevel;
 
 /// How frequently should Zara update all its controllers,
 /// recalculate values and check monitors (real seconds)
@@ -93,7 +94,6 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         // Collect active diseases data
         for (_key, disease) in self.health.diseases.borrow().iter() {
-            if !disease.get_is_active(game_time_contract) { continue; }
             match disease.get_active_stage(game_time_contract) {
                 Some(st) => {
                     active_diseases.push(ActiveDiseaseC {
@@ -107,13 +107,23 @@ impl<E: Listener + 'static> ZaraController<E> {
                         needs_treatment: disease.needs_treatment
                     });
                 },
-                _ => { continue; }
+                _ => {
+                    active_diseases.push(ActiveDiseaseC {
+                        name: disease.disease.get_name(),
+                        is_active: false,
+                        scheduled_time: disease.get_activation_time(),
+                        end_time: disease.get_end_time(),
+                        current_level: StageLevel::Undefined,
+                        current_level_percent: 0,
+                        is_healing: false,
+                        needs_treatment: disease.needs_treatment
+                    });
+                }
             }
         };
 
         // Collect active injuries data
         for (_key, injury) in self.health.injuries.borrow().iter() {
-            if !injury.get_is_active(game_time_contract) { continue; }
             match injury.get_active_stage(game_time_contract) {
                 Some(st) => {
                     active_injuries.push(ActiveInjuryC {
@@ -128,7 +138,19 @@ impl<E: Listener + 'static> ZaraController<E> {
                         is_blood_stopped: injury.get_is_blood_stopped()
                     });
                 },
-                _ => { continue; }
+                _ => {
+                    active_injuries.push(ActiveInjuryC {
+                        name: injury.injury.get_name(),
+                        is_active: false,
+                        scheduled_time: injury.get_activation_time(),
+                        end_time: injury.get_end_time(),
+                        current_level: StageLevel::Undefined,
+                        current_level_percent: 0,
+                        is_healing: false,
+                        needs_treatment: injury.needs_treatment,
+                        is_blood_stopped: injury.get_is_blood_stopped()
+                    });
+                }
             }
         };
 
