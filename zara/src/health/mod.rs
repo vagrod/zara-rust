@@ -3,6 +3,7 @@ use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
 use crate::health::injury::{ActiveInjury, InjuryKey};
 use crate::health::side::{SideEffectsMonitor};
+use crate::health::medagent::MedicalAgentsMonitor;
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use crate::body::BodyParts;
 
@@ -19,6 +20,7 @@ mod monitors;
 pub mod disease;
 pub mod injury;
 pub mod side;
+pub mod medagent;
 
 /// Describes and controls player's health
 pub struct Health {
@@ -49,6 +51,8 @@ pub struct Health {
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
     /// All active or scheduled injuries
     pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
+    /// Registered medical agents
+    pub medical_agents: Option<MedicalAgentsMonitor>,
 
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
@@ -87,6 +91,9 @@ impl TryFrom<i32> for StageLevel {
 impl Health {
     /// Creates new ready-to-use `Health`.
     ///
+    /// ## Parameters
+    /// - `medical_agents`: registered medical agents, if any
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -94,9 +101,9 @@ impl Health {
     /// ```
     /// use zara::health;
     ///
-    /// let h = health::Health::new();
+    /// let h = health::Health::new(Some(medical_agents));
     /// ```
-    pub fn new() -> Self {
+    pub fn new(agents: Option<MedicalAgentsMonitor>) -> Self {
         let healthy = HealthC::healthy();
 
         Health {
@@ -107,6 +114,7 @@ impl Health {
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
             message_queue: RefCell::new(BTreeMap::new()),
+            medical_agents: agents,
 
             // Healthy values by default
             is_alive: Cell::new(true),
@@ -123,7 +131,8 @@ impl Health {
     }
 
     /// Called by zara controller when item is consumed as food or water
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
+                       inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_consumed(self, game_time, item, inventory_items);
@@ -135,10 +144,21 @@ impl Health {
                 disease.on_consumed(game_time, item, inventory_items);
             }
         }
+
+        // Notify medical agents
+        match &self.medical_agents {
+            Some(monitor) => {
+                for (_, agent) in &monitor.agents {
+                    agent.on_consumed(item.name.to_string())
+                }
+            },
+            None => { }
+        };
     }
 
     /// Called by zara controller when appliance item is taken
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
+                              body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
             if disease.get_is_active(game_time) {
@@ -152,6 +172,21 @@ impl Health {
                 injury.on_appliance_taken(game_time, item, body_part, inventory_items);
             }
         }
+
+        // Notify medical agents
+        match &self.medical_agents {
+            Some(monitor) => {
+                for (_, agent) in &monitor.agents {
+                    agent.on_appliance_taken(item.name.to_string())
+                }
+            },
+            None => { }
+        };
+    }
+
+    /// Sets controller alive state to `false`
+    pub fn declare_dead(&self) {
+        self.is_alive.set(false);
     }
 }
 

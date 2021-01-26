@@ -1,4 +1,4 @@
-/// Is used by `ActiveDisease.invert()` method
+/// Is used by `ActiveDisease/ActiveInjury.invert()` method
 pub enum ChainInvertErr {
     /// When calling `invert()` on already inverted chain
     AlreadyInverted,
@@ -10,7 +10,7 @@ pub enum ChainInvertErr {
     NoActiveStageAtGivenTime
 }
 
-/// Is used by `ActiveDisease.invert_back()` method
+/// Is used by `ActiveDisease/ActiveInjury.invert_back()` method
 pub enum ChainInvertBackErr {
     /// When calling `invert_back()` on already inverted back chain
     AlreadyInvertedBack,
@@ -101,4 +101,9 @@ pub enum ApplianceTakeErr {
 pub enum ZaraUpdateErr {
     /// When `update` called on a dead character
     CharacterIsDead
+}
+
+/// Is used by `MedicalAgentsMonitor.get_is_active` method
+pub enum MedicalAgentErr {
+    AgentNotFound
 }
