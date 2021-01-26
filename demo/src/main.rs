@@ -122,6 +122,8 @@ fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
     person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
     person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::LeftShoulder, zara::utils::GameTimeC::new(0,0,7,25.));
     person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::Forehead, zara::utils::GameTimeC::new(0,0,7,25.));
+
+    person.health.remove_injury(format!("Cut"), BodyParts::LeftShoulder);
     //person.health.spawn_disease(Box::new(diseases::Angina), zara::utils::GameTimeC::new(0,0,2,42.));
 }
 
@@ -294,7 +296,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
         if is_active {
             let active_stage = injury.get_active_stage(game_time).unwrap();
             let p = active_stage.get_percent_active(game_time);
-            write!(stdout, "{}  {} on {:?}: active - ", termion::cursor::Goto(150, diseases_height), injury.injury.get_name(), injury.body_part);
+            write!(stdout, "{}  {} on {:?}: active - ", termion::cursor::Goto(150, diseases_height), key.injury, key.body_part);
             write!(stdout, "{:?} {}%", injury.get_active_level(game_time).unwrap_or(StageLevel::Undefined), p);
             if injury.get_is_healing() {
                 write!(stdout, " (now healing)");
@@ -317,7 +319,7 @@ fn flush_data<W: Write>(stdout: &mut W, person: &zara::ZaraController<ZaraEvents
             }
         } else {
             let time = &injury.get_activation_time();
-            writeln!(stdout, "{}  {} on {:?}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), injury.injury.get_name(), injury.body_part,
+            writeln!(stdout, "{}  {} on {:?}: scheduled to activate @{}d {}h {}m {:.0}s", termion::cursor::Goto(150, diseases_height), key.injury, key.body_part,
                      time.day,
                      time.hour,
                      time.minute,

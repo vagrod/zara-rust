@@ -57,16 +57,17 @@ impl Health {
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
-    pub fn remove_injury(&self, key: &InjuryKey) -> Result<(), RemoveInjuryErr> {
+    pub fn remove_injury(&self, injury_name: String, body_part: BodyParts) -> Result<(), RemoveInjuryErr> {
         if !self.is_alive.get() { return Err(RemoveInjuryErr::CharacterIsDead); }
 
         let mut b = self.injuries.borrow_mut();
+        let key = InjuryKey::new(injury_name, body_part);
 
-        if !b.contains_key(key) {
+        if !b.contains_key(&key) {
             return Err(RemoveInjuryErr::InjuryNotFound);
         }
 
-        b.remove(key);
+        b.remove(&key);
 
         self.queue_message(Event::InjuryRemoved(key.injury.to_string()));
 

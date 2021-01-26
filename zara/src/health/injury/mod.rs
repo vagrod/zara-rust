@@ -51,8 +51,8 @@ macro_rules! fracture(
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InjuryKey {
-    injury: String,
-    body_part: BodyParts
+    pub injury: String,
+    pub body_part: BodyParts
 }
 impl InjuryKey {
     pub fn new(injury: String, body_part: BodyParts) -> Self {

@@ -232,14 +232,14 @@ impl Health {
         let mut injuries_to_remove = Vec::new();
         {
             let injuries = self.injuries.borrow();
-            for (_, injury) in injuries.iter() {
+            for (key, injury) in injuries.iter() {
                 if injury.get_is_old(game_time) {
-                    injuries_to_remove.push(InjuryKey::new(injury.injury.get_name(), injury.body_part));
+                    injuries_to_remove.push(InjuryKey::new(key.injury.to_string(), key.body_part));
                 }
             }
         }
-        for injury_name in injuries_to_remove {
-            self.remove_injury(&injury_name).ok(); // we don't really care here
+        for injury_key in injuries_to_remove {
+            self.remove_injury(injury_key.injury, injury_key.body_part).ok(); // we don't really care here
         }
 
         let mut result = InjuryDeltasC::for_related();
