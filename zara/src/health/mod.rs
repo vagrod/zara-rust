@@ -170,6 +170,11 @@ impl Health {
     /// Called by zara controller when appliance item is taken
     pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
                               body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+        // Notify disease monitors
+        for (_, monitor) in self.disease_monitors.borrow().iter() {
+            monitor.on_appliance_taken(self, game_time, item, body_part, inventory_items);
+        }
+
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
             if disease.get_is_active(game_time) {
@@ -184,7 +189,6 @@ impl Health {
             }
         }
 
-        // Notify medical agents
         // Notify medical agents
         for (_, agent) in self.medical_agents.agents.borrow().iter() {
             agent.on_appliance_taken(item.name.to_string())

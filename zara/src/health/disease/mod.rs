@@ -289,11 +289,23 @@ pub trait DiseaseMonitor {
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
     /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `item`: consumable part description
+    /// - `item`: consumable description
     /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC,
                    inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+
+    /// Being called when player takes an appliance (like bandage or injection)
+    ///
+    /// # Parameters
+    /// - `health`: health controller object. It can be used to call `spawn_disease` for example
+    /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
+    /// - `item`: appliance description
+    /// - `body_part`: body part to which this item was applied
+    /// - `inventory_items`: all inventory items. Applied item is still in this list at the
+    ///     moment of this call
+    fn on_appliance_taken(&self, health: &Health, game_time: &GameTimeC, item: &ApplianceC,
+                          body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Trait that must be implemented by all diseases
