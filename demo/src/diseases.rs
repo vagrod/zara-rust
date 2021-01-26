@@ -29,7 +29,7 @@ zara::disease!(Flu, "Flu", Some(Box::new(Flu)),
 
         StageBuilder::start()
             .build_for(StageLevel::Progressing)
-                .self_heal(20)
+                .no_self_heal()
                 .vitals()
                     .with_target_body_temp(38.2)
                     .with_target_heart_rate(89.)

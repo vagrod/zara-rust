@@ -1,3 +1,4 @@
+use crate::utils::event::{MessageQueue, Event};
 use crate::utils::{GameTimeC};
 use crate::health::StageLevel;
 use crate::health::injury::fluent::{StageInit};
@@ -5,7 +6,7 @@ use crate::inventory::items::{InventoryItem, ApplianceC};
 use crate::body::{BodyParts};
 
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 
@@ -289,7 +290,10 @@ pub struct ActiveInjury {
     /// Treatment object associated with this disease
     treatment: Rc<Option<Box<dyn InjuryTreatment>>>,
     /// Blood loss stopped from "outside"
-    blood_loss_stop: Cell<bool>
+    blood_loss_stop: Cell<bool>,
+
+    // Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 impl ActiveInjury {
     /// Creates new active disease object
@@ -356,7 +360,8 @@ impl ActiveInjury {
             will_self_heal_on: self_heal_level,
             lerp_data: RefCell::new(None), // will be calculated on first get_drain_deltas
             last_deltas: RefCell::new(InjuryDeltasC::empty()),
-            blood_loss_stop: Cell::new(false)
+            blood_loss_stop: Cell::new(false),
+            message_queue: RefCell::new(BTreeMap::new())
         }
     }
 
@@ -462,5 +467,22 @@ impl ActiveInjury {
     /// [`stop_blood_loss`]: #method.stop_blood_loss
     pub fn get_is_blood_stopped(&self) -> bool {
         self.blood_loss_stop.get()
+    }
+}
+
+impl MessageQueue for ActiveInjury {
+    fn has_messages(&self) -> bool {
+        self.message_queue.borrow().len() > 0
+    }
+
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
     }
 }

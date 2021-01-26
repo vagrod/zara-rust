@@ -30,10 +30,14 @@ pub enum Event {
     DiseaseSpawned(String),
     DiseaseRemoved(String),
     DiseaseSelfHealStarted(String),
+    DiseaseInverted(String),
+    DiseaseResumed(String),
 
     InjurySpawned(String, BodyParts),
     InjuryRemoved(String),
     InjurySelfHealStarted(String),
+    InjuryInverted(String),
+    InjuryResumed(String),
 
     InventoryItemAdded(String),
     InventoryItemRemoved(String)

@@ -5,6 +5,9 @@ use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
 use crate::utils::event::{Event, Listener, Dispatcher, MessageQueue};
 use crate::health::injury::InjuryDeltasC;
 
+use std::cell::RefMut;
+use std::collections::BTreeMap;
+
 pub struct UpdateResult {
     pub is_alive: bool
 }
@@ -143,6 +146,10 @@ impl Health {
         {
             let diseases = self.diseases.borrow();
             for (disease_name, disease) in diseases.iter() {
+                // Move messages from diseases to the main queue for further processing
+                if disease.has_messages() {
+                    self.flush_queue(disease.get_message_queue());
+                }
                 if disease.get_is_active(game_time) {
                     disease_deltas.push(disease.get_vitals_deltas(game_time));
 
@@ -242,6 +249,10 @@ impl Health {
         {
             let injuries = self.injuries.borrow();
             for (injury_name, injury) in injuries.iter() {
+                // Move messages from injuries to the main queue for further processing
+                if injury.has_messages() {
+                    self.flush_queue(injury.get_message_queue());
+                }
                 if injury.get_is_active(game_time) {
                     injury_deltas.push(injury.get_drains_deltas(game_time));
 
@@ -339,5 +350,24 @@ impl Health {
         self.blood_level.set(crate::utils::clamp(snapshot.blood_level, 0., 100.));
         self.stamina_level.set(crate::utils::clamp(snapshot.stamina_level, 0., 100.));
         self.fatigue_level.set(crate::utils::clamp(snapshot.fatigue_level, 0., 100.));
+    }
+
+    fn flush_queue(&self, mut q: RefMut<BTreeMap<usize, Event>>) {
+        if q.len() == 0 { return }
+
+        let mut key = 0;
+
+        loop {
+            match q.get(&key) {
+                Some(event) => {
+                    self.queue_message(event.clone());
+
+                    q.remove(&key);
+                },
+                None => break
+            }
+
+            key += 1;
+        }
     }
 }

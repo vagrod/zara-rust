@@ -346,6 +346,9 @@ impl Listener for ZaraEventsListener {
             Event::InventoryItemAdded(item_name) => {
                 println!("Item added: {}", item_name)
             }
+            Event::DiseaseInverted(disease_name) => {
+                println!("{} is getting better", disease_name)
+            }
             _ => println!("Other event")
         }
     }

@@ -1,3 +1,4 @@
+use crate::utils::event::{MessageQueue, Event};
 use crate::health::injury::{ActiveInjury, ActiveStage, StageLevel};
 use crate::utils::{GameTimeC, clamp_bottom};
 use crate::error::{ChainInvertErr, ChainInvertBackErr};
@@ -121,6 +122,8 @@ impl ActiveInjury {
         self.end_time.replace(Some(GameTimeC::from_duration(Duration::from_secs_f32(t))));
         self.will_end.set(true);
         self.is_inverted.set(true);
+
+        self.queue_message(Event::InjuryInverted(self.injury.get_name()));
 
         return Ok(());
     }
@@ -254,6 +257,8 @@ impl ActiveInjury {
         self.end_time.replace(new_end_time);
         self.will_end.set(will_end);
         self.is_inverted.set(false);
+
+        self.queue_message(Event::InjuryResumed(self.injury.get_name()));
 
         return Ok(());
     }
