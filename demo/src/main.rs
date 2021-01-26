@@ -8,8 +8,8 @@ use std::cell::Cell;
 use zara::body::{BodyParts};
 use zara::utils::event::{Listener, Event};
 use zara::utils::{FrameSummaryC, GameTimeC};
-use zara::health::{Health, StageLevel};
-use zara::health::medagent::{MedicalAgentsMonitor, MedicalAgent, MedicalAgentGroup};
+use zara::health::{Health, StageLevel, MedicalAgentBuilder};
+use zara::health::medagent::{CurveType};
 use zara::health::disease::{DiseaseMonitor, Disease};
 use zara::health::side::builtin::{RunningSideEffects, DynamicVitalsSideEffect, FatigueSideEffects};
 use zara::inventory::items::{InventoryItem, ConsumableC, ConsumableBehavior, SpoilingBehavior};
@@ -43,26 +43,27 @@ fn main() {
 
         // Describe environment conditions
         let environment = zara::utils::EnvironmentC::new(24., 2., 0.);
-        let medical_agents = MedicalAgentsMonitor::new(
-            vec![
-                zara::med_agent!("Aspirin",
-                    zara::med_group!(
-                        vec![
-                            "Big Green Leaves",
-                            "Aspirin Pills",
-                            "Syringe With Aspirin",
-                            "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
-                        ]
-                    )
-                )
-            ]
-        );
 
         // Initialize Zara instance
         let person =
-            zara::ZaraController::full (
-                events_listener, environment, medical_agents
+            zara::ZaraController::with_environment (
+                events_listener, environment
             );
+
+        person.health.register_medical_agent (
+            MedicalAgentBuilder::start()
+                .for_agent("Aspirin")
+                .activates(CurveType::Immediately)
+                .and_peaks_in_minutes(30.)
+                .contains(
+                    vec![
+                        "Big Green Leaves",
+                        "Aspirin Pills",
+                        "Syringe With Aspirin",
+                        "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
+                    ]
+                ).build()
+        );
 
         add_side_effects(&person);
         populate_inventory(&person);

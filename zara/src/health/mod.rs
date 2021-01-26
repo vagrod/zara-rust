@@ -3,7 +3,8 @@ use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
 use crate::health::injury::{ActiveInjury, InjuryKey};
 use crate::health::side::{SideEffectsMonitor};
-use crate::health::medagent::MedicalAgentsMonitor;
+use crate::health::medagent::{MedicalAgentsMonitor, CurveType};
+use crate::health::medagent::fluent::{AgentStart};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use crate::body::BodyParts;
 
@@ -52,7 +53,7 @@ pub struct Health {
     /// All active or scheduled injuries
     pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
     /// Registered medical agents
-    pub medical_agents: Option<MedicalAgentsMonitor>,
+    pub medical_agents: Arc<MedicalAgentsMonitor>,
 
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
@@ -87,12 +88,27 @@ impl TryFrom<i32> for StageLevel {
         }
     }
 }
+/// Used to describe a new medical agent
+pub struct MedicalAgentBuilder {
+    pub name: RefCell<String>,
+    pub duration_minutes: Cell<f32>,
+    pub curve_type: RefCell<CurveType>,
+    pub items: RefCell<Vec<String>>
+}
+impl MedicalAgentBuilder {
+    /// Starts building process for a new medical agent
+    pub fn start() -> Box<dyn AgentStart> {
+        Box::new(MedicalAgentBuilder {
+            name: RefCell::new(String::new()),
+            curve_type: RefCell::new(CurveType::Linearly),
+            duration_minutes: Cell::new(0.),
+            items: RefCell::new(Vec::new())
+        })
+    }
+}
 
 impl Health {
     /// Creates new ready-to-use `Health`.
-    ///
-    /// ## Parameters
-    /// - `medical_agents`: registered medical agents, if any
     ///
     /// # Examples
     ///
@@ -101,9 +117,9 @@ impl Health {
     /// ```
     /// use zara::health;
     ///
-    /// let h = health::Health::new(Some(medical_agents));
+    /// let h = health::Health::new();
     /// ```
-    pub fn new(agents: Option<MedicalAgentsMonitor>) -> Self {
+    pub fn new() -> Self {
         let healthy = HealthC::healthy();
 
         Health {
@@ -114,7 +130,7 @@ impl Health {
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
             message_queue: RefCell::new(BTreeMap::new()),
-            medical_agents: agents,
+            medical_agents: Arc::new(MedicalAgentsMonitor::new()),
 
             // Healthy values by default
             is_alive: Cell::new(true),
@@ -146,14 +162,9 @@ impl Health {
         }
 
         // Notify medical agents
-        match &self.medical_agents {
-            Some(monitor) => {
-                for (_, agent) in &monitor.agents {
-                    agent.on_consumed(item.name.to_string())
-                }
-            },
-            None => { }
-        };
+        for (_, agent) in self.medical_agents.agents.borrow().iter() {
+            agent.on_consumed(item.name.to_string())
+        }
     }
 
     /// Called by zara controller when appliance item is taken
@@ -174,14 +185,10 @@ impl Health {
         }
 
         // Notify medical agents
-        match &self.medical_agents {
-            Some(monitor) => {
-                for (_, agent) in &monitor.agents {
-                    agent.on_appliance_taken(item.name.to_string())
-                }
-            },
-            None => { }
-        };
+        // Notify medical agents
+        for (_, agent) in self.medical_agents.agents.borrow().iter() {
+            agent.on_appliance_taken(item.name.to_string())
+        }
     }
 
     /// Sets controller alive state to `false`

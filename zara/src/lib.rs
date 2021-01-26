@@ -4,7 +4,6 @@ use player::{PlayerStatus};
 use error::{ItemConsumeErr, ApplianceTakeErr};
 use inventory::items::{ConsumableC, ApplianceC};
 use body::BodyParts;
-use health::medagent::MedicalAgentsMonitor;
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -69,17 +68,12 @@ pub struct ZaraController<E: Listener + 'static> {
 
 impl<E: Listener + 'static> ZaraController<E> {
 
-    /// Creates new `ZaraController` without pre-defined environment and without medical agents.
+    /// Creates new `ZaraController` without pre-defined environment. You can change environment
+    /// parameters later at any time by accessing the `environment` field.
     ///
-    /// To create `ZaraController` with environment, but without medical agents, use [`with_environment`] method.
+    /// To create `ZaraController` with pre-defined environment, use [`with_environment`] method.
     ///
-    /// To create `ZaraController` without pre-defined environment and with medical agents, use [`with_medical_agents`] method.
-    ///
-    /// To create `ZaraController` with environment and medical agents, use [`full`] method.
-    ///
-    /// [`full`]: #method.new
     /// [`with_environment`]: #method.with_environment
-    /// [`with_medical_agents`]: #method.with_medical_agents
     ///
     /// # Parameters
     /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
@@ -92,21 +86,15 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// use zara;
     ///
-    /// let zara = zara::ZaraController::basic(listener);
+    /// let zara = zara::ZaraController::new(listener);
     /// ```
-    pub fn basic(listener : E) -> Self { ZaraController::init(listener, EnvironmentC::default(), None) }
+    pub fn new(listener : E) -> Self { ZaraController::init(listener, EnvironmentC::default()) }
 
-    /// Creates a new `ZaraController` with pre-defined environment and witout medical agents.
+    /// Creates a new `ZaraController` with pre-defined environment.
     ///
-    /// To create `ZaraController` without pre-defined environment and without medical agents, use [`basic`] method.
+    /// To create `ZaraController` without pre-defined environment, use [`new`] method.
     ///
-    /// To create `ZaraController` without pre-defined environment and with medical agents, use [`with_medical_agents`] method.
-    ///
-    /// To create `ZaraController` with environment and medical agents, use [`full`] method.
-    ///
-    /// [`full`]: #method.full
-    /// [`basic`]: #method.basic
-    /// [`with_medical_agents`]: #method.with_medical_agents
+    /// [`new`]: #method.new
     ///
     /// # Parameters
     /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
@@ -122,62 +110,10 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// let zara = zara::ZaraController::with_environment(listener, env);
     /// ```
-    pub fn with_environment(listener : E, env: EnvironmentC) -> Self { ZaraController::init(listener, env, None) }
-
-    /// Creates a new `ZaraController` without pre-defined environment, but with described medical agents.
-    ///
-    /// To create `ZaraController` without pre-defined environment and without medical agents, use [`basic`] method.
-    ///
-    /// To create `ZaraController` with environment, but without medical agents, use [`with_environment`] method.
-    ///
-    /// To create `ZaraController` with environment and medical agents, use [`full`] method.
-    ///
-    /// [`full`]: #method.new
-    /// [`with_environment`]: #method.with_environment
-    /// [`basic`]: #method.basic
-    ///
-    /// # Parameters
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
-    ///     called when Zara event occurs
-    /// - `medical_agents`:  [`MedicalAgentsMonitor`](crate::health::medagent::MedicalAgentsMonitor) object that describes
-    ///     all medical agents
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// use zara;
-    ///
-    /// let zara = zara::ZaraController::with_medical_agents(listener, medical_agents);
-    /// ```
-    pub fn with_medical_agents(listener : E, medical_agents: MedicalAgentsMonitor) -> Self { ZaraController::init(listener, EnvironmentC::default(), Some(medical_agents)) }
-
-    /// Creates a new `ZaraController` with pre-defined environment.
-    /// To create `ZaraController` with empty environment, use [`new`] method.
-    ///
-    /// [`new`]: #method.new
-    ///
-    /// # Parameters
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
-    ///     called when Zara event occurs
-    /// - `env`: [`EnvironmentC`](crate::utils::EnvironmentC) object that describes initial state of the environment
-    /// - `medical_agents`:  [`MedicalAgentsMonitor`](crate::health::medagent::MedicalAgentsMonitor) object that describes
-    ///     all medical agents
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// use zara;
-    ///
-    /// let zara = zara::ZaraController::full(listener, env, medical_agents);
-    /// ```
-    pub fn full(listener : E, env: EnvironmentC, medical_agents: MedicalAgentsMonitor) -> Self { ZaraController::init(listener, env, Some(medical_agents)) }
+    pub fn with_environment(listener : E, env: EnvironmentC) -> Self { ZaraController::init(listener, env) }
 
     /// Private initialization function
-    fn init(listener : E, env: EnvironmentC, agents: Option<MedicalAgentsMonitor>) -> Self {
+    fn init(listener : E, env: EnvironmentC) -> Self {
         // Register external events listener
         let mut dispatcher: Dispatcher<E> = Dispatcher::<E>::new();
         let listener_rc = Arc::new(RefCell::new(listener));
@@ -187,7 +123,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         ZaraController {
             is_alive: Cell::new(true),
             environment: Arc::new(world::EnvironmentData::from_description(env)),
-            health: Arc::new(health::Health::new(agents)),
+            health: Arc::new(health::Health::new()),
             inventory: Arc::new(inventory::Inventory::new()),
             body: Arc::new(body::Body::new()),
 
