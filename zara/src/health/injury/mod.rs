@@ -224,7 +224,6 @@ impl ActiveStage {
         let gt_d = gt - start;
 
         return ((gt_d/d) * 100.) as usize;
-
     }
 
     pub fn copy(&self) -> ActiveStage {
@@ -467,6 +466,8 @@ impl ActiveInjury {
     /// [`resume_blood_loss`]: #method.resume_blood_loss
     pub fn stop_blood_loss(&self) {
         self.blood_loss_stop.set(true);
+
+        self.queue_message(Event::BloodLossStopped(self.injury.get_name().to_string(), self.body_part));
     }
 
     /// Resumes stopped by the [`stop_blood_loss`] call blood drain
@@ -474,6 +475,8 @@ impl ActiveInjury {
     /// [`stop_blood_loss`]: #method.stop_blood_loss
     pub fn resume_blood_loss(&self) {
         self.blood_loss_stop.set(false);
+
+        self.queue_message(Event::BloodLossResumed(self.injury.get_name().to_string(), self.body_part));
     }
 
     /// Gets if blood loss has been temporary stopped by the [`stop_blood_loss`] call

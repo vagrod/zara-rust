@@ -270,7 +270,10 @@ impl Health {
                                 {
                                     is_alive = false;
 
-                                    self.queue_message(Event::DeathFromInjury(injury.injury.get_name().to_string()))
+                                    self.queue_message(Event::DeathFromInjury(
+                                        injury.injury.get_name().to_string(),
+                                        injury.body_part
+                                    ));
                                 }
                             }
                         },
@@ -288,7 +291,10 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     injury.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::InjurySelfHealStarted(injury.injury.get_name().to_string()));
+                                    self.queue_message(Event::InjurySelfHealStarted(
+                                        injury.injury.get_name().to_string(),
+                                        injury.body_part
+                                    ));
                                 }
                             },
                             _ => { }

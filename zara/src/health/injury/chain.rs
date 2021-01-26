@@ -123,7 +123,7 @@ impl ActiveInjury {
         self.will_end.set(true);
         self.is_inverted.set(true);
 
-        self.queue_message(Event::InjuryInverted(self.injury.get_name()));
+        self.queue_message(Event::InjuryInverted(self.injury.get_name(), self.body_part));
 
         return Ok(());
     }
@@ -258,7 +258,7 @@ impl ActiveInjury {
         self.will_end.set(will_end);
         self.is_inverted.set(false);
 
-        self.queue_message(Event::InjuryResumed(self.injury.get_name()));
+        self.queue_message(Event::InjuryResumed(self.injury.get_name(), self.body_part));
 
         return Ok(());
     }

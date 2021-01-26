@@ -51,6 +51,7 @@ impl Health {
     ///
     /// # Parameters
     /// - `injury_name`: unique name of the injury
+    /// - `body_part`: body part to remove injury from
     ///
     /// # Returns
     /// Ok on success
@@ -69,7 +70,7 @@ impl Health {
 
         b.remove(&key);
 
-        self.queue_message(Event::InjuryRemoved(key.injury.to_string()));
+        self.queue_message(Event::InjuryRemoved(key.injury.to_string(), key.body_part));
 
         return Ok(());
     }

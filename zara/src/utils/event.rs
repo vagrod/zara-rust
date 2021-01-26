@@ -25,7 +25,7 @@ pub enum Event {
     Exhausted,
 
     DeathFromDisease(String),
-    DeathFromInjury(String),
+    DeathFromInjury(String, BodyParts),
 
     DiseaseSpawned(String),
     DiseaseRemoved(String),
@@ -34,10 +34,12 @@ pub enum Event {
     DiseaseResumed(String),
 
     InjurySpawned(String, BodyParts),
-    InjuryRemoved(String),
-    InjurySelfHealStarted(String),
-    InjuryInverted(String),
-    InjuryResumed(String),
+    InjuryRemoved(String, BodyParts),
+    InjurySelfHealStarted(String, BodyParts),
+    InjuryInverted(String, BodyParts),
+    InjuryResumed(String, BodyParts),
+    BloodLossStopped(String, BodyParts),
+    BloodLossResumed(String, BodyParts),
 
     InventoryItemAdded(String),
     InventoryItemRemoved(String)
