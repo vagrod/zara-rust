@@ -3,7 +3,7 @@ use crate::health::side::{SideEffectDeltasC};
 use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
 use crate::utils::event::{Event, Listener, Dispatcher, MessageQueue};
-use crate::health::injury::InjuryDeltasC;
+use crate::health::injury::{InjuryDeltasC, InjuryKey};
 
 use std::cell::RefMut;
 use std::collections::BTreeMap;
@@ -232,9 +232,9 @@ impl Health {
         let mut injuries_to_remove = Vec::new();
         {
             let injuries = self.injuries.borrow();
-            for (name, injury) in injuries.iter() {
+            for (_, injury) in injuries.iter() {
                 if injury.get_is_old(game_time) {
-                    injuries_to_remove.push(name.clone());
+                    injuries_to_remove.push(InjuryKey::new(injury.injury.get_name(), injury.body_part));
                 }
             }
         }
@@ -248,7 +248,7 @@ impl Health {
         let mut injury_deltas = Vec::new();
         {
             let injuries = self.injuries.borrow();
-            for (injury_name, injury) in injuries.iter() {
+            for (_, injury) in injuries.iter() {
                 // Move messages from injuries to the main queue for further processing
                 if injury.has_messages() {
                     self.flush_queue(injury.get_message_queue());
@@ -270,7 +270,7 @@ impl Health {
                                 {
                                     is_alive = false;
 
-                                    self.queue_message(Event::DeathFromInjury(injury_name.to_string()))
+                                    self.queue_message(Event::DeathFromInjury(injury.injury.get_name().to_string()))
                                 }
                             }
                         },
@@ -288,7 +288,7 @@ impl Health {
                                 {
                                     // Invoke the healing process
                                     injury.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::InjurySelfHealStarted(injury_name.to_string()));
+                                    self.queue_message(Event::InjurySelfHealStarted(injury.injury.get_name().to_string()));
                                 }
                             },
                             _ => { }

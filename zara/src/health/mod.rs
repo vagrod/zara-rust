@@ -1,7 +1,7 @@
 use crate::utils::event::{Event, MessageQueue};
 use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
-use crate::health::injury::ActiveInjury;
+use crate::health::injury::{ActiveInjury, InjuryKey};
 use crate::health::side::{SideEffectsMonitor};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use crate::body::BodyParts;
@@ -48,7 +48,7 @@ pub struct Health {
     /// All active or scheduled diseases
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
     /// All active or scheduled injuries
-    pub injuries: Arc<RefCell<HashMap<String, Rc<ActiveInjury>>>>,
+    pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
 
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,

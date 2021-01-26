@@ -34,7 +34,7 @@ pub enum SpawnDiseaseErr {
 pub enum SpawnInjuryErr {
     /// When `spawn_injury` called on a dead character
     CharacterIsDead,
-    /// When injury you trying to spawn was already spawned
+    /// When injury you trying to spawn was already spawned on this body part
     InjuryAlreadyAdded
 }
 

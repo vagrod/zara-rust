@@ -49,6 +49,20 @@ macro_rules! fracture(
     );
 );
 
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct InjuryKey {
+    injury: String,
+    body_part: BodyParts
+}
+impl InjuryKey {
+    pub fn new(injury: String, body_part: BodyParts) -> Self {
+        InjuryKey {
+            injury,
+            body_part
+        }
+    }
+}
+
 /// Builds an injury stage.
 ///
 /// # Examples

@@ -1,13 +1,11 @@
 use crate::utils::event::{Event, MessageQueue};
 use crate::health::Health;
-use crate::health::injury::{ActiveInjury, Injury};
+use crate::health::injury::{ActiveInjury, Injury, InjuryKey};
 use crate::utils::GameTimeC;
 use crate::error::{SpawnInjuryErr, RemoveInjuryErr};
 use crate::body::BodyParts;
 
 use std::rc::Rc;
-
-/// Contains code related to injury handling
 
 impl Health {
 
@@ -32,12 +30,13 @@ impl Health {
         let mut b = self.injuries.borrow_mut();
         let injury_name = injury.get_name();
         let name_for_message= injury.get_name().to_string();
+        let key = InjuryKey::new(injury_name, body_part);
 
-        if b.contains_key(&injury_name) {
+        if b.contains_key(&key) {
             return Err(SpawnInjuryErr::InjuryAlreadyAdded);
         }
 
-        b.insert(injury_name, Rc::new(ActiveInjury::new(
+        b.insert(key, Rc::new(ActiveInjury::new(
             injury,
             body_part,
             activation_time
@@ -58,18 +57,18 @@ impl Health {
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
-    pub fn remove_injury(&self, injury_name: &String) -> Result<(), RemoveInjuryErr> {
+    pub fn remove_injury(&self, key: &InjuryKey) -> Result<(), RemoveInjuryErr> {
         if !self.is_alive.get() { return Err(RemoveInjuryErr::CharacterIsDead); }
 
         let mut b = self.injuries.borrow_mut();
 
-        if !b.contains_key(injury_name) {
+        if !b.contains_key(key) {
             return Err(RemoveInjuryErr::InjuryNotFound);
         }
 
-        b.remove(injury_name);
+        b.remove(key);
 
-        self.queue_message(Event::InjuryRemoved(injury_name.to_string()));
+        self.queue_message(Event::InjuryRemoved(key.injury.to_string()));
 
         return Ok(());
     }
