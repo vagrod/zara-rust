@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 
+mod lerp;
+
 pub mod fluent;
 
 /// Describes medical agent activation curve type
