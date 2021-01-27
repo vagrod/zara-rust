@@ -19,9 +19,8 @@ pub trait AgentCurve {
 }
 
 pub trait AgentDuration {
-    /// Time, in game minutes, how fast will this agent reach its peak activation value
-    /// after consuming/injecting its first agent
-    fn and_peaks_in_minutes(&self, game_minutes: f32) -> &dyn AgentItems;
+    /// Duration, in game minutes, of a single agent dose to have an effect
+    fn and_lasts_for_minutes(&self, game_minutes: f32) -> &dyn AgentItems;
 }
 
 pub trait AgentItems {
@@ -49,7 +48,7 @@ impl AgentCurve for MedicalAgentBuilder {
     }
 }
 impl AgentDuration for MedicalAgentBuilder {
-    fn and_peaks_in_minutes(&self, game_minutes: f32) -> &dyn AgentItems {
+    fn and_lasts_for_minutes(&self, game_minutes: f32) -> &dyn AgentItems {
         self.duration_minutes.set(game_minutes);
 
         self.as_agent_items()

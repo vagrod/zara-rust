@@ -1,11 +1,11 @@
 use crate::error::MedicalAgentErr;
 use crate::health::Health;
 use crate::health::medagent::lerp::{MultiKeyedLerp, KeyFrame};
+use crate::utils::GameTimeC;
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
-use crate::utils::GameTimeC;
 
 mod lerp;
 
@@ -15,7 +15,7 @@ pub mod fluent;
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum CurveType {
     Immediately,
-    FasterInSecondHalf,
+    MostActiveInSecondHalf,
     Linearly
 }
 
@@ -166,7 +166,7 @@ impl MedicalAgent {
                     KeyFrame::new(gt + duration_secs, 0.),
                 ]
             },
-            CurveType::FasterInSecondHalf => {
+            CurveType::MostActiveInSecondHalf => {
                 vec![
                     KeyFrame::new(gt, 0.),
                     KeyFrame::new(gt + duration_secs * 0.3, 15.),

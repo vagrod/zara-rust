@@ -22,7 +22,7 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
         MedicalAgentBuilder::start()
             .for_agent("Aspirin")
             .activates(CurveType::Immediately)
-            .and_peaks_in_minutes(30.)
+            .and_lasts_for_minutes(30.)
             .contains(
                 vec![
                     "Big Green Leaves",
