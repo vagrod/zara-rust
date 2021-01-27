@@ -1,9 +1,11 @@
 use crate::error::MedicalAgentErr;
 use crate::health::Health;
+use crate::health::medagent::lerp::{MultiKeyedLerp, KeyFrame};
 
 use std::collections::HashMap;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
+use crate::utils::GameTimeC;
 
 mod lerp;
 
@@ -61,7 +63,7 @@ impl Health {
 }
 
 pub struct MedicalAgentGroup {
-    pub items: Vec<String>
+    items: Vec<String>
 }
 
 impl MedicalAgentGroup {
@@ -70,6 +72,22 @@ impl MedicalAgentGroup {
             items
         }
     }
+    pub fn contains(&self, item_name: &String) -> bool {
+        self.items.contains(item_name)
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
+struct AgentDoseKey {
+    pub item: String,
+    pub timestamp: i32
+}
+
+struct AgentDose {
+    pub lerp: MultiKeyedLerp,
+    pub start_time: f32,
+    pub end_time: f32,
+    pub duration: f32
 }
 
 pub struct MedicalAgent {
@@ -81,7 +99,8 @@ pub struct MedicalAgent {
     // Private fields
     percent_of_activity: Cell<f32>,
     percent_of_presence: Cell<f32>,
-    is_active: Cell<bool>
+    is_active: Cell<bool>,
+    doses: RefCell<HashMap<AgentDoseKey, AgentDose>>
 }
 
 impl MedicalAgent {
@@ -93,42 +112,69 @@ impl MedicalAgent {
             group,
             is_active: Cell::new(false),
             percent_of_activity: Cell::new(0.),
-            percent_of_presence: Cell::new(0.)
+            percent_of_presence: Cell::new(0.),
+            doses: RefCell::new(HashMap::new())
         }
     }
 
-    pub fn on_consumed(&self, item_name: String) {
-        //println!("medagent on consumed");
+    pub fn on_consumed(&self, game_time: &GameTimeC, item_name: String) {
+        self.add_dose_if_needed(game_time, item_name);
     }
-    pub fn on_appliance_taken(&self, item_name: String) {
+    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item_name: String) {
+        self.add_dose_if_needed(game_time, item_name);
+    }
 
-    }
+    fn add_dose_if_needed(&self, game_time: &GameTimeC, item_name: String) {
+        if self.group.contains(&item_name) {
+            let gt = game_time.as_secs_f32();
+            let duration_secs = self.peak_time_minutes*60.;
 
-    pub fn is_active(&self) -> bool {
-        self.is_active.get()
-    }
-    pub fn percent_of_presence(&self) -> usize {
-        self.percent_of_presence.get() as usize
-    }
-    pub fn percent_of_activity(&self) -> usize {
-        self.percent_of_activity.get() as usize
-    }
-    pub fn copy(&self) -> Self {
-        let mut items = Vec::new();
+            let mut frames = MedicalAgent::generate_frames(gt, duration_secs, self.activation_curve);
+            let key = AgentDoseKey {
+                item: item_name,
+                timestamp: gt as i32
+            };
+            let dose = AgentDose {
+                start_time: gt,
+                end_time: gt + duration_secs,
+                duration: duration_secs,
+                lerp: MultiKeyedLerp::new(frames)
+            };
 
-        for item in &self.group.items {
-            items.push(item.to_string());
+            self.doses.borrow_mut().insert(key, dose);
         }
+    }
 
-        MedicalAgent {
-            name: self.name.to_string(),
-            is_active: Cell::new(self.is_active()),
-            activation_curve: self.activation_curve,
-            peak_time_minutes: self.peak_time_minutes,
-            percent_of_presence: Cell::new(self.percent_of_presence() as f32),
-            percent_of_activity: Cell::new(self.percent_of_activity() as f32),
-            group: MedicalAgentGroup {
-                items
+    pub fn is_active(&self) -> bool { self.is_active.get() }
+    pub fn percent_of_presence(&self) -> usize { self.percent_of_presence.get() as usize }
+    pub fn percent_of_activity(&self) -> usize { self.percent_of_activity.get() as usize }
+
+    pub fn generate_frames(gt: f32, duration_secs: f32, curve: CurveType) -> Vec<KeyFrame> {
+        return match curve {
+            CurveType::Linearly => {
+                vec![
+                    KeyFrame::new(gt, 0.),
+                    KeyFrame::new(gt + duration_secs * 0.5, 100.),
+                    KeyFrame::new(gt + duration_secs, 0.)
+                ]
+            },
+            CurveType::Immediately => {
+                vec![
+                    KeyFrame::new(gt, 0.),
+                    KeyFrame::new(gt + duration_secs * 0.25, 100.),
+                    KeyFrame::new(gt + duration_secs * 0.85, 100.),
+                    KeyFrame::new(gt + duration_secs, 0.),
+                ]
+            },
+            CurveType::FasterInSecondHalf => {
+                vec![
+                    KeyFrame::new(gt, 0.),
+                    KeyFrame::new(gt + duration_secs * 0.3, 15.),
+                    KeyFrame::new(gt + duration_secs * 0.5, 15.),
+                    KeyFrame::new(gt + duration_secs * 0.65, 100.),
+                    KeyFrame::new(gt + duration_secs * 0.9, 100.),
+                    KeyFrame::new(gt + duration_secs, 0.),
+                ]
             }
         }
     }

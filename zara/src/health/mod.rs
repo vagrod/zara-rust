@@ -166,7 +166,7 @@ impl Health {
 
         // Notify medical agents
         for (_, agent) in self.medical_agents.agents.borrow().iter() {
-            agent.on_consumed(item.name.to_string())
+            agent.on_consumed(game_time, item.name.to_string())
         }
     }
 
@@ -194,7 +194,7 @@ impl Health {
 
         // Notify medical agents
         for (_, agent) in self.medical_agents.agents.borrow().iter() {
-            agent.on_appliance_taken(item.name.to_string())
+            agent.on_appliance_taken(game_time, item.name.to_string())
         }
     }
 

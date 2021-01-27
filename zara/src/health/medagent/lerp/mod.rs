@@ -1,6 +1,5 @@
 use std::cmp::Ordering::Equal;
 use std::cell::RefCell;
-use std::borrow::Borrow;
 
 pub struct MultiKeyedLerp {
     keyframes: Vec<KeyFrame>,
