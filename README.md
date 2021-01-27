@@ -2,6 +2,8 @@ This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](h
 
 This code is **WIP** and changes all the time.
 
+![Zara Rust Demo](http://imw.su/zara_rust_003.png)
+
 ## What's done at the moment
 - Game time
 
@@ -52,5 +54,3 @@ This code is **WIP** and changes all the time.
 - Optional easing variants for lerping diseases/injuries/vitals
 
 The demo is using `crossterm`.
-
-![Zara Rust Demo](http://imw.su/zara_rust_003.png)
