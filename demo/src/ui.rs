@@ -199,6 +199,25 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1)
     );
 
+    // Weather
+    execute!(w,
+        cursor::MoveToNextLine(1),
+        style::SetForegroundColor(style::Color::DarkCyan),
+        style::Print("Weather"),
+        style::SetForegroundColor(style::Color::Cyan),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Temperature: {}°C", person.environment.temperature.get())),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Wind speed: {:.1} m/s", person.environment.wind_speed.get())),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Rain intensity: {:.2} (0..1)", person.environment.rain_intensity.get())),
+        cursor::MoveToNextLine(1)
+    );
+
+
     // Diseases
     let dis_col_base = 90;
     execute!(w,
