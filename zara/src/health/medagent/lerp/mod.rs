@@ -37,23 +37,26 @@ impl MultiKeyedLerp {
             }
         };
 
+        let mut need_rescan = false;
         match self.last_segment.borrow().as_ref() {
             Some(seg) => {
                 if !(time >= seg.0.time && time <= seg.1.time) {
-                    rescan_segments();
+                    need_rescan = true;
                 }
             },
             None => {
-                rescan_segments();
+                need_rescan = true;
             }
         }
+
+        if need_rescan { rescan_segments(); }
 
         match self.last_segment.borrow().as_ref() {
             Some(seg) => {
                 // sanity check
                 if !(seg.0.time..=seg.1.time).contains(&time) { return None; }
 
-                let p = crate::utils::clamp_01(time - seg.0.time) / (seg.1.time - seg.0.time);
+                let p = crate::utils::clamp_01((time - seg.0.time) / (seg.1.time - seg.0.time));
 
                 Some(crate::utils::lerp(seg.0.value, seg.1.value, p))
             },
