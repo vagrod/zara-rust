@@ -51,6 +51,6 @@ This code is **WIP** and changes all the time.
 - Trait to get and restore state of every engine node
 - Optional easing variants for lerping diseases/injuries/vitals
 
-The demo is built with `termion` which seems like does not support Windows. Maybe later I'll try find another solution for the demo "UI".
+The demo is using `crossterm`.
 
 ![Zara Rust Demo](http://imw.su/zara_rust_003.png)
