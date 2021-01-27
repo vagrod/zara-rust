@@ -237,7 +237,7 @@ impl DiseaseDeltasC {
 
 impl ActiveStage {
     /// Checks if stage is active for a given time
-    pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
+    pub fn is_active(&self, game_time: &GameTimeC) -> bool {
         let start = self.start_time.as_secs_f32();
         let peak = self.peak_time.as_secs_f32();
         let gt = game_time.as_secs_f32();
@@ -250,7 +250,7 @@ impl ActiveStage {
     }
 
     /// Returns percent of activity of this stage. Always in 0..100 range.
-    pub fn get_percent_active(&self, game_time: &GameTimeC) -> usize {
+    pub fn percent_active(&self, game_time: &GameTimeC) -> usize {
         let gt = game_time.as_secs_f32();
         let start = self.start_time.as_secs_f32();
         let end = self.peak_time.as_secs_f32();
@@ -444,13 +444,13 @@ impl ActiveDisease {
     }
 
     /// Gets if this disease will end (is it finite)
-    pub fn get_will_end(&self) -> bool { self.will_end.get() }
+    pub fn will_end(&self) -> bool { self.will_end.get() }
 
     /// Gets if this disease is now healing (is inverted)
-    pub fn get_is_healing(&self) -> bool { self.is_inverted.get() }
+    pub fn is_healing(&self) -> bool { self.is_inverted.get() }
 
     /// Gets the end time of this disease, if it is finite
-    pub fn get_end_time(&self) -> Option<GameTimeC> {
+    pub fn end_time(&self) -> Option<GameTimeC> {
         let b = self.end_time.borrow();
 
         match b.as_ref() {
@@ -462,19 +462,19 @@ impl ActiveDisease {
     /// Gets a copy of active disease stage data for a given time
     pub fn get_active_stage(&self, game_time: &GameTimeC) -> Option<ActiveStage> {
         for (_, stage) in self.stages.borrow().iter() {
-            if stage.get_is_active(game_time) { return Some(stage.copy()) }
+            if stage.is_active(game_time) { return Some(stage.copy()) }
         }
 
         return None;
     }
 
     /// Gets active stage level for a given game time
-    pub fn get_active_level(&self, game_time: &GameTimeC) -> Option<StageLevel> {
+    pub fn active_level(&self, game_time: &GameTimeC) -> Option<StageLevel> {
         self.get_active_stage(game_time).map(|st| st.info.level)
     }
 
     /// Returns a copy of a game time structure containing data of when this disease was activated
-    pub fn get_activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
+    pub fn activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
 
     /// Returns a copy of stage data by its level
     pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
@@ -486,7 +486,7 @@ impl ActiveDisease {
     }
 
     /// Gets whether disease is active or not for a given time
-    pub fn get_is_active(&self, game_time: &GameTimeC) -> bool {
+    pub fn is_active(&self, game_time: &GameTimeC) -> bool {
         let activation_secs = self.activation_time.borrow().as_secs_f32();
         let game_time_secs = game_time.as_secs_f32();
 
@@ -504,7 +504,7 @@ impl ActiveDisease {
     }
 
     /// Returns `true` if this disease already passed and is no longer relevant, for a given game time
-    pub fn get_is_old(&self, game_time: &GameTimeC) -> bool {
+    pub fn is_old(&self, game_time: &GameTimeC) -> bool {
         let gt = game_time.as_secs_f32();
         return match self.end_time.borrow().as_ref() {
             Some(t) => gt > t.as_secs_f32(),
@@ -515,7 +515,7 @@ impl ActiveDisease {
     /// Is called by Zara from the health engine when person consumes an item
     pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
-        if !self.get_is_active(game_time) { return; }
+        if !self.is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {
@@ -529,7 +529,7 @@ impl ActiveDisease {
     /// Is called by Zara from the health engine when appliance is taken
     pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
-        if !self.get_is_active(game_time) { return; }
+        if !self.is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
             Some(t) => match self.get_active_stage(game_time) {

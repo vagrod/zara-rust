@@ -102,13 +102,13 @@ impl MedicalAgent {
 
     }
 
-    pub fn get_is_active(&self) -> bool {
+    pub fn is_active(&self) -> bool {
         self.is_active.get()
     }
-    pub fn get_percent_of_presence(&self) -> usize {
+    pub fn percent_of_presence(&self) -> usize {
         self.percent_of_presence.get() as usize
     }
-    pub fn get_percent_of_activity(&self) -> usize {
+    pub fn percent_of_activity(&self) -> usize {
         self.percent_of_activity.get() as usize
     }
     pub fn copy(&self) -> Self {
@@ -120,11 +120,11 @@ impl MedicalAgent {
 
         MedicalAgent {
             name: self.name.to_string(),
-            is_active: Cell::new(self.get_is_active()),
+            is_active: Cell::new(self.is_active()),
             activation_curve: self.activation_curve,
             peak_time_minutes: self.peak_time_minutes,
-            percent_of_presence: Cell::new(self.get_percent_of_presence() as f32),
-            percent_of_activity: Cell::new(self.get_percent_of_activity() as f32),
+            percent_of_presence: Cell::new(self.percent_of_presence() as f32),
+            percent_of_activity: Cell::new(self.percent_of_activity() as f32),
             group: MedicalAgentGroup {
                 items
             }
@@ -142,9 +142,9 @@ impl MedicalAgentsMonitor {
         }
     }
 
-    pub fn get_is_active(&self, agent_name: String) -> Result<bool, MedicalAgentErr> {
+    pub fn is_active(&self, agent_name: String) -> Result<bool, MedicalAgentErr> {
         match self.agents.borrow().get(&agent_name) {
-            Some(agent) => Ok(agent.get_is_active()),
+            Some(agent) => Ok(agent.is_active()),
             None => Err(MedicalAgentErr::AgentNotFound)
         }
     }

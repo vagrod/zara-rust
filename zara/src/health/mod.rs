@@ -25,25 +25,6 @@ pub mod medagent;
 
 /// Describes and controls player's health
 pub struct Health {
-    // Health state fields
-    /// Body temperature (degrees C)
-    pub body_temperature: Cell<f32>,
-    /// Heart rate (bpm)
-    pub heart_rate: Cell<f32>,
-    /// Top body pressure (mmHg)
-    pub top_pressure: Cell<f32>,
-    /// Bottom body pressure (mmHg)
-    pub bottom_pressure: Cell<f32>,
-    /// Blood level (0..100)
-    pub blood_level: Cell<f32>,
-    /// Food level (0..100)
-    pub food_level: Cell<f32>,
-    /// Water level (0..100)
-    pub water_level: Cell<f32>,
-    /// Stamina level (0..100)
-    pub stamina_level: Cell<f32>,
-    /// Fatigue level (0..100)
-    pub fatigue_level: Cell<f32>,
     /// How fast stamina recovers (percents per game second)
     pub stamina_regain_rate: Cell<f32>,
     /// How fast blood recovers (percents per game second)
@@ -55,12 +36,33 @@ pub struct Health {
     /// Registered medical agents
     pub medical_agents: Arc<MedicalAgentsMonitor>,
 
+    // Health state fields
+    /// Body temperature (degrees C)
+    body_temperature: Cell<f32>,
+    /// Heart rate (bpm)
+    heart_rate: Cell<f32>,
+    /// Top body pressure (mmHg)
+    top_pressure: Cell<f32>,
+    /// Bottom body pressure (mmHg)
+    bottom_pressure: Cell<f32>,
+    /// Blood level (0..100)
+    blood_level: Cell<f32>,
+    /// Food level (0..100)
+    food_level: Cell<f32>,
+    /// Water level (0..100)
+    water_level: Cell<f32>,
+    /// Stamina level (0..100)
+    stamina_level: Cell<f32>,
+    /// Fatigue level (0..100)
+    fatigue_level: Cell<f32>,
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
     /// Stores all registered side effects monitors
     side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
     /// Is character alive
     is_alive: Cell<bool>,
+    /// Has any injury active blood loss
+    has_blood_loss: Cell<bool>,
 
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
@@ -133,6 +135,7 @@ impl Health {
             medical_agents: Arc::new(MedicalAgentsMonitor::new()),
 
             // Healthy values by default
+            has_blood_loss: Cell::new(false),
             is_alive: Cell::new(true),
             blood_level: Cell::new(healthy.blood_level),
             body_temperature: Cell::new(healthy.body_temperature),
@@ -156,7 +159,7 @@ impl Health {
 
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
-            if disease.get_is_active(game_time) {
+            if disease.is_active(game_time) {
                 disease.on_consumed(game_time, item, inventory_items);
             }
         }
@@ -177,14 +180,14 @@ impl Health {
 
         // Notify diseases
         for (_, disease) in self.diseases.borrow().iter() {
-            if disease.get_is_active(game_time) {
+            if disease.is_active(game_time) {
                 disease.on_appliance_taken(game_time, item, body_part, inventory_items);
             }
         }
 
         // Notify injuries
         for (_, injury) in self.injuries.borrow().iter() {
-            if injury.get_is_active(game_time) {
+            if injury.is_active(game_time) {
                 injury.on_appliance_taken(game_time, item, body_part, inventory_items);
             }
         }

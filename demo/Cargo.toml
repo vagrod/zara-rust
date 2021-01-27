@@ -17,4 +17,4 @@ path="../zara/src/lib.rs"
 # If you want to use sources instead of lib, uncomment this line and comment out "rand" dependency
 # zara = { path = "../zara" }
 rand = "0.8.2"
-termion = "*"
+crossterm = "0.18"

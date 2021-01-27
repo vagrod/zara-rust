@@ -25,7 +25,7 @@ impl ActiveDisease {
     /// - `game_time`: the time when inversion occurs
     pub fn invert(&self, game_time: &GameTimeC) -> Result<(), ChainInvertErr> {
         if self.is_inverted.get() { return Err(ChainInvertErr::AlreadyInverted); }
-        if !self.get_is_active(game_time) { return Err(ChainInvertErr::DiseaseNotActiveAtGivenTime); }
+        if !self.is_active(game_time) { return Err(ChainInvertErr::DiseaseNotActiveAtGivenTime); }
         let active_stage = match self.get_active_stage(game_time) {
             Some(o) => o,
             None => return Err(ChainInvertErr::NoActiveStageAtGivenTime)
@@ -144,7 +144,7 @@ impl ActiveDisease {
     /// - `game_time`: the time when inversion occurs
     pub fn invert_back(&self, game_time: &GameTimeC) -> Result<(), ChainInvertBackErr> {
         if !self.is_inverted.get() { return Err(ChainInvertBackErr::AlreadyInvertedBack); }
-        if !self.get_is_active(game_time) {
+        if !self.is_active(game_time) {
             return Err(ChainInvertBackErr::DiseaseNotActiveAtGivenTime);
         }
         let active_stage = match self.get_active_stage(game_time) {

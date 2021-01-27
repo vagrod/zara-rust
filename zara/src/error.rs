@@ -103,7 +103,7 @@ pub enum ZaraUpdateErr {
     CharacterIsDead
 }
 
-/// Is used by `MedicalAgentsMonitor.get_is_active` method
+/// Is used by `MedicalAgentsMonitor.is_active` method
 pub enum MedicalAgentErr {
     AgentNotFound
 }

@@ -19,7 +19,8 @@ struct ProcessDiseasesResult {
 
 struct ProcessInjuriesResult {
     deltas: InjuryDeltasC,
-    is_alive: bool
+    is_alive: bool,
+    blood_loss: bool
 }
 
 impl Health {
@@ -78,6 +79,8 @@ impl Health {
         // Apply the resulted health snapshot
         self.apply_health_snapshot(&snapshot);
 
+        self.has_blood_loss.set(injuries_result.blood_loss);
+
         // Do the external events
         self.dispatch_events::<E>(frame.events);
 
@@ -130,7 +133,7 @@ impl Health {
         {
             let diseases = self.diseases.borrow();
             for (name, disease) in diseases.iter() {
-                if disease.get_is_old(game_time) {
+                if disease.is_old(game_time) {
                     diseases_to_remove.push(name.clone());
                 }
             }
@@ -150,7 +153,7 @@ impl Health {
                 if disease.has_messages() {
                     self.flush_queue(disease.get_message_queue());
                 }
-                if disease.get_is_active(game_time) {
+                if disease.is_active(game_time) {
                     disease_deltas.push(disease.get_vitals_deltas(game_time));
 
                     let active_stage = disease.get_active_stage(game_time);
@@ -162,7 +165,7 @@ impl Health {
 
                             if chance > 0 {
                                 // The further into the stage, the bigger is probability of death
-                                if crate::utils::roll_dice(st.get_percent_active(game_time))
+                                if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
                                 {
                                     is_alive = false;
@@ -175,10 +178,10 @@ impl Health {
                     }
 
                     // Handling self-heal
-                    if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.get_is_healing() {
+                    if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.is_healing() {
                         match &active_stage {
                             Some(st) => {
-                                let p = st.get_percent_active(game_time);
+                                let p = st.percent_active(game_time);
                                 let dice = crate::utils::range(50., 99.) as usize;
                                 if (st.info.level == disease.will_self_heal_on && p > dice) ||
                                     st.info.level as i32 > disease.will_self_heal_on as i32
@@ -227,13 +230,14 @@ impl Health {
 
     fn process_injuries(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessInjuriesResult {
         let mut is_alive = true;
+        let mut blood_loss = false;
 
         // Clean up garbage injuries
         let mut injuries_to_remove = Vec::new();
         {
             let injuries = self.injuries.borrow();
             for (key, injury) in injuries.iter() {
-                if injury.get_is_old(game_time) {
+                if injury.is_old(game_time) {
                     injuries_to_remove.push(InjuryKey::new(key.injury.to_string(), key.body_part));
                 }
             }
@@ -253,8 +257,12 @@ impl Health {
                 if injury.has_messages() {
                     self.flush_queue(injury.get_message_queue());
                 }
-                if injury.get_is_active(game_time) {
-                    injury_deltas.push(injury.get_drains_deltas(game_time));
+                if injury.is_active(game_time) {
+                    let d = injury.get_drains_deltas(game_time);
+
+                    if !injury.is_blood_stopped() && d.blood_drain > 0. { blood_loss = true; }
+
+                    injury_deltas.push(d);
 
                     let active_stage = injury.get_active_stage(game_time);
 
@@ -265,7 +273,7 @@ impl Health {
 
                             if chance > 0 {
                                 // The further into the stage, the bigger is probability of death
-                                if crate::utils::roll_dice(st.get_percent_active(game_time))
+                                if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
                                 {
                                     is_alive = false;
@@ -281,10 +289,10 @@ impl Health {
                     }
 
                     // Handling self-heal
-                    if !injury.needs_treatment && injury.will_self_heal_on != StageLevel::Undefined && !injury.get_is_healing() {
+                    if !injury.needs_treatment && injury.will_self_heal_on != StageLevel::Undefined && !injury.is_healing() {
                         match &active_stage {
                             Some(st) => {
-                                let p = st.get_percent_active(game_time);
+                                let p = st.percent_active(game_time);
                                 let dice = crate::utils::range(50., 99.) as usize;
                                 if (st.info.level == injury.will_self_heal_on && p > dice) ||
                                     st.info.level as i32 > injury.will_self_heal_on as i32
@@ -315,7 +323,8 @@ impl Health {
 
         return ProcessInjuriesResult {
             deltas: result,
-            is_alive
+            is_alive,
+            blood_loss
         }
     }
 

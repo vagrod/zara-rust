@@ -5,15 +5,16 @@ use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
 use std::collections::BTreeMap;
 
+mod status_methods;
+
 pub struct Body {
     /// Game time when player slept last time
-    pub last_sleep_time: RefCell<Option<GameTimeC>>,
+    last_sleep_time: RefCell<Option<GameTimeC>>,
     /// For how long player slept last time (game hours)
-    pub last_sleep_duration: Cell<f64>,
+    last_sleep_duration: Cell<f64>,
     /// Is player sleeping now
-    pub is_sleeping: Cell<bool>,
+    is_sleeping: Cell<bool>,
 
-    // Private fields
     sleeping_counter: Cell<f64>,
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>

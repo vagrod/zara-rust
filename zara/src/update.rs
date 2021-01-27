@@ -35,7 +35,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// zara_controller.update(time_delta);
     /// ```
     pub fn update(&self, frame_time: f32) -> Result<(), ZaraUpdateErr>{
-        if !self.is_alive.get() { return Err(ZaraUpdateErr::CharacterIsDead); }
+        if !self.health.is_alive() { return Err(ZaraUpdateErr::CharacterIsDead); }
 
         let elapsed = self.update_counter.get() + frame_time;
         let elapsed_for_queue = self.queue_counter.get() + frame_time;
@@ -54,7 +54,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         // When sleeping, our checks are more frequent
-        if self.body.is_sleeping.get() {
+        if self.body.is_sleeping() {
             ceiling = SLEEPING_UPDATE_INTERVAL;
 
             // When sleeping, we need to check sleeping state every frame, because
@@ -69,7 +69,6 @@ impl<E: Listener + 'static> ZaraController<E> {
         if elapsed >= ceiling {
             // Retrieve the summary for sub-controllers
             let summary = &self.get_summary();
-            let health_result;
 
             // Form the frame data structure
             let mut frame_data = &mut FrameC {
@@ -78,17 +77,13 @@ impl<E: Listener + 'static> ZaraController<E> {
             };
 
             // Update all sub-controllers
-            health_result = self.health.update(&mut frame_data);
+            self.health.update(&mut frame_data);
             self.inventory.update(&mut frame_data);
             self.body.update(&mut frame_data);
 
             // Reset the counter and set last update game time
             self.last_update_game_time.set(game_time_duration);
             self.update_counter.set(0.);
-
-            if !health_result.is_alive {
-                self.is_alive.set(false);
-            }
         } else {
             self.update_counter.set(elapsed);
         }
@@ -114,11 +109,11 @@ impl<E: Listener + 'static> ZaraController<E> {
                     active_diseases.push(ActiveDiseaseC {
                         name: disease.disease.get_name(),
                         is_active: true,
-                        scheduled_time: disease.get_activation_time(),
-                        end_time: disease.get_end_time(),
+                        scheduled_time: disease.activation_time(),
+                        end_time: disease.end_time(),
                         current_level: st.info.level,
-                        current_level_percent: st.get_percent_active(game_time_contract),
-                        is_healing: disease.get_is_healing(),
+                        current_level_percent: st.percent_active(game_time_contract),
+                        is_healing: disease.is_healing(),
                         needs_treatment: disease.needs_treatment
                     });
                 },
@@ -126,8 +121,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                     active_diseases.push(ActiveDiseaseC {
                         name: disease.disease.get_name(),
                         is_active: false,
-                        scheduled_time: disease.get_activation_time(),
-                        end_time: disease.get_end_time(),
+                        scheduled_time: disease.activation_time(),
+                        end_time: disease.end_time(),
                         current_level: StageLevel::Undefined,
                         current_level_percent: 0,
                         is_healing: false,
@@ -144,13 +139,13 @@ impl<E: Listener + 'static> ZaraController<E> {
                     active_injuries.push(ActiveInjuryC {
                         name: injury.injury.get_name(),
                         is_active: true,
-                        scheduled_time: injury.get_activation_time(),
-                        end_time: injury.get_end_time(),
+                        scheduled_time: injury.activation_time(),
+                        end_time: injury.end_time(),
                         current_level: st.info.level,
-                        current_level_percent: st.get_percent_active(game_time_contract),
-                        is_healing: injury.get_is_healing(),
+                        current_level_percent: st.percent_active(game_time_contract),
+                        is_healing: injury.is_healing(),
                         needs_treatment: injury.needs_treatment,
-                        is_blood_stopped: injury.get_is_blood_stopped(),
+                        is_blood_stopped: injury.is_blood_stopped(),
                         body_part: injury.body_part,
                         is_fracture: injury.is_fracture
                     });
@@ -159,13 +154,13 @@ impl<E: Listener + 'static> ZaraController<E> {
                     active_injuries.push(ActiveInjuryC {
                         name: injury.injury.get_name(),
                         is_active: false,
-                        scheduled_time: injury.get_activation_time(),
-                        end_time: injury.get_end_time(),
+                        scheduled_time: injury.activation_time(),
+                        end_time: injury.end_time(),
                         current_level: StageLevel::Undefined,
                         current_level_percent: 0,
                         is_healing: false,
                         needs_treatment: injury.needs_treatment,
-                        is_blood_stopped: injury.get_is_blood_stopped(),
+                        is_blood_stopped: injury.is_blood_stopped(),
                         body_part: injury.body_part,
                         is_fracture: injury.is_fracture
                     });
@@ -176,8 +171,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Determine last sleep time
         let mut last_slept: GameTimeC = GameTimeC::empty();
         {
-            let borrowed_time = self.body.last_sleep_time.borrow();
-            match borrowed_time.as_ref() {
+            match self.body.last_sleep_time().as_ref() {
                 Some(t) => last_slept = t.copy(),
                 None => { }
             }
@@ -190,8 +184,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                 is_running: self.player_state.is_running.get(),
                 is_swimming: self.player_state.is_swimming.get(),
                 is_underwater: self.player_state.is_underwater.get(),
-                is_sleeping: self.body.is_sleeping.get(),
-                last_slept_duration: self.body.last_sleep_duration.get(),
+                is_sleeping: self.body.is_sleeping(),
+                last_slept_duration: self.body.last_sleep_duration(),
                 last_slept
             },
             environment: EnvironmentC {
@@ -200,15 +194,15 @@ impl<E: Listener + 'static> ZaraController<E> {
                 temperature: self.environment.temperature.get()
             },
             health: HealthC {
-                body_temperature: self.health.body_temperature.get(),
-                blood_level: self.health.blood_level.get(),
-                heart_rate: self.health.heart_rate.get(),
-                water_level: self.health.water_level.get(),
-                food_level: self.health.food_level.get(),
-                top_pressure: self.health.top_pressure.get(),
-                bottom_pressure: self.health.bottom_pressure.get(),
-                stamina_level: self.health.stamina_level.get(),
-                fatigue_level: self.health.fatigue_level.get(),
+                body_temperature: self.health.body_temperature(),
+                blood_level: self.health.blood_level(),
+                heart_rate: self.health.heart_rate(),
+                water_level: self.health.water_level(),
+                food_level: self.health.food_level(),
+                top_pressure: self.health.top_pressure(),
+                bottom_pressure: self.health.bottom_pressure(),
+                stamina_level: self.health.stamina_level(),
+                fatigue_level: self.health.fatigue_level(),
 
                 diseases: active_diseases,
                 injuries: active_injuries
