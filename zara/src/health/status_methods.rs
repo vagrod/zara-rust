@@ -1,7 +1,5 @@
 use crate::health::Health;
 
-/// Contains health state-related "business" functions
-
 impl Health {
 
     /// Is character alive

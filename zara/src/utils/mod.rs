@@ -406,7 +406,7 @@ impl EnvironmentC {
 
     /// Creates default environment description object.
     ///
-    /// To create environment description with default values,
+    /// To create environment description with default values (26 degrees C, no rain, no wind),
     /// use [`new`] method.
     ///
     /// [`new`]: #method.new

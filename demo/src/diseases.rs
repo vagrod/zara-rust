@@ -1,7 +1,6 @@
 use zara::health::{StageLevel};
 use zara::body::{BodyParts};
 use zara::health::disease::{StageBuilder, DiseaseTreatment, ActiveStage, ActiveDisease};
-use zara::inventory::{Inventory};
 use zara::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
 use zara::utils::{GameTimeC};
 
