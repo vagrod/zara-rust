@@ -119,8 +119,6 @@ impl Health {
     }
 
     fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessDiseasesResult {
-        let mut is_alive = true;
-
         // Clean up garbage diseases
         let mut diseases_to_remove = Vec::new();
         {
@@ -161,7 +159,7 @@ impl Health {
                                 if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
                                 {
-                                    is_alive = false;
+                                    self.is_alive.set(false);
 
                                     self.queue_message(Event::DeathFromDisease(disease_name.to_string()))
                                 }
@@ -221,7 +219,6 @@ impl Health {
     }
 
     fn process_injuries(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessInjuriesResult {
-        let mut is_alive = true;
         let mut blood_loss = false;
 
         // Clean up garbage injuries
@@ -268,7 +265,7 @@ impl Health {
                                 if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
                                 {
-                                    is_alive = false;
+                                    self.is_alive.set(false);
 
                                     self.queue_message(Event::DeathFromInjury(
                                         injury.injury.get_name().to_string(),

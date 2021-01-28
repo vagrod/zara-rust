@@ -1,6 +1,6 @@
 use crate::body::clothes::{ClothesGroup, ClothesItem};
 use crate::body::ClothesGroupBuilder;
-use crate::inventory::items::{ClothesDescription, InventoryItem};
+use crate::inventory::items::{ClothesDescription};
 
 use std::collections::HashMap;
 
@@ -30,6 +30,9 @@ pub trait ClothesGroupWater {
 
 pub trait ClothesGroupItems {
     /// Description of all clothes that form this group ("suit")
+    ///
+    /// First argument is a unique inventory item name, second is a description of the item's
+    /// `ClothesDescription` option.
     fn includes(&self, items: Vec<(&str, Box<dyn ClothesDescription>)>) -> &dyn ClothesGroupEnd;
 }
 

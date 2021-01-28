@@ -48,10 +48,10 @@ impl ClothesItem {
 }
 
 pub struct ClothesGroup {
-    name: String,
-    items: HashMap<String, ClothesItem>,
-    bonus_cold_resistance: usize,
-    bonus_water_resistance: usize
+    pub name: String,
+    pub items: HashMap<String, ClothesItem>,
+    pub bonus_cold_resistance: usize,
+    pub bonus_water_resistance: usize
 }
 impl ClothesGroup {
     pub fn new(name: String, items: Vec<ClothesItem>, bonus_cold_resistance: usize, bonus_water_resistance: usize) -> Self {

@@ -153,7 +153,7 @@ impl MedicalAgent {
             };
         }
         // Sanity check
-        let mut is_active;
+        let is_active;
         if end_time >= start_time && (gt >= start_time && gt <= end_time) {
             let duration = end_time - start_time;
             let elapsed = gt - start_time;

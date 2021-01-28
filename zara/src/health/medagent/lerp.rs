@@ -2,7 +2,6 @@ use std::cmp::Ordering::Equal;
 use std::cell::RefCell;
 
 pub struct MultiKeyedLerp {
-    keyframes: Vec<KeyFrame>,
     segments: Vec<(KeyFrame, KeyFrame)>,
     last_segment: RefCell<Option<(KeyFrame, KeyFrame)>>
 }
@@ -20,7 +19,6 @@ impl MultiKeyedLerp {
         }
 
         MultiKeyedLerp {
-            keyframes,
             segments,
             last_segment: RefCell::new(None)
         }
