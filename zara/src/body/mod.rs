@@ -1,11 +1,16 @@
 use crate::utils::{FrameC, GameTimeC};
 use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
+use crate::body::clothes::{ClothesGroup, ClothesItem};
+use crate::body::clothes::fluent::ClothesGroupStart;
 
 use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 
 mod status_methods;
+
+pub mod clothes;
 
 pub struct Body {
     /// Game time when player slept last time
@@ -14,10 +19,31 @@ pub struct Body {
     last_sleep_duration: Cell<f64>,
     /// Is player sleeping now
     is_sleeping: Cell<bool>,
+    /// Registered clothes groups
+    clothes_groups: Arc<RefCell<HashMap<String, ClothesGroup>>>,
 
     sleeping_counter: Cell<f64>,
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+
+/// Used to describe a new clothes group
+pub struct ClothesGroupBuilder {
+    pub name: RefCell<String>,
+    pub bonus_cold_resistance: Cell<usize>,
+    pub bonus_water_resistance: Cell<usize>,
+    pub items: RefCell<HashMap<String, ClothesItem>>
+}
+impl ClothesGroupBuilder {
+    /// Starts building process for a new clothes group. Use `start` method to begin.
+    pub fn start() -> Box<dyn ClothesGroupStart> {
+        Box::new(ClothesGroupBuilder {
+            name: RefCell::new(String::new()),
+            bonus_cold_resistance: Cell::new(0),
+            bonus_water_resistance: Cell::new(0),
+            items: RefCell::new(HashMap::new())
+        })
+    }
 }
 
 /// All body parts enum
@@ -70,6 +96,7 @@ impl Body {
             is_sleeping: Cell::new(false),
             sleeping_counter: Cell::new(0.),
             last_sleep_duration: Cell::new(0.),
+            clothes_groups: Arc::new(RefCell::new(HashMap::new())),
             message_queue: RefCell::new(BTreeMap::new())
         }
     }

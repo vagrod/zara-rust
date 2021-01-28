@@ -1,8 +1,11 @@
 use super::inventory;
 use super::events::ZaraEventsListener;
+use super::inventory::{PantsClothes, JacketClothes};
 
 use zara::health::medagent::{CurveType};
-use zara::health::{MedicalAgentBuilder};
+use zara::health::MedicalAgentBuilder;
+use zara::body::ClothesGroupBuilder;
+
 use std::cell::Cell;
 
 pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
@@ -21,16 +24,31 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
     person.health.register_medical_agent (
         MedicalAgentBuilder::start()
             .for_agent("Aspirin")
-            .activates(CurveType::Immediately)
-            .and_lasts_for_minutes(10.)
-            .contains(
-                vec![
-                    "Aspirin Pills",
-                    "Big Green Leaves",
-                    "Syringe With Aspirin",
-                    "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
-                ]
-            ).build()
+                .activates(CurveType::Immediately)
+                .and_lasts_for_minutes(23.)
+                .includes(
+                    vec![
+                        "Aspirin Pills",
+                        "Big Green Leaves",
+                        "Syringe With Aspirin",
+                        "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
+                    ]
+                )
+            .build()
+    );
+
+    person.body.register_clothes_group(
+        ClothesGroupBuilder::start()
+            .with_name("Water Resistant Suit")
+                .bonus_cold_resistance(5)
+                .bonus_water_resistance(7)
+                .includes(
+                    vec![
+                        ("Pants", Box::new(PantsClothes)),
+                        ("Jacket", Box::new(JacketClothes)),
+                    ]
+                )
+            .build()
     );
 
     add_side_effects(&person);

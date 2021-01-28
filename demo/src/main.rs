@@ -86,7 +86,6 @@ fn main() {
                 console_update_counter = 0.;
 
                 ui_frame(&mut stderr, &person);
-               // flush_data(&mut stdout, &person);
             }
         }
     });

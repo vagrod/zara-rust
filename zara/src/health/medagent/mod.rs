@@ -191,7 +191,9 @@ impl MedicalAgent {
                 lerp: MultiKeyedLerp::new(frames)
             };
 
-            self.last_dose_end_time.replace(Some(GameTimeC::from_duration(Duration::from_secs_f32(dose.end_time))));
+            self.last_dose_end_time.replace(Some(
+                GameTimeC::from_duration(Duration::from_secs_f32(dose.end_time))
+            ));
             self.doses.borrow_mut().insert(key, dose);
         }
     }
@@ -267,7 +269,5 @@ impl MedicalAgentsMonitor {
         self.active_count.set(active_count);
     }
 
-    pub fn active_count(&self) -> i32 {
-        self.active_count.get()
-    }
+    pub fn active_count(&self) -> i32 { self.active_count.get() }
 }

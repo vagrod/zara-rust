@@ -90,7 +90,7 @@ impl TryFrom<i32> for StageLevel {
         }
     }
 }
-/// Used to describe a new medical agent
+/// Used to describe a new medical agent. Use `start` method to begin.
 pub struct MedicalAgentBuilder {
     pub name: RefCell<String>,
     pub duration_minutes: Cell<f32>,

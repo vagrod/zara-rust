@@ -11,6 +11,7 @@ macro_rules! inv_item(
             fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
+            fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
         }
     );
 );
@@ -26,6 +27,7 @@ macro_rules! inv_item_cons(
             fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { $cons }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
+            fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
         }
     );
 );
@@ -41,6 +43,23 @@ macro_rules! inv_item_appl (
             fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { $appl }
+            fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+        }
+    );
+);
+
+/// Macro for declaring clothes inventory item
+#[macro_export]
+macro_rules! inv_item_clothes (
+    ($t:ty, $nm:expr, $wt:expr, $cl:expr) => (
+        impl zara::inventory::items::InventoryItem for $t {
+            fn get_count(&self) -> usize { self.count.get() }
+            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
+            fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
+            fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { $cl }
         }
     );
 );
@@ -103,6 +122,17 @@ macro_rules! inv_spoil(
             fn fresh_poisoning_chance(&self) -> usize { $c1 as usize }
             fn spoil_poisoning_chance(&self) -> usize { $c2 as usize }
             fn spoil_time(&self) -> zara::utils::GameTimeC { $st }
+        }
+    );
+);
+
+/// Macro for declaring a spoiling option
+#[macro_export]
+macro_rules! inv_clothes(
+    ($t:ty, $c1:expr, $c2:expr) => (
+        impl zara::inventory::items::ClothesDescription for $t {
+            fn cold_resistance(&self) -> usize { $c1 as usize }
+            fn water_resistance(&self) -> usize { $c2 as usize }
         }
     );
 );
@@ -204,6 +234,7 @@ pub trait InventoryItem {
     /// Node that describes behavior of this item as a consumable
     fn consumable(&self) -> Option<&dyn ConsumableBehavior>;
     fn appliance(&self) -> Option<&dyn ApplianceBehavior>;
+    fn clothes(&self) -> Option<&dyn ClothesDescription>;
 }
 
 /// Trait to describe appliance behavior of the inventory item
@@ -237,4 +268,10 @@ pub trait SpoilingBehavior {
     /// Time that is needed for fresh item to become spoiled
     /// ([GameTimeC](crate::utils::GameTimeC) structure)
     fn spoil_time(&self) -> GameTimeC;
+}
+
+/// Trait to describe clothes-related options of the item
+pub trait ClothesDescription {
+    fn cold_resistance(&self) -> usize;
+    fn water_resistance(&self) -> usize;
 }

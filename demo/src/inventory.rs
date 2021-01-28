@@ -43,3 +43,21 @@ zara::inv_food!(
     /* food gain, 0..100% */ 0.,
     /* spoil option */ None
 );
+
+pub struct Pants { pub count: Cell<usize> }
+pub struct PantsClothes;
+zara::inv_item_clothes!(Pants, "Pants", 1622., Some(&PantsClothes));
+zara::inv_clothes!(
+    PantsClothes,
+    /* cold resistance, 0..100% */ 5.,
+    /* water resistance, 0..100% */ 14.
+);
+
+pub struct Jacket { pub count: Cell<usize> }
+pub struct JacketClothes;
+zara::inv_item_clothes!(Jacket, "Jacket", 1874., Some(&JacketClothes));
+zara::inv_clothes!(
+    JacketClothes,
+    /* cold resistance, 0..100% */ 9.,
+    /* water resistance, 0..100% */ 38.
+);

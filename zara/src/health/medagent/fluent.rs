@@ -25,7 +25,7 @@ pub trait AgentDuration {
 
 pub trait AgentItems {
     /// What kinds of inventory items are describing this agent
-    fn contains(&self, items: Vec<&str>) -> &dyn AgentEnd;
+    fn includes(&self, items: Vec<&str>) -> &dyn AgentEnd;
 }
 
 pub trait AgentEnd {
@@ -55,7 +55,7 @@ impl AgentDuration for MedicalAgentBuilder {
     }
 }
 impl AgentItems for MedicalAgentBuilder {
-    fn contains(&self, items: Vec<&str>) -> &dyn AgentEnd {
+    fn includes(&self, items: Vec<&str>) -> &dyn AgentEnd {
         self.items.replace(items.iter().map(|x| x.to_string()).collect());
 
         self.as_agent_end()
