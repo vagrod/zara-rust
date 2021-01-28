@@ -340,6 +340,41 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         ).ok();
     }
 
+    // Medical Agents
+    let medagent_col_base = 140;
+    execute!(w,
+        cursor::MoveTo(medagent_col_base, 0),
+        style::SetForegroundColor(style::Color::DarkRed),
+        style::Print(format!("Medical Agents ({} active now)", person.health.medical_agents.active_count())),
+        style::SetForegroundColor(style::Color::Red),
+        cursor::MoveToNextLine(1),
+    ).ok();
+    for (name, agent) in person.health.medical_agents.agents.borrow().iter() {
+        execute!(w,
+            cursor::MoveToColumn(medagent_col_base + 3),
+            style::Print(format!("{}", name)),
+            cursor::MoveToNextLine(1),
+        ).ok();
+        execute!(w,
+            cursor::MoveToColumn(medagent_col_base + 6),
+            style::Print(format!("Percent of activity: {:.1}%", agent.percent_of_activity())),
+            cursor::MoveToNextLine(1),
+            cursor::MoveToColumn(medagent_col_base + 6),
+            style::Print(format!("Percent of presence: {:.1}%", agent.percent_of_presence())),
+            cursor::MoveToNextLine(1),
+        ).ok();
+        match agent.last_dose_end_time() {
+            Some(t) => {
+                execute!(w,
+                cursor::MoveToColumn(medagent_col_base + 6),
+                style::Print(format!("Effect will last until {}", format_gt(&t))),
+                cursor::MoveToNextLine(1),
+            ).ok();
+            },
+            _ => { }
+        }
+    }
+
     w.flush().ok();
 }
 

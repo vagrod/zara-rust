@@ -47,7 +47,6 @@ impl Health {
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance
-    /// [`SideEffectsMonitor`](crate::health::side::SideEffectsMonitor) trait
     pub fn register_side_effect_monitor(&self, monitor: Box<dyn SideEffectsMonitor>) -> usize {
         let mut b = self.side_effects.borrow_mut();
         let key = b.keys().max().unwrap_or(&0) + 1;

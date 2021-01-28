@@ -33,3 +33,13 @@ zara::inv_food!(
     /* food gain, 0..100% */ 18.,
     /* spoil option */ None
 );
+
+pub struct AspirinPills { pub count: Cell<usize> }
+pub struct AspirinPillsConsumableOption;
+zara::inv_item_cons!(AspirinPills, "Aspirin Pills", 27., Some(&AspirinPillsConsumableOption));
+zara::inv_food!(
+    AspirinPillsConsumableOption,
+    /* water gain, 0..100% */ 0.,
+    /* food gain, 0..100% */ 0.,
+    /* spoil option */ None
+);

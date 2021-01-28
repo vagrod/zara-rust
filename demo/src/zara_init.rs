@@ -22,11 +22,11 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
         MedicalAgentBuilder::start()
             .for_agent("Aspirin")
             .activates(CurveType::Immediately)
-            .and_lasts_for_minutes(30.)
+            .and_lasts_for_minutes(10.)
             .contains(
                 vec![
-                    "Big Green Leaves",
                     "Aspirin Pills",
+                    "Big Green Leaves",
                     "Syringe With Aspirin",
                     "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
                 ]
@@ -44,7 +44,9 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let knife = inventory::Knife{ count: Cell::new(1) };
     let rope = inventory::Rope{ count: Cell::new(5) };
     let mre = inventory::MRE{ count: Cell::new(2) };
+    let aspirin = inventory::AspirinPills{ count: Cell::new(2) };
 
+    person.inventory.add_item(Box::new(aspirin));
     person.inventory.add_item(Box::new(meat));
     person.inventory.add_item(Box::new(knife));
     person.inventory.add_item(Box::new(rope));

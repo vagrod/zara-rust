@@ -8,18 +8,12 @@ use crate::health::injury::{InjuryDeltasC, InjuryKey};
 use std::cell::RefMut;
 use std::collections::BTreeMap;
 
-pub struct UpdateResult {
-    pub is_alive: bool
-}
-
 struct ProcessDiseasesResult {
-    deltas: DiseaseDeltasC,
-    is_alive: bool
+    deltas: DiseaseDeltasC
 }
 
 struct ProcessInjuriesResult {
     deltas: InjuryDeltasC,
-    is_alive: bool,
     blood_loss: bool
 }
 
@@ -28,11 +22,14 @@ impl Health {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>) -> UpdateResult {
+    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>) {
         // Update disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.check(self, &frame.data);
         }
+
+        // Update medical agents
+        self.medical_agents.update(&frame.data.game_time);
 
         let mut snapshot = HealthC::healthy();
 
@@ -83,10 +80,6 @@ impl Health {
 
         // Do the external events
         self.dispatch_events::<E>(frame.events);
-
-        UpdateResult {
-            is_alive: diseases_result.is_alive && injuries_result.is_alive
-        }
     }
 
     fn dispatch_events<E: Listener + 'static>(&self, events: &mut Dispatcher<E>) {
@@ -163,7 +156,7 @@ impl Health {
                         Some(st) => {
                             let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if chance > 0 {
+                            if chance > 0 && !disease.is_healing() {
                                 // The further into the stage, the bigger is probability of death
                                 if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
@@ -223,8 +216,7 @@ impl Health {
         result.cleanup();
 
         return ProcessDiseasesResult {
-            deltas: result,
-            is_alive
+            deltas: result
         }
     }
 
@@ -271,7 +263,7 @@ impl Health {
                         Some(st) => {
                             let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if chance > 0 {
+                            if chance > 0 && !injury.is_healing() {
                                 // The further into the stage, the bigger is probability of death
                                 if crate::utils::roll_dice(st.percent_active(game_time))
                                     && crate::utils::roll_dice(chance)
@@ -323,7 +315,6 @@ impl Health {
 
         return ProcessInjuriesResult {
             deltas: result,
-            is_alive,
             blood_loss
         }
     }
