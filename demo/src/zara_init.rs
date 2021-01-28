@@ -6,8 +6,6 @@ use zara::health::medagent::{CurveType};
 use zara::health::MedicalAgentBuilder;
 use zara::body::ClothesGroupBuilder;
 
-use std::cell::Cell;
-
 pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
     // Instantiate our events listener
     let events_listener = ZaraEventsListener;
@@ -58,11 +56,11 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
-    let meat = inventory::Meat{ count: Cell::new(2) };
-    let knife = inventory::Knife{ count: Cell::new(1) };
-    let rope = inventory::Rope{ count: Cell::new(5) };
-    let mre = inventory::MRE{ count: Cell::new(2) };
-    let aspirin = inventory::AspirinPills{ count: Cell::new(2) };
+    let meat = inventory::Meat{ count: 2 };
+    let knife = inventory::Knife{ count: 1 };
+    let rope = inventory::Rope{ count: 5 };
+    let mre = inventory::MRE{ count: 2 };
+    let aspirin = inventory::AspirinPills{ count: 2 };
 
     person.inventory.add_item(Box::new(aspirin));
     person.inventory.add_item(Box::new(meat));

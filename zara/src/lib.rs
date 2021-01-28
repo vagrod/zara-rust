@@ -146,6 +146,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
+    /// ## Note
+    /// Borrows `inventory.items` collection
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -156,36 +159,39 @@ impl<E: Listener + 'static> ZaraController<E> {
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         if !self.health.is_alive() { return Err(ItemConsumeErr::CharacterIsDead); }
 
-        let items_count: usize;
+        let new_count;
         let mut consumable = ConsumableC::new();
-        let inv_items = self.inventory.items.borrow();
+        {
+            let items_count: usize;
+            let inv_items = self.inventory.items.borrow();
 
-        let item = match inv_items.get(item_name) {
-            Some(o) => o,
-            None => return Err(ItemConsumeErr::ItemNotFound)
-        };
+            let item = match inv_items.get(item_name) {
+                Some(o) => o,
+                None => return Err(ItemConsumeErr::ItemNotFound)
+            };
 
-        items_count = item.get_count();
+            items_count = item.get_count();
+            new_count = items_count - 1;
 
-        if items_count - 1 <= 0 { // 1 so far
-            return Err(ItemConsumeErr::NotEnoughResources);
+            if items_count - 1 <= 0 { // 1 so far
+                return Err(ItemConsumeErr::NotEnoughResources);
+            }
+
+            let c = match item.consumable() {
+                Some(c) => c,
+                None => return Err(ItemConsumeErr::ItemIsNotConsumable)
+            };
+
+            consumable.name = item.get_name();
+            consumable.is_water = c.is_water();
+            consumable.is_food = c.is_food();
+            consumable.consumed_count = 1; // so far
+
+            let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
+
+            // Notify health controller about the event
+            self.health.on_consumed(&game_time, &consumable, &*inv_items);
         }
-
-        let c = match item.consumable() {
-            Some(c) => c,
-            None => return Err(ItemConsumeErr::ItemIsNotConsumable)
-        };
-
-        consumable.name = item.get_name();
-        consumable.is_water = c.is_water();
-        consumable.is_food = c.is_food();
-        consumable.consumed_count = 1; // so far
-
-        let new_count = items_count - 1;
-        let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
-
-        // Notify health controller about the event
-        self.health.on_consumed(&game_time, &consumable, &*inv_items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)
@@ -208,6 +214,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
+    /// ## Note
+    /// Borrows `inventory.items` collection
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -219,36 +228,39 @@ impl<E: Listener + 'static> ZaraController<E> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
         if body_part == BodyParts::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
 
-        let items_count: usize;
+        let new_count;
         let mut appliance = ApplianceC::new();
-        let inv_items = self.inventory.items.borrow();
+        {
+            let items_count: usize;
+            let inv_items = self.inventory.items.borrow();
 
-        let item = match inv_items.get(item_name) {
-            Some(o) => o,
-            None => return Err(ApplianceTakeErr::ItemNotFound)
-        };
+            let item = match inv_items.get(item_name) {
+                Some(o) => o,
+                None => return Err(ApplianceTakeErr::ItemNotFound)
+            };
 
-        items_count = item.get_count();
+            items_count = item.get_count();
+            new_count = items_count - 1;
 
-        if items_count - 1 <= 0 { // 1 so far
-            return Err(ApplianceTakeErr::NotEnoughResources);
+            if items_count - 1 <= 0 { // 1 so far
+                return Err(ApplianceTakeErr::NotEnoughResources);
+            }
+
+            let a = match item.appliance() {
+                Some(a) => a,
+                None => return Err(ApplianceTakeErr::ItemIsNotAppliance)
+            };
+
+            appliance.name = item.get_name();
+            appliance.is_body_appliance = a.is_body_appliance();
+            appliance.is_injection = a.is_injection();
+            appliance.taken_count = 1; // so far
+
+            let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
+
+            // Notify health controller about the event
+            self.health.on_appliance_taken(&game_time, &appliance, body_part, &*inv_items);
         }
-
-        let a = match item.appliance() {
-            Some(a) => a,
-            None => return Err(ApplianceTakeErr::ItemIsNotAppliance)
-        };
-
-        appliance.name = item.get_name();
-        appliance.is_body_appliance = a.is_body_appliance();
-        appliance.is_injection = a.is_injection();
-        appliance.taken_count = 1; // so far
-
-        let new_count = items_count - 1;
-        let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
-
-        // Notify health controller about the event
-        self.health.on_appliance_taken(&game_time, &appliance, body_part, &*inv_items);
 
         // Change items count
         self.inventory.change_item_count(item_name, new_count)

@@ -199,15 +199,11 @@ impl Health {
     }
 
     /// Sets controller alive state to `false`
-    pub fn declare_dead(&self) {
-        self.is_alive.set(false);
-    }
+    pub fn declare_dead(&self) { self.is_alive.set(false); }
 }
 
 impl MessageQueue for Health {
-    fn has_messages(&self) -> bool {
-        self.message_queue.borrow().len() > 0
-    }
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
 
     fn queue_message(&self, message: Event) {
         let mut q = self.message_queue.borrow_mut();

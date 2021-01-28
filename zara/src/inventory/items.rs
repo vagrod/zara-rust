@@ -5,10 +5,10 @@ use crate::utils::GameTimeC;
 macro_rules! inv_item(
     ($t:ty, $nm:expr, $wt:expr) => (
         impl zara::inventory::items::InventoryItem for $t {
-            fn get_count(&self) -> usize { self.count.get() }
-            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_count(&self) -> usize { self.count }
+            fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
-            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
@@ -21,10 +21,10 @@ macro_rules! inv_item(
 macro_rules! inv_item_cons(
     ($t:ty, $nm:expr, $wt:expr, $cons:expr) => (
         impl zara::inventory::items::InventoryItem for $t {
-            fn get_count(&self) -> usize { self.count.get() }
-            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_count(&self) -> usize { self.count }
+            fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
-            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { $cons }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
@@ -37,10 +37,10 @@ macro_rules! inv_item_cons(
 macro_rules! inv_item_appl (
     ($t:ty, $nm:expr, $wt:expr, $appl:expr) => (
         impl zara::inventory::items::InventoryItem for $t {
-            fn get_count(&self) -> usize { self.count.get() }
-            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_count(&self) -> usize { self.count }
+            fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
-            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { $appl }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
@@ -53,10 +53,10 @@ macro_rules! inv_item_appl (
 macro_rules! inv_item_clothes (
     ($t:ty, $nm:expr, $wt:expr, $cl:expr) => (
         impl zara::inventory::items::InventoryItem for $t {
-            fn get_count(&self) -> usize { self.count.get() }
-            fn set_count(&self, new_count: usize) { self.count.set(new_count) }
+            fn get_count(&self) -> usize { self.count }
+            fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
-            fn get_total_weight(&self) -> f32 { self.count.get() as f32 * $wt }
+            fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { $cl }
@@ -205,7 +205,7 @@ pub trait InventoryItem {
     /// ```
     /// item.set_count(new_value);
     /// ```
-    fn set_count(&self, new_count: usize);
+    fn set_count(&mut self, new_count: usize);
 
     /// Gets unique name for all items of this kind
     ///

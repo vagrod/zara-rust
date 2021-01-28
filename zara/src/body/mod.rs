@@ -27,7 +27,7 @@ pub struct Body {
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
-/// Used to describe a new clothes group
+/// Used to describe a new clothes group. Use `start` method to begin.
 pub struct ClothesGroupBuilder {
     pub name: RefCell<String>,
     pub bonus_cold_resistance: Cell<usize>,
@@ -35,7 +35,7 @@ pub struct ClothesGroupBuilder {
     pub items: RefCell<HashMap<String, ClothesItem>>
 }
 impl ClothesGroupBuilder {
-    /// Starts building process for a new clothes group. Use `start` method to begin.
+    /// Starts building process for a new clothes group.
     pub fn start() -> Box<dyn ClothesGroupStart> {
         Box::new(ClothesGroupBuilder {
             name: RefCell::new(String::new()),
@@ -144,9 +144,7 @@ impl Body {
 }
 
 impl MessageQueue for Body {
-    fn has_messages(&self) -> bool {
-        self.message_queue.borrow().len() > 0
-    }
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
 
     fn queue_message(&self, message: Event) {
         let mut q = self.message_queue.borrow_mut();

@@ -36,8 +36,8 @@ macro_rules! disease(
 /// # Examples
 /// Start with `start` method and call `build` when you're done.
 /// ```
-/// use zara::health::disease::{StageBuilder};
-/// use zara::health::{StageLevel};
+/// use zara::health::disease::StageBuilder;
+/// use zara::health::StageLevel;
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
@@ -542,9 +542,7 @@ impl ActiveDisease {
 }
 
 impl MessageQueue for ActiveDisease {
-    fn has_messages(&self) -> bool {
-        self.message_queue.borrow().len() > 0
-    }
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
 
     fn queue_message(&self, message: Event) {
         let mut q = self.message_queue.borrow_mut();

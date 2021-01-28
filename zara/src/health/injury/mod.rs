@@ -482,15 +482,11 @@ impl ActiveInjury {
     /// Gets if blood loss has been temporary stopped by the [`stop_blood_loss`] call
     ///
     /// [`stop_blood_loss`]: #method.stop_blood_loss
-    pub fn is_blood_stopped(&self) -> bool {
-        self.blood_loss_stop.get()
-    }
+    pub fn is_blood_stopped(&self) -> bool { self.blood_loss_stop.get() }
 }
 
 impl MessageQueue for ActiveInjury {
-    fn has_messages(&self) -> bool {
-        self.message_queue.borrow().len() > 0
-    }
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
 
     fn queue_message(&self, message: Event) {
         let mut q = self.message_queue.borrow_mut();

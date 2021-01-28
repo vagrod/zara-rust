@@ -1,13 +1,12 @@
 use zara::utils::{GameTimeC};
-use std::cell::Cell;
 
-pub struct Knife { pub count: Cell<usize> }
+pub struct Knife { pub count: usize }
 zara::inv_item!(Knife, "Knife", 432.);
 
-pub struct Rope { pub count: Cell<usize> }
+pub struct Rope { pub count: usize }
 zara::inv_item!(Rope, "Rope", 328.);
 
-pub struct Meat { pub count: Cell<usize> }
+pub struct Meat { pub count: usize }
 pub struct MeatConsumableOption;
 pub struct MeatSpoilOption;
 zara::inv_item_cons!(Meat, "Meat", 351., Some(&MeatConsumableOption));
@@ -24,7 +23,7 @@ zara::inv_food!(
     /* spoil option */ Some(&MeatSpoilOption)
 );
 
-pub struct MRE { pub count: Cell<usize> }
+pub struct MRE { pub count: usize }
 pub struct MREConsumableOption;
 zara::inv_item_cons!(MRE, "MRE", 269., Some(&MREConsumableOption));
 zara::inv_food!(
@@ -34,7 +33,7 @@ zara::inv_food!(
     /* spoil option */ None
 );
 
-pub struct AspirinPills { pub count: Cell<usize> }
+pub struct AspirinPills { pub count: usize }
 pub struct AspirinPillsConsumableOption;
 zara::inv_item_cons!(AspirinPills, "Aspirin Pills", 27., Some(&AspirinPillsConsumableOption));
 zara::inv_food!(
@@ -44,7 +43,7 @@ zara::inv_food!(
     /* spoil option */ None
 );
 
-pub struct Pants { pub count: Cell<usize> }
+pub struct Pants { pub count: usize }
 pub struct PantsClothes;
 zara::inv_item_clothes!(Pants, "Pants", 1622., Some(&PantsClothes));
 zara::inv_clothes!(
@@ -53,7 +52,7 @@ zara::inv_clothes!(
     /* water resistance, 0..100% */ 14.
 );
 
-pub struct Jacket { pub count: Cell<usize> }
+pub struct Jacket { pub count: usize }
 pub struct JacketClothes;
 zara::inv_item_clothes!(Jacket, "Jacket", 1874., Some(&JacketClothes));
 zara::inv_clothes!(

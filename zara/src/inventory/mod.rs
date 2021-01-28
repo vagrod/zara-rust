@@ -61,16 +61,25 @@ impl Inventory {
         }
     }
 
-    /// Shorthand function to change count of a given kind
+    /// Shorthand function to change count of a given kind.
+    ///
+    /// ## Note
+    /// Borrows `items` collection
     pub fn change_item_count(&self, name: &String, new_value: usize) -> Result<(), InventoryItemAccessErr> {
-        let b = self.items.borrow();
-        match b.get(name) {
-            Some(o) => {
-                o.set_count(new_value);
-                self.recalculate_weight();
-            },
-            None => return Err(InventoryItemAccessErr::ItemNotFound)
-        };
+        let need_recalculate;
+        {
+            let mut b = self.items.borrow_mut();
+            match b.get_mut(name) {
+                Some(o) => {
+                    o.set_count(new_value);
+
+                    need_recalculate = true;
+                },
+                None => return Err(InventoryItemAccessErr::ItemNotFound)
+            };
+        }
+
+        if need_recalculate { self.recalculate_weight(); }
 
         return Ok(());
     }
