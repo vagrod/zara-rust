@@ -217,7 +217,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Diseases
-    let dis_col_base = 90;
+    let dis_col_base = 83;
     execute!(w,
         cursor::MoveTo(dis_col_base, 0),
         style::SetForegroundColor(style::Color::DarkMagenta),
@@ -276,7 +276,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Injuries
-    let inj_col_base = 90;
+    let inj_col_base = 83;
     execute!(w,
         cursor::MoveToNextLine(1),
         cursor::MoveToColumn(inj_col_base+1),
@@ -346,7 +346,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Medical Agents
-    let medagent_col_base = 140;
+    let medagent_col_base = 130;
     execute!(w,
         cursor::MoveTo(medagent_col_base, 0),
         style::SetForegroundColor(style::Color::DarkRed),
@@ -372,7 +372,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
             Some(t) => {
                 execute!(w,
                 cursor::MoveToColumn(medagent_col_base + 6),
-                style::Print(format!("Effect will last until {}", format_gt(&t))),
+                style::Print(format!("Will last until {}", format_gt(&t))),
                 cursor::MoveToNextLine(1),
             ).ok();
             },
@@ -381,7 +381,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Clothes
-    let cl_col_base = 195;
+    let cl_col_base = 175;
     execute!(w,
         cursor::MoveTo(cl_col_base, 0),
         style::SetForegroundColor(style::Color::DarkBlue),
@@ -412,6 +412,28 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
                 }
             },
             _ => { }
+        }
+    }
+    match person.body.has_complete_clothes_set() {
+        Some(set) => {
+            execute!(w,
+                    cursor::MoveToColumn(cl_col_base + 3),
+                    style::Print(format!("Has complete clothes set: {}", set)),
+                    cursor::MoveToNextLine(1),
+                    cursor::MoveToColumn(cl_col_base + 6),
+                    style::Print(format!("Bonus water protection: {}%", person.body.bonus_water_resistance())),
+                    cursor::MoveToNextLine(1),
+                    cursor::MoveToColumn(cl_col_base + 6),
+                    style::Print(format!("Bonus cold protection: {}%", person.body.bonus_water_resistance())),
+                    cursor::MoveToNextLine(1),
+                ).ok();
+        },
+        _ => {
+            execute!(w,
+                    cursor::MoveToColumn(cl_col_base + 3),
+                    style::Print("No complete clothes set"),
+                    cursor::MoveToNextLine(1)
+                ).ok();
         }
     }
 

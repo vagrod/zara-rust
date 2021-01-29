@@ -294,6 +294,12 @@ impl ops::Sub<GameTimeC> for GameTimeC {
     }
 }
 
+pub struct ClothesGroupC {
+    pub name: String,
+    pub bonus_cold_resistance: usize,
+    pub bonus_water_resistance: usize
+}
+
 /// Structure for storing health snapshot
 pub struct HealthC {
     /// Body temperature (degrees C)

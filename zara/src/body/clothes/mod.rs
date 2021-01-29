@@ -69,4 +69,15 @@ impl ClothesGroup {
         }
     }
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains_key(item_name) }
+    pub fn has_complete(&self, items: Vec<String>) -> bool {
+        if items.len() == 0 { return false; }
+
+        for (key, _) in self.items.iter() {
+            if items.iter().all(|x| x != key) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
