@@ -107,3 +107,27 @@ pub enum ZaraUpdateErr {
 pub enum MedicalAgentErr {
     AgentNotFound
 }
+
+/// Is used by `ZaraController.put_on_clothes` method
+pub enum ClothesOnActionErr {
+    ItemNotFound,
+    InsufficientResources,
+    AlreadyHaveThisItemOn,
+    IsNotClothesType
+}
+
+/// Is used by `ZaraController.take_off_clothes` method
+pub enum ClothesOffActionErr {
+    ItemNotFound,
+    InsufficientResources,
+    ItemIsNotOn,
+    IsNotClothesType
+}
+
+pub enum RequestClothesOnErr {
+    AlreadyHaveThisItemOn
+}
+
+pub enum RequestClothesOffErr {
+    ItemIsNotOn
+}

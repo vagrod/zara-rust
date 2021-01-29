@@ -88,7 +88,7 @@ impl StageBuilder {
 pub trait DiseaseTreatment {
     /// Called on all active diseases when player eats something
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `game_time`: game time when this call happened
     /// - `item`: consumable item description
     /// - `active_stage`: instance of the active stage of a disease
@@ -101,7 +101,7 @@ pub trait DiseaseTreatment {
 
    /// Called on all active diseases when appliance is taken (bandage, injection, etc)
    ///
-   /// ## Parameters
+   /// # Parameters
    /// - `game_time`: game time when this call happened
    /// - `item`: appliance item description
    /// - `body_part`: part of the body where this appliance was applied

@@ -330,6 +330,11 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         }
         execute!(w,
             cursor::MoveToColumn(inj_col_base+6),
+            style::Print(format!("Fracture? {}", if item.is_fracture { "yes" } else { "no" })),
+            cursor::MoveToNextLine(1),
+        ).ok();
+        execute!(w,
+            cursor::MoveToColumn(inj_col_base+6),
             style::Print(format!("Needs treatment? {}", if item.needs_treatment { "yes" } else { "no (will self-heal)" })),
             cursor::MoveToNextLine(1),
         ).ok();
@@ -370,6 +375,41 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
                 style::Print(format!("Effect will last until {}", format_gt(&t))),
                 cursor::MoveToNextLine(1),
             ).ok();
+            },
+            _ => { }
+        }
+    }
+
+    // Clothes
+    let cl_col_base = 195;
+    execute!(w,
+        cursor::MoveTo(cl_col_base, 0),
+        style::SetForegroundColor(style::Color::DarkBlue),
+        style::Print("Clothes"),
+        style::SetForegroundColor(style::Color::Blue),
+        cursor::MoveToNextLine(1),
+    ).ok();
+    for item_name in person.body.clothes.borrow().iter() {
+        execute!(w,
+            cursor::MoveToColumn(cl_col_base + 3),
+            style::Print(format!("{}", item_name)),
+            cursor::MoveToNextLine(1),
+        ).ok();
+        match person.inventory.items.borrow().get(item_name) {
+            Some(item) => {
+                match item.clothes() {
+                    Some(c) => {
+                        execute!(w,
+                            cursor::MoveToColumn(cl_col_base + 6),
+                            style::Print(format!("Cold protection: {}%", c.cold_resistance())),
+                            cursor::MoveToNextLine(1),
+                            cursor::MoveToColumn(cl_col_base + 6),
+                            style::Print(format!("Water protection: {}%", c.water_resistance())),
+                            cursor::MoveToNextLine(1),
+                        ).ok();
+                    },
+                    _ => { }
+                }
             },
             _ => { }
         }

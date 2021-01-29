@@ -7,11 +7,11 @@ pub mod fluent;
 impl Body {
     /// Registers new clothes group.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `group`: clothes group to register. Use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
     ///     to create one.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     ///```
     /// use crate::zara::body::ClothesGroupBuilder;

@@ -107,7 +107,7 @@ impl StageBuilder {
 pub trait InjuryTreatment {
     /// Called on all active injuries when player takes an appliance (bandage, injection, etc)
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `game_time`: game time when this call happened
     /// - `item`: appliance item description
     /// - `body_part`: part of the body where this appliance was applied

@@ -2,6 +2,7 @@ use crate::utils::{FrameC, GameTimeC};
 use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
 use crate::body::clothes::{ClothesGroup, ClothesItem};
 use crate::body::clothes::fluent::ClothesGroupStart;
+use crate::error::{RequestClothesOnErr, RequestClothesOffErr};
 
 use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
@@ -13,6 +14,14 @@ mod status_methods;
 pub mod clothes;
 
 pub struct Body {
+    /// Clothes that character is wearing now.
+    ///
+    /// # Important
+    /// Do not alter this collection manually, use `ZaraController.put_on_clothes` and
+    /// `ZaraController.take_off_clothes`, otherwise clothes will not be correctly synchronized
+    /// between controllers
+    pub clothes: Arc<RefCell<Vec<String>>>,
+
     /// Game time when player slept last time
     last_sleep_time: RefCell<Option<GameTimeC>>,
     /// For how long player slept last time (game hours)
@@ -92,6 +101,7 @@ impl Body {
     /// ```
     pub fn new() -> Self {
         Body {
+            clothes: Arc::new(RefCell::new(Vec::new())),
             last_sleep_time: RefCell::new(Option::None),
             is_sleeping: Cell::new(false),
             sleeping_counter: Cell::new(0.),
@@ -140,6 +150,31 @@ impl Body {
         self.last_sleep_duration.set(game_hours);
 
         return true;
+    }
+
+    pub fn request_clothes_on(&self, item_name: &String) -> Result<(), RequestClothesOnErr> {
+        let mut b = self.clothes.borrow_mut();
+        if b.contains(item_name) {
+            return Err(RequestClothesOnErr::AlreadyHaveThisItemOn);
+        }
+
+        b.push(item_name.to_string());
+
+        Ok(())
+    }
+
+    pub fn request_clothes_off(&self, item_name: &String) -> Result<(), RequestClothesOffErr> {
+        let mut b = self.clothes.borrow_mut();
+        match b.iter().position(|x| x==item_name) {
+            Some(ind) =>{
+                b.remove(ind);
+            },
+            None => {
+                return Err(RequestClothesOffErr::ItemIsNotOn);
+            }
+        }
+
+        Ok(())
     }
 }
 

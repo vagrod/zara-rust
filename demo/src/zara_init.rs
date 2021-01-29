@@ -51,8 +51,14 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
 
     add_side_effects(&person);
     populate_inventory(&person);
+    dress(&person);
 
     return person;
+}
+
+fn dress(person: &zara::ZaraController<ZaraEventsListener>) {
+    person.put_on_clothes(&format!("Pants")).ok();
+    person.put_on_clothes(&format!("Jacket")).ok();
 }
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
@@ -61,12 +67,16 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let rope = inventory::Rope{ count: 5 };
     let mre = inventory::MRE{ count: 2 };
     let aspirin = inventory::AspirinPills{ count: 2 };
+    let pants = inventory::Pants{ count: 1 };
+    let jacket = inventory::Jacket{ count: 1 };
 
     person.inventory.add_item(Box::new(aspirin));
     person.inventory.add_item(Box::new(meat));
     person.inventory.add_item(Box::new(knife));
     person.inventory.add_item(Box::new(rope));
     person.inventory.add_item(Box::new(mre));
+    person.inventory.add_item(Box::new(pants));
+    person.inventory.add_item(Box::new(jacket));
 }
 
 fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {

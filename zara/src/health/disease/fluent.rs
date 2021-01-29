@@ -14,7 +14,7 @@ impl StageBuilder {
 pub trait StageInit {
     /// Starts stage building process
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `level`: level of the stage we will be building
     fn build_for(&self, level: StageLevel) -> &dyn StageSelfHeal;
 }
@@ -22,7 +22,7 @@ pub trait StageInit {
 pub trait StageSelfHeal {
     /// Will this stage have a chance of triggering self-healing
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `probability`: 0..100 chance of self-heal for this stage
     fn self_heal(&self, probability: usize) -> &dyn StageVitalsNode;
     /// This stage has no self-healing probability
@@ -37,24 +37,24 @@ pub trait StageVitalsNode {
 pub trait StageVitalsValues {
     /// Set the target body temperature for this stage
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: absolute value (like 37.3)
     fn with_target_body_temp(&self, value: f32) -> &dyn StageVitalsValues;
     /// Set the target heart rate for this stage
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: absolute value (like 84.)
     fn with_target_heart_rate(&self, value: f32) -> &dyn StageVitalsValues;
     /// Set the target blood pressure for this stage
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `top`: absolute value (like 120.)
     /// - `bottom`: absolute value (like 70.)
     fn with_target_blood_pressure(&self, top: f32, bottom: f32) -> &dyn StageVitalsValues;
 
     /// In what time this stage should reach those vitals values (in game time hours)
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `hours`: number of game hours
     fn will_reach_target_in(&self, hours: f32) -> &dyn StageVitalsValues;
     /// Tells that disease will move on when `will_reach_target_in` time ends.
@@ -78,23 +78,23 @@ pub trait StageDrainsNode {
 pub trait StageDrainsValues {
     /// Set the static drain rate for the stamina for this stage. 0..100 percents per game second.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn stamina(&self, value: f32) -> &dyn StageDrainsValues;
     /// Set the static drain rate for the food level for this stage. 0..100 percents per game second.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn food_level(&self, value: f32) -> &dyn StageDrainsValues;
     /// Set the static drain rate for the water level for this stage. 0..100 percents per game second.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn water_level(&self, value: f32) -> &dyn StageDrainsValues;
 
     /// Choose this if you want this stage to affect fatigue.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `target_delta`: maximum impact on fatigue at the end of this stage (0..100 percents)
     fn affects_fatigue(&self, target_delta: f32) -> &dyn StageDeathChance;
     /// This stage does not affect fatigue

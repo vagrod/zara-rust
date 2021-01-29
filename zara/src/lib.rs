@@ -1,7 +1,7 @@
+use error::*;
 use utils::{GameTime, EnvironmentC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
-use error::{ItemConsumeErr, ApplianceTakeErr};
 use inventory::items::{ConsumableC, ApplianceC};
 use body::BodyParts;
 
@@ -273,8 +273,72 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Sets controller alive state to `false`
-    pub fn declare_dead(&self) {
-        self.health.declare_dead();
+    pub fn declare_dead(&self) { self.health.declare_dead(); }
+
+    /// Adds given item to the `body.clothes` collection.
+    ///
+    /// # Parameters
+    /// - `item_name`: unique inventory item name. Item must have `clothes` option present.
+    ///
+    /// ## Note
+    /// This method borrows `body.clothes` collection.
+    ///
+    /// # Returns
+    /// Ok on success
+    pub fn put_on_clothes(&self, item_name: &String) -> Result<(), ClothesOnActionErr> {
+        match self.inventory.items.borrow().get(item_name) {
+            Some(item) => {
+                if item.get_count() <= 0 {
+                    return Err(ClothesOnActionErr::InsufficientResources)
+                }
+                if item.clothes().is_none() {
+                    return Err(ClothesOnActionErr::IsNotClothesType)
+                }
+            },
+            None => return Err(ClothesOnActionErr::ItemNotFound)
+        };
+
+        match self.body.request_clothes_on(item_name) {
+            Err(RequestClothesOnErr::AlreadyHaveThisItemOn) => {
+                Err(ClothesOnActionErr::AlreadyHaveThisItemOn)
+            },
+            _ => {
+                Ok(())
+            }
+        }
+    }
+
+    /// Removes given item from the `body.clothes` collection.
+    ///
+    /// # Parameters
+    /// - `item_name`: unique inventory item name that was put on earlier.
+    ///
+    /// ## Note
+    /// This method borrows `body.clothes` collection.
+    ///
+    /// # Returns
+    /// Ok on success
+    pub fn take_off_clothes(&self, item_name: &String) -> Result<(), ClothesOffActionErr> {
+        match self.inventory.items.borrow().get(item_name) {
+            Some(item) => {
+                if item.get_count() <= 0 {
+                    return Err(ClothesOffActionErr::InsufficientResources)
+                }
+                if item.clothes().is_none() {
+                    return Err(ClothesOffActionErr::IsNotClothesType)
+                }
+            },
+            None => return Err(ClothesOffActionErr::ItemNotFound)
+        };
+
+        match self.body.request_clothes_off(item_name) {
+            Err(RequestClothesOffErr::ItemIsNotOn) => {
+                Err(ClothesOffActionErr::ItemIsNotOn)
+            },
+            _ => {
+                Ok(())
+            }
+        }
     }
 
 }

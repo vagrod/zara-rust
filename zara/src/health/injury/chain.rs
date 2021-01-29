@@ -18,7 +18,7 @@ impl ActiveInjury {
     ///
     /// [`invert_back`]: #method.invert_back
     ///
-    /// ## Returns
+    /// # Returns
     /// Ok on success.
     ///
     /// # Parameters
@@ -137,7 +137,7 @@ impl ActiveInjury {
     ///
     /// [`invert`]: #method.invert
     ///
-    /// ## Returns
+    /// # Returns
     /// Ok on success.
     ///
     /// # Parameters

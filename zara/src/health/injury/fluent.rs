@@ -15,7 +15,7 @@ impl StageBuilder {
 pub trait StageInit {
     /// Starts stage building process
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `level`: level of the stage we will be building
     fn build_for(&self, level: StageLevel) -> &dyn StageSelfHeal;
 }
@@ -23,7 +23,7 @@ pub trait StageInit {
 pub trait StageSelfHeal {
     /// Will this stage have a chance of triggering self-healing
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `probability`: 0..100 chance of self-heal for this stage
     fn self_heal(&self, probability: usize) -> &dyn StageDrainsNode;
     /// This stage has no self-healing probability
@@ -40,12 +40,12 @@ pub trait StageDrainsNode {
 pub trait StageDrainsValues {
     /// Set the static drain rate for the stamina for this stage. 0..100 percents per game second.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn stamina(&self, value: f32) -> &dyn StageDrainsValues;
     /// Set the static drain rate for the food level for this stage. 0..100 percents per game second.
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `value`: max drain value for this stage (0..100 percents per game second)
     fn blood_level(&self, value: f32) -> &dyn StageDrainsValues;
     /// This stage is not deadly
@@ -70,7 +70,7 @@ pub trait StageDeathChance {
 pub trait StageTargets {
     /// In what time this stage should reach those vitals values (in game time hours)
     ///
-    /// ## Parameters
+    /// # Parameters
     /// - `hours`: number of game hours
     fn will_reach_target_in(&self, hours: f32) -> &dyn StageDuration;
 }
