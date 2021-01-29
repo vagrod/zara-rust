@@ -1,4 +1,7 @@
-use crate::body::Body;
+use crate::body::{Body, ClothesItemC};
+use crate::error::{RequestClothesOffErr, RequestClothesOnErr};
+use crate::inventory::items::ClothesDescription;
+use crate::utils::ClothesGroupC;
 
 use std::collections::HashMap;
 
@@ -28,6 +31,64 @@ impl Body {
     ///
     pub fn register_clothes_group(&self, group: ClothesGroup) {
         self.clothes_groups.borrow_mut().insert(group.name.to_string(), group);
+    }
+
+    pub fn request_clothes_on(&self, item_name: &String, data: &dyn ClothesDescription) -> Result<(), RequestClothesOnErr> {
+        {
+            let mut clothes = self.clothes.borrow_mut();
+            if clothes.contains(item_name) {
+                return Err(RequestClothesOnErr::AlreadyHaveThisItemOn);
+            }
+
+            clothes.push(item_name.to_string());
+
+            let mut cdata = self.clothes_data.borrow_mut();
+            cdata.insert(item_name.to_string(), ClothesItemC {
+                cold_resistance: data.cold_resistance(),
+                water_resistance: data.water_resistance()
+            });
+        }
+
+        self.refresh_clothes_group();
+
+        Ok(())
+    }
+
+    pub fn request_clothes_off(&self, item_name: &String) -> Result<(), RequestClothesOffErr> {
+        {
+            let mut clothes = self.clothes.borrow_mut();
+            match clothes.iter().position(|x| x == item_name) {
+                Some(ind) => {
+                    clothes.remove(ind);
+                },
+                None => {
+                    return Err(RequestClothesOffErr::ItemIsNotOn);
+                }
+            }
+
+            let mut cdata = self.clothes_data.borrow_mut();
+            if cdata.contains_key(item_name) {
+                cdata.remove(item_name);
+            }
+        }
+
+        self.refresh_clothes_group();
+
+        Ok(())
+    }
+
+    fn refresh_clothes_group(&self) {
+        match self.clothes_groups.borrow_mut().iter().find(|(_, group)|
+            (*group).has_complete(self.clothes.borrow().clone())) {
+            Some((key, g)) => {
+                self.clothes_group.replace(Some(ClothesGroupC {
+                    name: key.to_string(),
+                    bonus_cold_resistance: g.bonus_cold_resistance,
+                    bonus_water_resistance: g.bonus_water_resistance
+                }))
+            },
+            None => self.clothes_group.replace(None)
+        };
     }
 }
 

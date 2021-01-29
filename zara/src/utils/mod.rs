@@ -299,6 +299,15 @@ pub struct ClothesGroupC {
     pub bonus_cold_resistance: usize,
     pub bonus_water_resistance: usize
 }
+impl ClothesGroupC {
+    pub fn copy(&self) -> ClothesGroupC {
+        ClothesGroupC {
+            name: self.name.to_string(),
+            bonus_water_resistance: self.bonus_water_resistance,
+            bonus_cold_resistance: self.bonus_cold_resistance
+        }
+    }
+}
 
 /// Structure for storing health snapshot
 pub struct HealthC {

@@ -286,25 +286,26 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     pub fn put_on_clothes(&self, item_name: &String) -> Result<(), ClothesOnActionErr> {
-        match self.inventory.items.borrow().get(item_name) {
+        return match self.inventory.items.borrow().get(item_name) {
             Some(item) => {
                 if item.get_count() <= 0 {
                     return Err(ClothesOnActionErr::InsufficientResources)
                 }
-                if item.clothes().is_none() {
-                    return Err(ClothesOnActionErr::IsNotClothesType)
+                match item.clothes() {
+                    Some(c) => {
+                        match self.body.request_clothes_on(item_name, c) {
+                            Err(RequestClothesOnErr::AlreadyHaveThisItemOn) => {
+                                Err(ClothesOnActionErr::AlreadyHaveThisItemOn)
+                            },
+                            _ => {
+                                Ok(())
+                            }
+                        }
+                    },
+                    None => Err(ClothesOnActionErr::IsNotClothesType)
                 }
             },
-            None => return Err(ClothesOnActionErr::ItemNotFound)
-        };
-
-        match self.body.request_clothes_on(item_name) {
-            Err(RequestClothesOnErr::AlreadyHaveThisItemOn) => {
-                Err(ClothesOnActionErr::AlreadyHaveThisItemOn)
-            },
-            _ => {
-                Ok(())
-            }
+            None => Err(ClothesOnActionErr::ItemNotFound)
         }
     }
 

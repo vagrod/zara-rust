@@ -2,7 +2,6 @@ use crate::utils::{FrameC, GameTimeC, ClothesGroupC};
 use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
 use crate::body::clothes::{ClothesGroup, ClothesItem};
 use crate::body::clothes::fluent::ClothesGroupStart;
-use crate::error::{RequestClothesOnErr, RequestClothesOffErr};
 
 use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
@@ -32,10 +31,17 @@ pub struct Body {
     clothes_groups: Arc<RefCell<HashMap<String, ClothesGroup>>>,
     /// Current matched clothes group
     clothes_group: RefCell<Option<ClothesGroupC>>,
+    /// Active clothes resistance levels data
+    clothes_data: RefCell<HashMap<String, ClothesItemC>>,
 
     sleeping_counter: Cell<f64>,
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+
+struct ClothesItemC {
+    cold_resistance: usize,
+    water_resistance: usize,
 }
 
 /// Used to describe a new clothes group. Use `start` method to begin.
@@ -110,7 +116,8 @@ impl Body {
             last_sleep_duration: Cell::new(0.),
             clothes_groups: Arc::new(RefCell::new(HashMap::new())),
             message_queue: RefCell::new(BTreeMap::new()),
-            clothes_group: RefCell::new(None)
+            clothes_group: RefCell::new(None),
+            clothes_data: RefCell::new(HashMap::new())
         }
     }
 
@@ -153,53 +160,6 @@ impl Body {
         self.last_sleep_duration.set(game_hours);
 
         return true;
-    }
-
-    pub fn request_clothes_on(&self, item_name: &String) -> Result<(), RequestClothesOnErr> {
-        {
-            let mut b = self.clothes.borrow_mut();
-            if b.contains(item_name) {
-                return Err(RequestClothesOnErr::AlreadyHaveThisItemOn);
-            }
-
-            b.push(item_name.to_string());
-        }
-
-        self.refresh_clothes_group();
-
-        Ok(())
-    }
-
-    pub fn request_clothes_off(&self, item_name: &String) -> Result<(), RequestClothesOffErr> {
-        {
-            let mut b = self.clothes.borrow_mut();
-            match b.iter().position(|x| x == item_name) {
-                Some(ind) => {
-                    b.remove(ind);
-                },
-                None => {
-                    return Err(RequestClothesOffErr::ItemIsNotOn);
-                }
-            }
-        }
-
-        self.refresh_clothes_group();
-
-        Ok(())
-    }
-
-    fn refresh_clothes_group(&self) {
-        match self.clothes_groups.borrow_mut().iter().find(|(_, group)|
-            (*group).has_complete(self.clothes.borrow().clone())) {
-            Some((key, g)) => {
-                self.clothes_group.replace(Some(ClothesGroupC {
-                    name: key.to_string(),
-                    bonus_cold_resistance: g.bonus_cold_resistance,
-                    bonus_water_resistance: g.bonus_water_resistance
-                }))
-            },
-            None => self.clothes_group.replace(None)
-        };
     }
 }
 

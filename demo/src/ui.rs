@@ -414,28 +414,36 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
             _ => { }
         }
     }
-    match person.body.has_complete_clothes_set() {
-        Some(set) => {
+    match person.body.clothes_group() {
+        Some(group) => {
             execute!(w,
-                    cursor::MoveToColumn(cl_col_base + 3),
-                    style::Print(format!("Has complete clothes set: {}", set)),
-                    cursor::MoveToNextLine(1),
-                    cursor::MoveToColumn(cl_col_base + 6),
-                    style::Print(format!("Bonus water protection: {}%", person.body.bonus_water_resistance())),
-                    cursor::MoveToNextLine(1),
-                    cursor::MoveToColumn(cl_col_base + 6),
-                    style::Print(format!("Bonus cold protection: {}%", person.body.bonus_water_resistance())),
-                    cursor::MoveToNextLine(1),
-                ).ok();
+                cursor::MoveToColumn(cl_col_base + 3),
+                style::Print(format!("Has complete clothes set: {}", group.name)),
+                cursor::MoveToNextLine(1),
+                cursor::MoveToColumn(cl_col_base + 6),
+                style::Print(format!("Bonus water protection: {}%", group.bonus_water_resistance)),
+                cursor::MoveToNextLine(1),
+                cursor::MoveToColumn(cl_col_base + 6),
+                style::Print(format!("Bonus cold protection: {}%", group.bonus_cold_resistance)),
+                cursor::MoveToNextLine(1),
+            ).ok();
         },
         _ => {
             execute!(w,
-                    cursor::MoveToColumn(cl_col_base + 3),
-                    style::Print("No complete clothes set"),
-                    cursor::MoveToNextLine(1)
-                ).ok();
+                cursor::MoveToColumn(cl_col_base + 3),
+                style::Print("No complete clothes set"),
+                cursor::MoveToNextLine(1)
+            ).ok();
         }
     }
+    execute!(w,
+        cursor::MoveToColumn(cl_col_base + 3),
+        style::Print(format!("Total water protection: {}%", person.body.total_water_resistance())),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(cl_col_base + 3),
+        style::Print(format!("Total cold protection: {}%", person.body.total_cold_resistance())),
+        cursor::MoveToNextLine(1),
+    ).ok();
 
     w.flush().ok();
 }
