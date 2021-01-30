@@ -5,6 +5,8 @@ use crate::utils::ClothesGroupC;
 
 use std::collections::HashMap;
 
+mod warmth;
+
 pub mod fluent;
 
 impl Body {
@@ -50,6 +52,7 @@ impl Body {
         }
 
         self.refresh_clothes_group();
+        self.recalculate_warmth_level();
 
         Ok(())
     }
@@ -73,6 +76,7 @@ impl Body {
         }
 
         self.refresh_clothes_group();
+        self.recalculate_warmth_level();
 
         Ok(())
     }

@@ -48,7 +48,7 @@ pub struct PantsClothes;
 zara::inv_item_clothes!(Pants, "Pants", 1622., Some(&PantsClothes));
 zara::inv_clothes!(
     PantsClothes,
-    /* cold resistance, 0..100% */ 5.,
+    /* cold resistance, 0..100% */ 1.,
     /* water resistance, 0..100% */ 14.
 );
 
@@ -57,6 +57,6 @@ pub struct JacketClothes;
 zara::inv_item_clothes!(Jacket, "Jacket", 1874., Some(&JacketClothes));
 zara::inv_clothes!(
     JacketClothes,
-    /* cold resistance, 0..100% */ 9.,
+    /* cold resistance, 0..100% */ 2.,
     /* water resistance, 0..100% */ 38.
 );

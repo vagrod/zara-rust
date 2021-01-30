@@ -5,6 +5,12 @@ impl Body {
     /// Is player sleeping now
     pub fn is_sleeping(&self) -> bool { self.is_sleeping.get() }
 
+    /// Cached warmth level value
+    pub fn warmth_level(&self) -> f32 { self.warmth_level.get() }
+
+    /// Cached wetness level value
+    pub fn wetness_level(&self) -> f32 { self.wetness_level.get() }
+
     /// Last time slept (if any)
     pub fn last_sleep_time(&self) -> Option<GameTimeC> {
         match self.last_sleep_time.borrow().as_ref()
@@ -14,8 +20,8 @@ impl Body {
         }
     }
 
-    /// Duration of the last sleep (zero if none)
-    pub fn last_sleep_duration(&self) -> f64 { self.last_sleep_duration.get() }
+    /// Duration of the last sleep (game hours)
+    pub fn last_sleep_duration(&self) -> f32 { self.last_sleep_duration.get() }
 
     /// Returns copy of matched clothes group description.
     pub fn clothes_group(&self) -> Option<ClothesGroupC> {
@@ -46,7 +52,7 @@ impl Body {
     }
 
     /// Returns total 0..100 bonus water resistance value calculated as a sum of all active clothes
-    /// cold resistance values plus water resistance bonus from a matched clothes group, if any
+    /// water resistance values plus water resistance bonus from a matched clothes group, if any
     ///
     /// ## Note
     /// This value is not cached.

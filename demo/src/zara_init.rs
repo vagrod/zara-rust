@@ -38,7 +38,7 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
     person.body.register_clothes_group(
         ClothesGroupBuilder::start()
             .with_name("Water Resistant Suit")
-                .bonus_cold_resistance(5)
+                .bonus_cold_resistance(2)
                 .bonus_water_resistance(7)
                 .includes(
                     vec![

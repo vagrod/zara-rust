@@ -2,6 +2,7 @@ use crate::utils::{FrameC, GameTimeC, ClothesGroupC};
 use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
 use crate::body::clothes::{ClothesGroup, ClothesItem};
 use crate::body::clothes::fluent::ClothesGroupStart;
+use crate::world::EnvironmentData;
 
 use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
@@ -24,7 +25,7 @@ pub struct Body {
     /// Game time when player slept last time
     last_sleep_time: RefCell<Option<GameTimeC>>,
     /// For how long player slept last time (game hours)
-    last_sleep_duration: Cell<f64>,
+    last_sleep_duration: Cell<f32>,
     /// Is player sleeping now
     is_sleeping: Cell<bool>,
     /// Registered clothes groups
@@ -33,8 +34,15 @@ pub struct Body {
     clothes_group: RefCell<Option<ClothesGroupC>>,
     /// Active clothes resistance levels data
     clothes_data: RefCell<HashMap<String, ClothesItemC>>,
+    /// Warmth level value
+    warmth_level: Cell<f32>,
+    /// Wetness level value
+    wetness_level: Cell<f32>,
 
     sleeping_counter: Cell<f64>,
+    cached_world_temp: Cell<f32>,
+    cached_wind_speed: Cell<f32>,
+
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
@@ -117,7 +125,11 @@ impl Body {
             clothes_groups: Arc::new(RefCell::new(HashMap::new())),
             message_queue: RefCell::new(BTreeMap::new()),
             clothes_group: RefCell::new(None),
-            clothes_data: RefCell::new(HashMap::new())
+            clothes_data: RefCell::new(HashMap::new()),
+            cached_wind_speed: Cell::new(-1000.),
+            cached_world_temp: Cell::new(-1000.),
+            warmth_level: Cell::new(0.),
+            wetness_level: Cell::new(0.)
         }
     }
 
@@ -125,8 +137,8 @@ impl Body {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>){
-
+    pub fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>, environment: &EnvironmentData){
+        self.update_warmth_level_if_needed(environment.temperature.get(), environment.wind_speed.get());
     }
 
     /// Is called every frame by Zara controller.
@@ -154,9 +166,9 @@ impl Body {
     ///
     /// # Parameters
     /// - `game_hours`: for how many game hours should player sleep
-    pub fn start_sleeping(&self, game_hours: f64) -> bool {
+    pub fn start_sleeping(&self, game_hours: f32) -> bool {
         self.is_sleeping.set(true);
-        self.sleeping_counter.set(game_hours * 60. * 60.);
+        self.sleeping_counter.set(game_hours as f64 * 60. * 60.);
         self.last_sleep_duration.set(game_hours);
 
         return true;

@@ -312,7 +312,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Removes given item from the `body.clothes` collection.
     ///
     /// # Parameters
-    /// - `item_name`: unique inventory item name that was put on earlier.
+    /// - `item_name`: unique name of the inventory item that was put on earlier.
     ///
     /// ## Note
     /// This method borrows `body.clothes` collection.

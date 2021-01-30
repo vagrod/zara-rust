@@ -33,7 +33,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         style::Print(format_gt(&gt)),
     ).ok();
 
-    let vitals_h = 12;
+    let vitals_h = 14;
     // Vitals
     execute!(w,
         cursor::MoveTo(0, 2),
@@ -64,6 +64,12 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1),
         style::Print("  Blood level: "),
         style::Print(format!("{:.1}%", person.health.blood_level())),
+        cursor::MoveToNextLine(1),
+        style::Print("  Warmth level: "),
+        style::Print(format!("{:.1} (-5..+5 is a sweet spot)", person.body.warmth_level())),
+        cursor::MoveToNextLine(1),
+        style::Print("  Wetness level: "),
+        style::Print(format!("{:.1}%", person.body.wetness_level())),
         cursor::MoveToNextLine(1),
     ).ok();
 
@@ -120,7 +126,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     ).ok();
 
     // Inventory
-    let inv_col_base = 40;
+    let inv_col_base = 43;
     execute!(w,
         cursor::MoveTo(inv_col_base, 0),
         style::SetForegroundColor(style::Color::DarkBlue),
@@ -217,7 +223,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Diseases
-    let dis_col_base = 83;
+    let dis_col_base = 86;
     execute!(w,
         cursor::MoveTo(dis_col_base, 0),
         style::SetForegroundColor(style::Color::DarkMagenta),
@@ -276,7 +282,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Injuries
-    let inj_col_base = 83;
+    let inj_col_base = 86;
     execute!(w,
         cursor::MoveToNextLine(1),
         cursor::MoveToColumn(inj_col_base+1),
@@ -346,7 +352,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Medical Agents
-    let medagent_col_base = 130;
+    let medagent_col_base = 133;
     execute!(w,
         cursor::MoveTo(medagent_col_base, 0),
         style::SetForegroundColor(style::Color::DarkRed),
@@ -381,7 +387,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     }
 
     // Clothes
-    let cl_col_base = 175;
+    let cl_col_base = 178;
     execute!(w,
         cursor::MoveTo(cl_col_base, 0),
         style::SetForegroundColor(style::Color::DarkBlue),

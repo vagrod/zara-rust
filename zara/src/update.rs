@@ -79,7 +79,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             // Update all sub-controllers
             self.health.update(&mut frame_data);
             self.inventory.update(&mut frame_data);
-            self.body.update(&mut frame_data);
+            self.body.update(&mut frame_data, &self.environment.as_ref());
 
             // Reset the counter and set last update game time
             self.last_update_game_time.set(game_time_duration);
