@@ -57,7 +57,7 @@ fn main() {
             }
 
             if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
-                person.consume(&format!("Aspirin Pills"));
+                person.health.consume(&format!("Aspirin Pills"));
                 is_item_consumed = true;
             }
 

@@ -54,10 +54,10 @@ struct ClothesItemC {
 
 /// Used to describe a new clothes group. Use `start` method to begin.
 pub struct ClothesGroupBuilder {
-    pub name: RefCell<String>,
-    pub bonus_cold_resistance: Cell<usize>,
-    pub bonus_water_resistance: Cell<usize>,
-    pub items: RefCell<HashMap<String, ClothesItem>>
+    pub(crate) name: RefCell<String>,
+    pub(crate) bonus_cold_resistance: Cell<usize>,
+    pub(crate) bonus_water_resistance: Cell<usize>,
+    pub(crate) items: RefCell<HashMap<String, ClothesItem>>
 }
 impl ClothesGroupBuilder {
     /// Starts building process for a new clothes group.
@@ -137,13 +137,13 @@ impl Body {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>, environment: &EnvironmentData){
+    pub(crate) fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>, environment: &EnvironmentData){
         self.update_warmth_level_if_needed(environment.temperature.get(), environment.wind_speed.get());
     }
 
     /// Is called every frame by Zara controller.
     /// Cannot be called in `update` because we need time precision
-    pub fn sleep_check<E: Listener + 'static>
+    pub(crate) fn sleep_check<E: Listener + 'static>
             (&self, events: &mut Dispatcher<E>, game_time: &Duration, game_time_delta: f32) {
         if self.is_sleeping.get(){
             let left = self.sleeping_counter.get() - game_time_delta as f64;

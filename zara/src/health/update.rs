@@ -22,7 +22,7 @@ impl Health {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>) {
+    pub(crate) fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>) {
         // Update disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.check(self, &frame.data);

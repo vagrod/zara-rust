@@ -448,7 +448,7 @@ impl ActiveInjury {
     }
 
     /// Is called by Zara from the health engine when person takes an appliance
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 

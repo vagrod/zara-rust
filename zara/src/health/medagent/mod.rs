@@ -114,10 +114,10 @@ impl MedicalAgent {
         }
     }
 
-    pub fn on_consumed(&self, game_time: &GameTimeC, item_name: String) {
+    pub(crate) fn on_consumed(&self, game_time: &GameTimeC, item_name: String) {
         self.add_dose_if_needed(game_time, item_name);
     }
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item_name: String) {
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item_name: String) {
         self.add_dose_if_needed(game_time, item_name);
     }
 
@@ -259,7 +259,7 @@ impl MedicalAgentsMonitor {
         }
     }
 
-    pub fn update(&self, game_time: &GameTimeC) {
+    pub(crate) fn update(&self, game_time: &GameTimeC) {
         let mut active_count = 0;
         for (_, agent) in self.agents.borrow().iter() {
             let result = agent.update(game_time);

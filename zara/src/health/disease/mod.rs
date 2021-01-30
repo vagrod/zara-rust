@@ -215,7 +215,7 @@ impl DiseaseDeltasC {
             water_drain: 0.
         }
     }
-    pub fn cleanup(&mut self){
+    pub(crate) fn cleanup(&mut self){
         if self.heart_rate_delta < -900. { self.heart_rate_delta = 0.; }
         if self.body_temperature_delta < -900. { self.body_temperature_delta = 0.; }
         if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
@@ -513,7 +513,7 @@ impl ActiveDisease {
     }
 
     /// Is called by Zara from the health engine when person consumes an item
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
+    pub(crate) fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
@@ -527,7 +527,7 @@ impl ActiveDisease {
     }
 
     /// Is called by Zara from the health engine when appliance is taken
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 

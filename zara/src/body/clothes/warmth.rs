@@ -2,7 +2,7 @@ use crate::body::Body;
 
 impl Body {
 
-    pub fn update_warmth_level_if_needed(&self, world_temp: f32, wind_speed: f32) {
+    pub(crate) fn update_warmth_level_if_needed(&self, world_temp: f32, wind_speed: f32) {
         let eps = 0.0001;
 
         if f32::abs(self.cached_world_temp.get() - world_temp) > eps ||
@@ -14,7 +14,7 @@ impl Body {
         }
     }
 
-    pub(crate) fn recalculate_warmth_level(&self) {
+    pub fn recalculate_warmth_level(&self) {
         const COMFORT_TEMPERATURE_NAKED: f32 = 22.; // degrees C
         const MAXIMUM_WETNESS_TEMPERATURE_DECREASE: f32 = 10.; // degrees C
         const MAXIMUM_WIND_TEMPERATURE_DECREASE: f32 = 15.; // degrees C

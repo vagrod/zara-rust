@@ -150,7 +150,7 @@ impl Health {
     }
 
     /// Called by zara controller when item is consumed as food or water
-    pub fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
+    pub(crate) fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
@@ -171,7 +171,7 @@ impl Health {
     }
 
     /// Called by zara controller when appliance item is taken
-    pub fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
                               body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
@@ -199,7 +199,7 @@ impl Health {
     }
 
     /// Sets controller alive state to `false`
-    pub fn declare_dead(&self) { self.is_alive.set(false); }
+    pub(crate) fn declare_dead(&self) { self.is_alive.set(false); }
 }
 
 impl MessageQueue for Health {
