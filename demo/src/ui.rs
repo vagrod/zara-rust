@@ -33,7 +33,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         style::Print(format_gt(&gt)),
     ).ok();
 
-    let vitals_h = 14;
+    let vitals_h = 12;
     // Vitals
     execute!(w,
         cursor::MoveTo(0, 2),
@@ -64,12 +64,6 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1),
         style::Print("  Blood level: "),
         style::Print(format!("{:.1}%", person.health.blood_level())),
-        cursor::MoveToNextLine(1),
-        style::Print("  Warmth level: "),
-        style::Print(format!("{:.1} (-5..+5 is a sweet spot)", person.body.warmth_level())),
-        cursor::MoveToNextLine(1),
-        style::Print("  Wetness level: "),
-        style::Print(format!("{:.1}%", person.body.wetness_level())),
         cursor::MoveToNextLine(1),
     ).ok();
 
@@ -104,6 +98,16 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1),
         cursor::MoveToColumn(3),
         style::Print(format!("Blood loss? {}", if person.health.is_blood_loss() { "yes" } else { "no" })),
+        cursor::MoveToNextLine(1)
+    ).ok();
+    execute!(w,
+        cursor::MoveToColumn(3),
+        style::Print("Warmth level: "),
+        style::Print(format!("{:.1} (-5..+5 is a sweet spot)", person.body.warmth_level())),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print("Wetness level: "),
+        style::Print(format!("{:.1}%", person.body.wetness_level())),
         cursor::MoveToNextLine(1)
     ).ok();
 

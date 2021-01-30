@@ -42,6 +42,8 @@ pub struct Body {
     sleeping_counter: Cell<f64>,
     cached_world_temp: Cell<f32>,
     cached_wind_speed: Cell<f32>,
+    cached_player_in_water: Cell<bool>,
+    cached_rain_intensity: Cell<f32>,
 
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
@@ -128,6 +130,8 @@ impl Body {
             clothes_data: RefCell::new(HashMap::new()),
             cached_wind_speed: Cell::new(-1000.),
             cached_world_temp: Cell::new(-1000.),
+            cached_rain_intensity: Cell::new(0.),
+            cached_player_in_water: Cell::new(false),
             warmth_level: Cell::new(0.),
             wetness_level: Cell::new(0.)
         }
@@ -137,8 +141,15 @@ impl Body {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub(crate) fn update<E: Listener + 'static>(&self, _frame: &mut FrameC<E>, environment: &EnvironmentData){
+    pub(crate) fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>, environment: &EnvironmentData){
         self.update_warmth_level_if_needed(environment.temperature.get(), environment.wind_speed.get());
+        self.update_wetness_level_if_needed(
+            frame.data.game_time_delta,
+            frame.data.player.is_swimming || frame.data.player.is_underwater,
+            frame.data.environment.rain_intensity,
+            frame.data.environment.temperature,
+            frame.data.environment.wind_speed
+        );
     }
 
     /// Is called every frame by Zara controller.

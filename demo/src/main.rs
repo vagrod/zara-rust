@@ -76,6 +76,18 @@ fn main() {
                 }
             }
 
+            // Wetness/drying test
+            if person.environment.game_time.minute.get() == 6 && person.environment.game_time.second.get() < 30. {
+                if !person.player_state.is_underwater.get() {
+                    person.player_state.is_underwater.set(true);
+                }
+            }
+            if person.environment.game_time.minute.get() == 7 && person.environment.game_time.second.get() < 20. {
+                if person.player_state.is_underwater.get() {
+                    person.player_state.is_underwater.set(false);
+                }
+            }
+
             // Update Zara state
             person.update(frame_time);
 

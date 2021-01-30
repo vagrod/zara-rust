@@ -30,7 +30,11 @@ impl Body {
         }
 
         let final_temp = temp + wetness_temperature_bonus + wind_temperature_bonus;
+
+        // Check for clothes cold resistance
         let cold_resistance = self.total_cold_resistance() as f32;
+
+        // Calculate the final level
         let level = (final_temp * (1. - cold_resistance / 100.)) -
             (COMFORT_TEMPERATURE_NAKED - cold_resistance / 2.) + final_temp * (cold_resistance / 100.);
 

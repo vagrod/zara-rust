@@ -6,6 +6,7 @@ use crate::utils::ClothesGroupC;
 use std::collections::HashMap;
 
 mod warmth;
+mod wetness;
 
 pub mod fluent;
 
