@@ -79,7 +79,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             // Update all sub-controllers
             self.health.update(&mut frame_data);
             self.inventory.update(&mut frame_data);
-            self.body.update(&mut frame_data, &self.environment.as_ref());
+            self.body.update(&mut frame_data);
 
             // Reset the counter and set last update game time
             self.last_update_game_time.set(game_time_duration);
@@ -179,6 +179,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         FrameSummaryC {
             game_time : self.environment.game_time.to_contract(),
+            game_time_delta: time_delta.as_secs_f32(),
             player: PlayerStatusC {
                 is_walking: self.player_state.is_walking.get(),
                 is_running: self.player_state.is_running.get(),
@@ -186,7 +187,13 @@ impl<E: Listener + 'static> ZaraController<E> {
                 is_underwater: self.player_state.is_underwater.get(),
                 is_sleeping: self.body.is_sleeping(),
                 last_slept_duration: self.body.last_sleep_duration(),
-                last_slept
+                last_slept,
+                warmth_level: self.body.warmth_level(),
+                wetness_level: self.body.wetness_level(),
+                clothes: self.body.clothes.borrow().clone(),
+                clothes_group: self.body.clothes_group(),
+                total_water_resistance: self.body.total_water_resistance(),
+                total_cold_resistance: self.body.total_cold_resistance()
             },
             environment: EnvironmentC {
                 wind_speed: self.environment.wind_speed.get(),
@@ -206,8 +213,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
                 diseases: active_diseases,
                 injuries: active_injuries
-            },
-            game_time_delta: time_delta.as_secs_f32()
+            }
         }
     }
 

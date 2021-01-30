@@ -435,9 +435,7 @@ impl EnvironmentC {
     ///
     /// let env = utils::EnvironmentC::default();
     /// ```
-    pub fn default() -> EnvironmentC {
-        EnvironmentC::new(26., 0., 0.)
-    }
+    pub fn default() -> EnvironmentC { EnvironmentC::new(26., 0., 0.) }
 }
 
 /// Describes a snapshot of the player state for a single frame
@@ -448,7 +446,13 @@ pub struct PlayerStatusC {
     pub is_underwater: bool,
     pub is_sleeping: bool,
     pub last_slept: GameTimeC,
-    pub last_slept_duration: f32
+    pub last_slept_duration: f32,
+    pub warmth_level: f32,
+    pub wetness_level: f32,
+    pub clothes: Vec<String>,
+    pub clothes_group: Option<ClothesGroupC>,
+    pub total_water_resistance: usize,
+    pub total_cold_resistance: usize
 }
 
 /// Classic linear lerp

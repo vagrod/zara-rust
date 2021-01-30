@@ -141,8 +141,11 @@ impl Body {
     ///
     /// # Parameters
     /// - `frame`: summary information for this frame
-    pub(crate) fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>, environment: &EnvironmentData){
-        self.update_warmth_level_if_needed(environment.temperature.get(), environment.wind_speed.get());
+    pub(crate) fn update<E: Listener + 'static>(&self, frame: &mut FrameC<E>){
+        self.update_warmth_level_if_needed(
+            frame.data.environment.temperature,
+            frame.data.environment.wind_speed
+        );
         self.update_wetness_level_if_needed(
             frame.data.game_time_delta,
             frame.data.player.is_swimming || frame.data.player.is_underwater,

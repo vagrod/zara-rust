@@ -20,8 +20,10 @@ impl Body {
         const MAXIMUM_WIND_TEMPERATURE_DECREASE: f32 = 15.; // degrees C
 
         let temp = self.cached_world_temp.get();
+        if temp < -500. { return; }
         let wetness_temperature_bonus = -(self.wetness_level.get() / 100.) * MAXIMUM_WETNESS_TEMPERATURE_DECREASE;
         let wind_speed = self.cached_wind_speed.get();
+        if wind_speed < 0. { return; }
         let wind_coldness = (wind_speed * (temp / 35.) - wind_speed) / 35.; // -1..+1 scale
         let mut wind_temperature_bonus = wind_coldness * MAXIMUM_WIND_TEMPERATURE_DECREASE;
 
