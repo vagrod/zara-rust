@@ -445,7 +445,7 @@ pub struct PlayerStatusC {
     pub is_swimming: bool,
     pub is_underwater: bool,
     pub is_sleeping: bool,
-    pub last_slept: GameTimeC,
+    pub last_slept: Option<GameTimeC>,
     pub last_slept_duration: f32,
     pub warmth_level: f32,
     pub wetness_level: f32,

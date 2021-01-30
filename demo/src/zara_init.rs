@@ -1,10 +1,12 @@
-use super::inventory;
 use super::events::ZaraEventsListener;
+use super::inventory;
+use crate::inventory::Knife;
 use super::inventory::{PantsClothes, JacketClothes};
 
 use zara::health::medagent::{CurveType};
 use zara::health::MedicalAgentBuilder;
 use zara::body::ClothesGroupBuilder;
+use zara::inventory::crafting;
 
 pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
     // Instantiate our events listener
@@ -77,6 +79,16 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     person.inventory.add_item(Box::new(mre));
     person.inventory.add_item(Box::new(pants));
     person.inventory.add_item(Box::new(jacket));
+
+    person.inventory.register_crafting_combinations(
+        vec![
+            crafting::Builder::start()
+                .build_for("Knife")
+                    .is("Sharp Stone", 1)
+                    .and("Stick", 2)
+                .build(zara::inv_result!(Knife { count: 1 }))
+        ]
+    );
 }
 
 fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {

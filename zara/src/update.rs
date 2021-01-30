@@ -1,5 +1,5 @@
 use crate::ZaraController;
-use crate::utils::{FrameC, EnvironmentC, HealthC, GameTimeC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC, ActiveInjuryC};
+use crate::utils::{FrameC, EnvironmentC, HealthC, FrameSummaryC, PlayerStatusC, ActiveDiseaseC, ActiveInjuryC};
 use crate::utils::event::{Listener, Event, MessageQueue};
 use crate::error::ZaraUpdateErr;
 use crate::health::StageLevel;
@@ -169,13 +169,11 @@ impl<E: Listener + 'static> ZaraController<E> {
         };
 
         // Determine last sleep time
-        let mut last_slept: GameTimeC = GameTimeC::empty();
-        {
+        let last_slept =
             match self.body.last_sleep_time().as_ref() {
-                Some(t) => last_slept = t.copy(),
-                None => { }
-            }
-        }
+                Some(t) => Some(t.copy()),
+                None => { None }
+            };
 
         FrameSummaryC {
             game_time : self.environment.game_time.to_contract(),

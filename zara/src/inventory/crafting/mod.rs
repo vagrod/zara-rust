@@ -1,5 +1,6 @@
 use crate::inventory::crafting::fluent::BuilderStepResultItem;
 use crate::inventory::Inventory;
+use crate::inventory::items::InventoryItem;
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -103,11 +104,13 @@ pub struct CraftingCombination {
     /// Result item kind
     pub result_item: String,
     /// Items involved
-    pub items: Rc<RefCell<HashMap<String, ItemInCombination>>>
+    pub items: Rc<RefCell<HashMap<String, ItemInCombination>>>,
+    /// Function to instantiate the resulted item (hello reflection :)
+    create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>
 }
 
 impl CraftingCombination {
-    pub fn new(result_item: String, items: Vec<ItemInCombination>) -> Self {
+    pub fn new(result_item: String, items: Vec<ItemInCombination>, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
@@ -132,7 +135,8 @@ impl CraftingCombination {
             unique_key: key.to_string(),
             match_key: get_match_key(item_names).to_string(),
             result_item,
-            items: Rc::new(RefCell::new(mapped))
+            items: Rc::new(RefCell::new(mapped)),
+            create
         }
     }
 }

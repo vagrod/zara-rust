@@ -2,7 +2,6 @@ use crate::utils::{FrameC, GameTimeC, ClothesGroupC};
 use crate::utils::event::{Dispatcher, Listener, Event, MessageQueue};
 use crate::body::clothes::{ClothesGroup, ClothesItem};
 use crate::body::clothes::fluent::ClothesGroupStart;
-use crate::world::EnvironmentData;
 
 use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;

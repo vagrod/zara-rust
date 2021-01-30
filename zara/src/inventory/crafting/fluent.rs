@@ -1,20 +1,57 @@
 use crate::inventory::crafting::{CraftingCombination, ItemInCombination, Builder};
+use crate::inventory::items::InventoryItem;
+
+/// Macro to describe crafting combination resulting instance creation.
+///
+/// Receives an instance of an object that implements
+/// [`InventoryItem`](crate::zara::inventory::InventoryItem) trait.
+#[macro_export]
+macro_rules! inv_result(
+    ($r:expr) => (
+        Box::new(|| Box::new($r))
+    );
+);
 
 pub trait BuilderStepResultItem {
+    /// Defines the resulted item kind.
+    ///
+    /// # Parameters
+    /// - `key`: unique name of a resulted item
     fn build_for(&self, key: &str) -> &dyn BuilderStepFirstItem;
 }
 
 pub trait BuilderStepFirstItem {
+    /// Adds first item to the combination. Items order does not matter.
+    ///
+    /// # Parameters
+    /// - `key`: unique name of an item
+    /// - `count`: how many items of this kind this combination demands
     fn is(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode;
 }
 
 pub trait BuilderStepItemNode {
+    /// Adds new item to the combination. Items order does not matter.
+    ///
+    /// # Parameters
+    /// - `key`: unique name of an item
+    /// - `count`: how many items of this kind this combination demands
     fn plus(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode;
+    /// Adds last item to the combination. Items order does not matter.
+    ///
+    /// # Parameters
+    /// - `key`: unique name of an item
+    /// - `count`: how many items of this kind this combination demands
     fn and(&self, key: &str, count: usize) -> &dyn BuilderStepDone;
 }
 
 pub trait BuilderStepDone {
-    fn build(&self) -> CraftingCombination;
+    /// Builds the crafting combination based on the info provided.
+    ///
+    /// # Parameters
+    /// - `create`: function that returns an instance of the resulted object
+    ///     that will be called if no such item exist in the inventory after
+    ///     the successful crafting process
+    fn build(&self, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> CraftingCombination;
 }
 
 impl Builder {
@@ -54,13 +91,13 @@ impl BuilderStepItemNode for Builder {
 }
 
 impl BuilderStepDone for Builder {
-    fn build(&self) -> CraftingCombination {
+    fn build(&self, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> CraftingCombination {
         let mut items = Vec::new();
 
         for item in self.items.borrow().iter() {
             items.push(item.copy());
         }
 
-        CraftingCombination::new(self.result_item.borrow().to_string(), items)
+        CraftingCombination::new(self.result_item.borrow().to_string(), items, create)
     }
 }
