@@ -2,7 +2,7 @@ This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](h
 
 This code is **WIP** and changes all the time.
 
-![Zara Rust Demo](http://imw.su/zara_rust_005.png)
+![Zara Rust Demo](http://imw.su/zara_rust_006.png)
 
 ## What's done at the moment
 - Game time
@@ -34,10 +34,11 @@ This code is **WIP** and changes all the time.
   + Body parts for injuries and treatment with appliances
   + Injury can be a fracture
   + Medical agents
-  + Clothes and clothes groups
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
+  + Warmth and wetness levels
+  + Clothes and clothes groups
 
 - Weather status
   + Rain intensity, temperature, wind speed that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -47,7 +48,6 @@ This code is **WIP** and changes all the time.
 ## What's in progress
 - Body appliances (bandages, splints, etc.)
 - Oxygen level (and optional "side effect" to control it)
-- Warmth and wetness levels (and optional "side effects" to control them)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Checking crafting recipe for resources availability
 - Actual getting new item from a crafting combination and spending resources on it
