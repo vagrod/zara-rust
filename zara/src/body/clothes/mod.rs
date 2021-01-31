@@ -11,10 +11,10 @@ mod wetness;
 pub mod fluent;
 
 impl Body {
-    /// Registers new clothes group.
+    /// Registers a list of clothes groups.
     ///
     /// # Parameters
-    /// - `group`: clothes group to register. Use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
+    /// - `groups`: a list of clothes groups to register. Use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
     ///     to create one.
     ///
     /// # Examples
@@ -22,18 +22,28 @@ impl Body {
     ///```
     /// use crate::zara::body::ClothesGroupBuilder;
     ///
-    /// person.body.register_clothes_group(
-    ///     ClothesGroupBuilder::start()
-    ///         .with_name("Group Name")
-    ///             .cold_resistance(5)
-    ///             .water_resistance(12)
-    ///               //.. and so on
-    ///     // .build()
+    /// person.body.register_clothes_groups(
+    ///     vec![
+    ///         ClothesGroupBuilder::start()
+    ///             .with_name("Group Name")
+    ///                 .bonus_cold_resistance(5)
+    ///                 .bonus_water_resistance(12)
+    ///                 .includes(
+    ///                     vec![
+    ///                         ("Jacket", JacketClothes),
+    ///                         ("Pants", PantsClothes),
+    ///                         //.. and so on
+    ///                     ]
+    ///                 )
+    ///             .build()
+    ///     ]
     ///  );
     ///```
     ///
-    pub fn register_clothes_group(&self, group: ClothesGroup) {
-        self.clothes_groups.borrow_mut().insert(group.name.to_string(), group);
+    pub fn register_clothes_groups(&self, groups: Vec<ClothesGroup>) {
+        for group in groups {
+            self.clothes_groups.borrow_mut().insert(group.name.to_string(), group);
+        }
     }
 
     pub fn request_clothes_on(&self, item_name: &String, data: &dyn ClothesDescription) -> Result<(), RequestClothesOnErr> {

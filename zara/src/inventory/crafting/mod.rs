@@ -24,13 +24,13 @@ impl Inventory {
     ///                .is("SharpenStone", 1)
     ///                .plus("Stick", 3)
     ///                .and("Rope", 2)
-    ///            .build(),
+    ///            .build(zara::inv_result!(StoneAxe { count: 1 })),
     ///
     ///        crafting::Builder::start()
     ///            .build_for("LeafHat")
     ///                .is("Leaf", 30)
     ///                .and("NeedleAndThread", 1)
-    ///            .build(),
+    ///            .build(zara::inv_result!(LeafHat { count: 1 })),
     ///
     ///        crafting::Builder::start()
     ///            .build_for("FishingRod")
@@ -38,7 +38,7 @@ impl Inventory {
     ///                .plus("Liana", 1)
     ///                .plus("Pin", 1)
     ///                .and("Worm", 2)
-    ///            .build(),
+    ///            .build(zara::inv_result!(FishingRod { count: 1 })),
     ///    ]
     /// );
     /// ```

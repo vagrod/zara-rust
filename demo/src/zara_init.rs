@@ -37,18 +37,20 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
             .build()
     );
 
-    person.body.register_clothes_group(
-        ClothesGroupBuilder::start()
-            .with_name("Water Resistant Suit")
-                .bonus_cold_resistance(2)
-                .bonus_water_resistance(7)
-                .includes(
-                    vec![
-                        ("Pants", Box::new(PantsClothes)),
-                        ("Jacket", Box::new(JacketClothes)),
-                    ]
-                )
-            .build()
+    person.body.register_clothes_groups(
+        vec![
+            ClothesGroupBuilder::start()
+                .with_name("Water Resistant Suit")
+                    .bonus_cold_resistance(2)
+                    .bonus_water_resistance(7)
+                    .includes(
+                        vec![
+                            ("Pants", Box::new(PantsClothes)),
+                            ("Jacket", Box::new(JacketClothes)),
+                        ]
+                    )
+                .build()
+        ]
     );
 
     add_side_effects(&person);
