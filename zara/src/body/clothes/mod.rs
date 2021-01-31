@@ -46,7 +46,7 @@ impl Body {
         }
     }
 
-    pub fn request_clothes_on(&self, item_name: &String, data: &dyn ClothesDescription) -> Result<(), RequestClothesOnErr> {
+    pub(crate) fn request_clothes_on(&self, item_name: &String, data: &dyn ClothesDescription) -> Result<(), RequestClothesOnErr> {
         {
             let mut clothes = self.clothes.borrow_mut();
             if clothes.contains(item_name) {
@@ -68,7 +68,7 @@ impl Body {
         Ok(())
     }
 
-    pub fn request_clothes_off(&self, item_name: &String) -> Result<(), RequestClothesOffErr> {
+    pub(crate) fn request_clothes_off(&self, item_name: &String) -> Result<(), RequestClothesOffErr> {
         {
             let mut clothes = self.clothes.borrow_mut();
             match clothes.iter().position(|x| x == item_name) {

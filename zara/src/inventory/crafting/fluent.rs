@@ -49,8 +49,6 @@ pub trait BuilderStepDone {
     ///
     /// # Parameters
     /// - `create`: function that returns an instance of the resulted object
-    ///     that will be called if no such item exist in the inventory after
-    ///     the successful crafting process
     fn build(&self, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> CraftingCombination;
 }
 

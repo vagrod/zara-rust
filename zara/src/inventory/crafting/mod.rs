@@ -1,3 +1,4 @@
+use crate::error::{CheckForResourcesErr, CombinationExecuteErr};
 use crate::inventory::crafting::fluent::BuilderStepResultItem;
 use crate::inventory::Inventory;
 use crate::inventory::items::InventoryItem;
@@ -43,8 +44,9 @@ impl Inventory {
     /// );
     /// ```
     pub fn register_crafting_combinations(&self, combinations: Vec<CraftingCombination>) {
+        let mut b = self.crafting_combinations.borrow_mut();
         for combination in combinations {
-            self.crafting_combinations.borrow_mut().push(combination);
+            b.insert(combination.unique_key.to_string(), combination);
         }
     }
 
@@ -54,15 +56,85 @@ impl Inventory {
         let key_to_check_against = get_match_key(items);
         let mut result = Vec::new();
 
-        for cmb in self.crafting_combinations.borrow().iter() {
+        for (key, cmb) in self.crafting_combinations.borrow().iter() {
             if cmb.match_key == key_to_check_against {
-                result.push(String::from(&cmb.unique_key));
+                result.push(key.to_string());
             }
         }
 
         return result;
     }
 
+    /// Checks if inventory has enough resources to execute a given combination
+    ///
+    /// # Parameters
+    /// - `combination_id`: unique id of a combination to check
+    pub fn check_for_resources(&self, combination_id: &String) -> Result<(), CheckForResourcesErr> {
+        match self.crafting_combinations.borrow().get(combination_id) {
+            Some(cmb) => {
+                for (name, item_data) in cmb.items.borrow().iter() {
+                    match self.items.borrow().get(name) {
+                        Some(item) => {
+                            if item.get_count() < item_data.count {
+                                return Err(CheckForResourcesErr::NotEnoughResources(name.to_string()));
+                            }
+                        },
+                        None => return Err(CheckForResourcesErr::ItemNotFound(name.to_string()))
+                    }
+                }
+
+                Ok(())
+            },
+            None => Err(CheckForResourcesErr::CombinationNotFound)
+        }
+    }
+
+    /// Executes given crafting combination. This method will check for resources availability
+    /// before trying.
+    ///
+    /// # Parameters
+    /// - `combination_id`: unique key of a combination to execute
+    ///
+    /// ## Note
+    /// Borrows `items` collection
+    pub fn execute_combination(&self, combination_id: &String) -> Result<(), CombinationExecuteErr> {
+        let cc = self.crafting_combinations.borrow();
+        let cmb = match cc.get(combination_id) {
+            Some(c) => c,
+            None => return Err(CombinationExecuteErr::CombinationNotFound)
+        };
+
+        match self.check_for_resources(combination_id) {
+            Err(e) => return Err(CombinationExecuteErr::ResourceError(e)),
+            _ => { } // Pass if ok
+        }
+
+        let mut b = self.items.borrow_mut();
+        for (key, item_data) in cmb.items.borrow().iter() {
+            match b.get_mut(key) {
+                Some(o) => {
+                    // Cannot be less that 0 because we checked it above
+                    o.set_count(o.get_count() - item_data.count);
+                },
+                _ => { /* We just checked that all resources are in place */ }
+            };
+        }
+
+        let resulted = (cmb.create)();
+        match b.get_mut(&cmb.result_item) {
+            Some(item) => {
+                // Increase count if we have item already
+                item.set_count(item.get_count() + resulted.get_count())
+            }
+            ,
+            None => {
+                // Add a new instance otherwise
+                b.insert(cmb.result_item.to_string(), resulted);
+            }
+        }
+
+        Ok(())
+    }
 }
 
 /// Describes item in combination

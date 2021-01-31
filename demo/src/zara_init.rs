@@ -67,8 +67,10 @@ fn dress(person: &zara::ZaraController<ZaraEventsListener>) {
 
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let meat = inventory::Meat{ count: 2 };
-    let knife = inventory::Knife{ count: 1 };
+    //let knife = inventory::Knife{ count: 1 };
     let rope = inventory::Rope{ count: 5 };
+    let stone = inventory::SharpStone{ count: 2 };
+    let stick = inventory::Stick{ count: 4 };
     let mre = inventory::MRE{ count: 2 };
     let aspirin = inventory::AspirinPills{ count: 2 };
     let pants = inventory::Pants{ count: 1 };
@@ -76,8 +78,10 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
 
     person.inventory.add_item(Box::new(aspirin));
     person.inventory.add_item(Box::new(meat));
-    person.inventory.add_item(Box::new(knife));
+   // person.inventory.add_item(Box::new(knife));
     person.inventory.add_item(Box::new(rope));
+    person.inventory.add_item(Box::new(stone));
+    person.inventory.add_item(Box::new(stick));
     person.inventory.add_item(Box::new(mre));
     person.inventory.add_item(Box::new(pants));
     person.inventory.add_item(Box::new(jacket));
@@ -86,11 +90,22 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
         vec![
             crafting::Builder::start()
                 .build_for("Knife")
-                    .is("Sharp Stone", 1)
-                    .and("Stick", 2)
+                    .is("SharpStone", 1)
+                    .plus("Stick", 1)
+                    .and("Rope", 2)
                 .build(zara::inv_result!(Knife { count: 1 }))
         ]
     );
+
+    // Crafting test
+    let ids = person.inventory.get_suitable_combinations_for(
+        vec![
+            format!("Stick"),
+            format!("Rope"),
+            format!("SharpStone")
+        ]);
+
+    person.inventory.execute_combination(&ids[0]);
 }
 
 fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {

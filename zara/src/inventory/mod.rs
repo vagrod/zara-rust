@@ -32,7 +32,7 @@ pub struct Inventory {
     /// Weight of all inventory items (in grams)
     weight: Cell<f32>,
     /// Registered crafting combinations (recipes)
-    crafting_combinations: Rc<RefCell<Vec<CraftingCombination>>>,
+    crafting_combinations: Rc<RefCell<HashMap<String, CraftingCombination>>>,
     /// Registered inventory monitors
     inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
     /// Messages queued for sending on the next frame
@@ -54,7 +54,7 @@ impl Inventory {
     pub fn new() -> Self {
         Inventory{
             items: Arc::new(RefCell::new(HashMap::new())),
-            crafting_combinations: Rc::new(RefCell::new(Vec::new())),
+            crafting_combinations: Rc::new(RefCell::new(HashMap::new())),
             inventory_monitors: Rc::new(RefCell::new(HashMap::new())),
             weight: Cell::new(0.),
             message_queue: RefCell::new(BTreeMap::new())

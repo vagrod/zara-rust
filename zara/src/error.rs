@@ -105,29 +105,57 @@ pub enum ZaraUpdateErr {
 
 /// Is used by `MedicalAgentsMonitor.is_active` method
 pub enum MedicalAgentErr {
+    /// When given medical agent key was not found
     AgentNotFound
 }
 
 /// Is used by `ZaraController.put_on_clothes` method
 pub enum ClothesOnActionErr {
+    /// When given item key was not found
     ItemNotFound,
+    /// When item count is zero
     InsufficientResources,
+    /// When given clothes is already on
     AlreadyHaveThisItemOn,
+    /// When given item has no `clothes` option
     IsNotClothesType
 }
 
 /// Is used by `ZaraController.take_off_clothes` method
 pub enum ClothesOffActionErr {
+    /// When given item key was not found
     ItemNotFound,
+    /// When item count is zero
     InsufficientResources,
+    /// When given clothes is not on
     ItemIsNotOn,
+    /// When given item has no `clothes` option
     IsNotClothesType
 }
 
-pub enum RequestClothesOnErr {
+pub(crate) enum RequestClothesOnErr {
     AlreadyHaveThisItemOn
 }
 
-pub enum RequestClothesOffErr {
+pub(crate) enum RequestClothesOffErr {
     ItemIsNotOn
+}
+
+/// Is used by `Inventory.check_for_resources` method
+pub enum CheckForResourcesErr {
+    /// When given combination key was not found
+    CombinationNotFound,
+    /// When a particular item in a combination recipe is not found in the inventory
+    ItemNotFound(String),
+    /// When a particular item in a combination recipe count is less that the count needed
+    /// for this combination to be executed
+    NotEnoughResources(String)
+}
+
+/// Is used by `Inventory.execute_combination` method
+pub enum CombinationExecuteErr {
+    /// When resources check failed
+    ResourceError(CheckForResourcesErr),
+    /// When given combination key was not found
+    CombinationNotFound
 }

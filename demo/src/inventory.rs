@@ -6,6 +6,12 @@ zara::inv_item!(Knife, "Knife", 432.);
 pub struct Rope { pub count: usize }
 zara::inv_item!(Rope, "Rope", 328.);
 
+pub struct SharpStone { pub count: usize }
+zara::inv_item!(SharpStone, "SharpStone", 318.);
+
+pub struct Stick { pub count: usize }
+zara::inv_item!(Stick, "Stick", 159.);
+
 pub struct Meat { pub count: usize }
 pub struct MeatConsumableOption;
 pub struct MeatSpoilOption;
