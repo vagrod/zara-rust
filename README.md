@@ -15,6 +15,7 @@ This code is **WIP** and changes all the time.
   + Consumables: water and food, consuming items
   + Macros to write less code describing items (one-liners)
   + Appliances as inventory item type
+  + Actual getting new item from a crafting combination and spending resources on it
   
 - Health:
   + Sleeping
@@ -50,7 +51,6 @@ This code is **WIP** and changes all the time.
 - Oxygen level (and optional "side effect" to control it)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Checking crafting recipe for resources availability
-- Actual getting new item from a crafting combination and spending resources on it
 - Trait to get and restore state of every engine node
 - Optional easing variants for lerping diseases/injuries/vitals
 
