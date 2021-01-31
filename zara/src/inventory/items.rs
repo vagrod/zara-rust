@@ -1,6 +1,16 @@
 use crate::utils::GameTimeC;
 
 /// Macro for declaring a simple inventory item with particular weight
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_item!(
+///     Meat,
+///     "Meat",
+///     /* weight per unit */ 351.
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_item(
     ($t:ty, $nm:expr, $wt:expr) => (
@@ -18,6 +28,16 @@ macro_rules! inv_item(
 );
 
 /// Macro for declaring an infinite inventory item with particular weight
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_infinite!(
+///     NeedleAndThread,
+///     "NeedleAndThread",
+///     /* weight per unit */ 351.
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_infinite(
     ($t:ty, $nm:expr, $wt:expr) => (
@@ -35,6 +55,17 @@ macro_rules! inv_infinite(
 );
 
 /// Macro for declaring consumable inventory item
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_item_cons!(
+///     Meat,
+///     "Meat",
+///     /* weight per unit */ 351.,
+///     /* consumable option */ Some(&MeatConsumableOption)
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_item_cons(
     ($t:ty, $nm:expr, $wt:expr, $cons:expr) => (
@@ -52,6 +83,17 @@ macro_rules! inv_item_cons(
 );
 
 /// Macro for declaring an appliance behavior
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_item_appl!(
+///     MorphineInjection,
+///     "MorphineInjection",
+///     /* weight per unit */ 87.,
+///     /* appliance option */ Some(&MorphineInjectionAppliance)
+/// )
+/// ```
 #[macro_export]
 macro_rules! inv_item_appl (
     ($t:ty, $nm:expr, $wt:expr, $appl:expr) => (
@@ -69,6 +111,16 @@ macro_rules! inv_item_appl (
 );
 
 /// Macro for declaring clothes inventory item
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_clothes!(
+///     JacketClothes,
+///     /* cold resistance, 0..100% */ 2.,
+///     /* water resistance, 0..100% */ 38.
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_item_clothes (
     ($t:ty, $nm:expr, $wt:expr, $cl:expr) => (
@@ -86,9 +138,15 @@ macro_rules! inv_item_clothes (
 );
 
 /// Macro for declaring body appliance option
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_body_appliance!(BandageOption);
+/// ```
 #[macro_export]
 macro_rules! inv_body_appliance (
-    ($t:ty, $wg:expr) => (
+    ($t:ty) => (
         impl zara::inventory::items::ConsumableBehavior for $t {
             fn is_body_appliance(&self) -> bool { true }
             fn is_injection(&self) -> bool { false }
@@ -97,9 +155,15 @@ macro_rules! inv_body_appliance (
 );
 
 /// Macro for declaring injection appliance option
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_injection_appliance!(InjectionOption);
+/// ```
 #[macro_export]
 macro_rules! inv_injection_appliance (
-    ($t:ty, $wg:expr) => (
+    ($t:ty) => (
         impl zara::inventory::items::ConsumableBehavior for $t {
             fn is_body_appliance(&self) -> bool { false }
             fn is_injection(&self) -> bool { true }
@@ -108,6 +172,17 @@ macro_rules! inv_injection_appliance (
 );
 
 /// Macro for declaring food consumable option
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_food!(
+///     AspirinPillsConsumableOption,
+///     /* water gain, 0..100% */ 0.,
+///     /* food gain, 0..100% */ 0.,
+///     /* spoil option */ None
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_food(
     ($t:ty, $wg:expr, $fg:expr, $sp:expr) => (
@@ -122,6 +197,17 @@ macro_rules! inv_food(
 );
 
 /// Macro for declaring water consumable option
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_water!(
+///     AspirinPillsConsumableOption,
+///     /* water gain, 0..100% */ 0.,
+///     /* food gain, 0..100% */ 0.,
+///     /* spoil option */ None
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_water(
     ($t:ty, $wg:expr, $fg:expr, $sp:ty) => (
@@ -136,6 +222,17 @@ macro_rules! inv_water(
 );
 
 /// Macro for declaring a spoiling option
+///
+/// # Examples:
+///
+/// ```
+/// zara::inv_spoil!(
+///     MeatSpoilOption,
+///     /* fresh poisoning chance, 0..100% probability */ 2,
+///     /* spoiled poisoning chance, 0..100% probability */ 15,
+///     /* spoil time */ GameTimeC::new(0,4,30,0.)
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_spoil(
     ($t:ty, $c1:expr, $c2:expr, $st:expr) => (
@@ -148,6 +245,16 @@ macro_rules! inv_spoil(
 );
 
 /// Macro for declaring a spoiling option
+///
+/// # Examples
+///
+/// ```
+/// zara::inv_clothes!(
+///     PantsClothes,
+///     /* cold resistance, 0..100% */ 1.,
+///     /* water resistance, 0..100% */ 14.
+/// );
+/// ```
 #[macro_export]
 macro_rules! inv_clothes(
     ($t:ty, $c1:expr, $c2:expr) => (
