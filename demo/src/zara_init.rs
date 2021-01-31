@@ -68,7 +68,7 @@ fn dress(person: &zara::ZaraController<ZaraEventsListener>) {
 fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let meat = inventory::Meat{ count: 2 };
     //let knife = inventory::Knife{ count: 1 };
-    let rope = inventory::Rope{ count: 5 };
+    let rope = inventory::Rope{ count: 2 };
     let stone = inventory::SharpStone{ count: 2 };
     let stick = inventory::Stick{ count: 4 };
     let mre = inventory::MRE{ count: 2 };

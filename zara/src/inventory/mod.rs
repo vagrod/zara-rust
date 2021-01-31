@@ -2,7 +2,7 @@ use crate::utils::event::{Event, MessageQueue};
 use crate::inventory::items::InventoryItem;
 use crate::inventory::crafting::CraftingCombination;
 use crate::inventory::monitors::InventoryMonitor;
-use crate::error::InventoryItemAccessErr;
+use crate::error::InventoryUseErr;
 
 use std::collections::{HashMap, BTreeMap};
 use std::cell::{Cell, RefCell, RefMut};
@@ -61,27 +61,44 @@ impl Inventory {
         }
     }
 
-    /// Shorthand function to change count of a given kind.
+    /// Decreases item count for a given item kind. If count becomes zero, removes item from
+    /// the inventory.
+    ///
+    /// Will recalculate weight automatically on success
+    ///
+    /// # Parameters
+    /// - `amount`: this number will be subtracted from the count
     ///
     /// ## Note
     /// Borrows `items` collection
-    pub fn change_item_count(&self, name: &String, new_value: usize) -> Result<(), InventoryItemAccessErr> {
-        let need_recalculate;
+    pub fn use_item(&self, name: &String, amount: usize) -> Result<(), InventoryUseErr> {
         {
             let mut b = self.items.borrow_mut();
-            match b.get_mut(name) {
-                Some(o) => {
-                    o.set_count(new_value);
-
-                    need_recalculate = true;
-                },
-                None => return Err(InventoryItemAccessErr::ItemNotFound)
-            };
+            self.use_item_internal(name, amount, &mut b)?
         }
 
-        if need_recalculate { self.recalculate_weight(); }
+        self.recalculate_weight();
 
-        return Ok(());
+        Ok(())
+    }
+
+    fn use_item_internal(&self, name: &String, amount: usize, items_mut: &mut HashMap<String, Box<dyn InventoryItem>>) -> Result<(), InventoryUseErr> {
+        match items_mut.get_mut(name) {
+            Some(o) => {
+                let c = o.get_count();
+                if amount > c { return Err(InventoryUseErr::InsufficientResources) }
+
+                if c - amount == 0 {
+                    // Need to clean up
+                    items_mut.remove(name);
+                } else {
+                    o.set_count(c - amount);
+                }
+            },
+            None => return Err(InventoryUseErr::ItemNotFound)
+        };
+
+        Ok(())
     }
 
     /// Returns total cached inventory weight (in grams)

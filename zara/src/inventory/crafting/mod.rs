@@ -76,7 +76,7 @@ impl Inventory {
                     match self.items.borrow().get(name) {
                         Some(item) => {
                             if item.get_count() < item_data.count {
-                                return Err(CheckForResourcesErr::NotEnoughResources(name.to_string()));
+                                return Err(CheckForResourcesErr::InsufficientResources(name.to_string()));
                             }
                         },
                         None => return Err(CheckForResourcesErr::ItemNotFound(name.to_string()))
@@ -109,29 +109,31 @@ impl Inventory {
             _ => { } // Pass if ok
         }
 
-        let mut b = self.items.borrow_mut();
-        for (key, item_data) in cmb.items.borrow().iter() {
-            match b.get_mut(key) {
-                Some(o) => {
-                    // Cannot be less that 0 because we checked it above
-                    o.set_count(o.get_count() - item_data.count);
-                },
-                _ => { /* We just checked that all resources are in place */ }
-            };
+        {
+            let mut b = self.items.borrow_mut();
+            for (key, item_data) in cmb.items.borrow().iter() {
+                // Properly use the item. It should return ok because we just checked resources
+                match self.use_item_internal(key, item_data.count, &mut b) {
+                    Err(e) => return Err(CombinationExecuteErr::UseItemError(e)),
+                    _ => { } // Pass if ok
+                }
+            }
+
+            let resulted = (cmb.create)();
+            match b.get_mut(&cmb.result_item) {
+                Some(item) => {
+                    // Increase count if we have item already
+                    item.set_count(item.get_count() + resulted.get_count())
+                }
+                ,
+                None => {
+                    // Add a new instance otherwise
+                    b.insert(cmb.result_item.to_string(), resulted);
+                }
+            }
         }
 
-        let resulted = (cmb.create)();
-        match b.get_mut(&cmb.result_item) {
-            Some(item) => {
-                // Increase count if we have item already
-                item.set_count(item.get_count() + resulted.get_count())
-            }
-            ,
-            None => {
-                // Add a new instance otherwise
-                b.insert(cmb.result_item.to_string(), resulted);
-            }
-        }
+        self.recalculate_weight();
 
         Ok(())
     }

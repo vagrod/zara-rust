@@ -61,10 +61,18 @@ pub enum UnregisterMonitorErr {
     MonitorIdNotFound
 }
 
-/// Is used by `Inventory.change_item_count`, `remove_item` methods
+/// Is used by `Inventory.remove_item` methods
 pub enum InventoryItemAccessErr {
     /// When given item key was not found in the inventory
     ItemNotFound
+}
+
+/// Is used by `Inventory.use_item` methods
+pub enum InventoryUseErr {
+    /// When given item key was not found in the inventory
+    ItemNotFound,
+    /// When requested amount is greater that the actual items count
+    InsufficientResources
 }
 
 /// Is used by `ZaraController.consume` method
@@ -74,11 +82,11 @@ pub enum ItemConsumeErr {
     /// When given item key was not found in the inventory
     ItemNotFound,
     /// When item `count` is not enough
-    NotEnoughResources,
+    InsufficientResources,
     /// When item has no `consumable` option
     ItemIsNotConsumable,
     /// When could not update item count
-    CouldNotUpdateItemCount(InventoryItemAccessErr)
+    CouldNotUseItem(InventoryUseErr)
 }
 
 /// Is used by `ZaraController.take_appliance` method
@@ -88,13 +96,13 @@ pub enum ApplianceTakeErr {
     /// When given item key was not found in the inventory
     ItemNotFound,
     /// When item `count` is not enough
-    NotEnoughResources,
+    InsufficientResources,
     /// When item has no `appliance` option
     ItemIsNotAppliance,
     /// When passed body part is unknown
     UnknownBodyPart,
     /// When could not update item count
-    CouldNotUpdateItemCount(InventoryItemAccessErr)
+    CouldNotUseItem(InventoryUseErr)
 }
 
 /// Is used by `ZaraController.update` method
@@ -149,13 +157,15 @@ pub enum CheckForResourcesErr {
     ItemNotFound(String),
     /// When a particular item in a combination recipe count is less that the count needed
     /// for this combination to be executed
-    NotEnoughResources(String)
+    InsufficientResources(String)
 }
 
 /// Is used by `Inventory.execute_combination` method
 pub enum CombinationExecuteErr {
     /// When resources check failed
     ResourceError(CheckForResourcesErr),
+    /// When failed to properly use an item (count mismatch for example)
+    UseItemError(InventoryUseErr),
     /// When given combination key was not found
     CombinationNotFound
 }

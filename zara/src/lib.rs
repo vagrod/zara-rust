@@ -159,7 +159,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         if !self.health.is_alive() { return Err(ItemConsumeErr::CharacterIsDead); }
 
-        let new_count;
         let mut consumable = ConsumableC::new();
         {
             let items_count: usize;
@@ -171,10 +170,9 @@ impl<E: Listener + 'static> ZaraController<E> {
             };
 
             items_count = item.get_count();
-            new_count = items_count - 1;
 
             if items_count - 1 <= 0 { // 1 so far
-                return Err(ItemConsumeErr::NotEnoughResources);
+                return Err(ItemConsumeErr::InsufficientResources);
             }
 
             let c = match item.consumable() {
@@ -194,8 +192,8 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         // Change items count
-        self.inventory.change_item_count(item_name, new_count)
-            .or_else(|err| Err(ItemConsumeErr::CouldNotUpdateItemCount(err)))?;
+        self.inventory.use_item(item_name, consumable.consumed_count)
+            .or_else(|err| Err(ItemConsumeErr::CouldNotUseItem(err)))?;
 
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));
@@ -228,7 +226,6 @@ impl<E: Listener + 'static> ZaraController<E> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
         if body_part == BodyParts::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
 
-        let new_count;
         let mut appliance = ApplianceC::new();
         {
             let items_count: usize;
@@ -240,10 +237,9 @@ impl<E: Listener + 'static> ZaraController<E> {
             };
 
             items_count = item.get_count();
-            new_count = items_count - 1;
 
             if items_count - 1 <= 0 { // 1 so far
-                return Err(ApplianceTakeErr::NotEnoughResources);
+                return Err(ApplianceTakeErr::InsufficientResources);
             }
 
             let a = match item.appliance() {
@@ -263,8 +259,8 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
 
         // Change items count
-        self.inventory.change_item_count(item_name, new_count)
-            .or_else(|err| Err(ApplianceTakeErr::CouldNotUpdateItemCount(err)))?;
+        self.inventory.use_item(item_name, appliance.taken_count)
+            .or_else(|err| Err(ApplianceTakeErr::CouldNotUseItem(err)))?;
 
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance, body_part));
