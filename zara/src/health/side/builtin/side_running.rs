@@ -1,18 +1,20 @@
 use crate::health::side::builtin::RunningSideEffects;
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
-use crate::utils::{FrameSummaryC};
+use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
 
 /// RunningSideEffects implementation
 
 impl RunningSideEffects {
-    pub fn new() -> Self {
+    pub fn new(stamina_drain: f32, water_drain: f32) -> Self {
         RunningSideEffects {
             running_state: Cell::new(false),
             sleeping_state: Cell::new(false),
             running_time: Cell::new(0.),
-            gained_fatigue: Cell::new(0.)
+            gained_fatigue: Cell::new(0.),
+            stamina_drain_amount: Cell::new(stamina_drain),
+            water_drain_amount: Cell::new(water_drain)
         }
     }
 }
@@ -24,8 +26,6 @@ impl SideEffectsMonitor for RunningSideEffects {
         const MAX_BODY_TEMP_IMPACT: f32 = 0.3;
         const MAX_TOP_PRESSURE_IMPACT: f32 = 24.;
         const MAX_BOTTOM_PRESSURE_IMPACT: f32 = 16.;
-        const STAMINA_DRAIN: f32 = 0.22; // percents per game second
-        const WATER_DRAIN: f32 = 0.009; // percents per game second
 
         if !frame_data.player.is_sleeping && self.sleeping_state.get() {
             // Woke up
@@ -60,21 +60,42 @@ impl SideEffectsMonitor for RunningSideEffects {
                 heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
                 top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                 bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
-                stamina_bonus: -STAMINA_DRAIN * frame_data.game_time_delta,
-                water_level_bonus: -WATER_DRAIN * frame_data.game_time_delta,
+                stamina_bonus: -self.stamina_drain_amount.get() * frame_data.game_time_delta,
+                water_level_bonus: -self.water_drain_amount.get() * frame_data.game_time_delta,
                 fatigue_bonus: self.gained_fatigue.get(),
 
                 ..Default::default()
             }
         } else {
+            // Lerp back
             if self.running_state.get() == true {
                 self.running_state.set(false);
-                self.running_time.set(0.);
+            }
+
+            let running_time = clamp_bottom(self.running_time.get() - frame_data.game_time_delta, 0.);
+
+            const EPS: f32 = 0.000001;
+
+            if running_time > EPS {
+                self.running_time.set(running_time);
+
+                let p = crate::utils::clamp_01(running_time / TIME_TO_REACH_RUNNING_EXHAUST);
+
+                return SideEffectDeltasC {
+                    body_temp_bonus: crate::utils::lerp(0., MAX_BODY_TEMP_IMPACT, p),
+                    heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
+                    top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
+                    bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
+                    fatigue_bonus: self.gained_fatigue.get(),
+
+                    ..Default::default()
+                }
             }
         }
 
         SideEffectDeltasC {
             fatigue_bonus: self.gained_fatigue.get(),
+
             ..Default::default()
         }
     }

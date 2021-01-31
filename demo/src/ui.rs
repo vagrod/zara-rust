@@ -33,7 +33,7 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         style::Print(format_gt(&gt)),
     ).ok();
 
-    let vitals_h = 12;
+    let vitals_h = 13;
     // Vitals
     execute!(w,
         cursor::MoveTo(0, 2),
@@ -64,6 +64,9 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1),
         style::Print("  Blood level: "),
         style::Print(format!("{:.1}%", person.health.blood_level())),
+        cursor::MoveToNextLine(1),
+        style::Print("  Oxygen level: "),
+        style::Print(format!("{:.1}%", person.health.oxygen_level())),
         cursor::MoveToNextLine(1),
     ).ok();
 
@@ -110,6 +113,22 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         style::Print(format!("{:.1}%", person.body.wetness_level())),
         cursor::MoveToNextLine(1)
     ).ok();
+    execute!(w,
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Walking?: {}", if person.player_state.is_walking.get() {"yes"} else {"no"})),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Running?: {}", if person.player_state.is_running.get() {"yes"} else {"no"})),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Swimming?: {}", if person.player_state.is_swimming.get() {"yes"} else {"no"})),
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(3),
+        style::Print(format!("Under water?: {}", if person.player_state.is_underwater.get() {"yes"} else {"no"})),
+        cursor::MoveToNextLine(1),
+    ).ok();
+
 
     // Weather
     execute!(w,

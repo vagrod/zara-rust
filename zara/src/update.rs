@@ -210,6 +210,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                 bottom_pressure: self.health.bottom_pressure(),
                 stamina_level: self.health.stamina_level(),
                 fatigue_level: self.health.fatigue_level(),
+                oxygen_level: self.health.oxygen_level(),
 
                 diseases: active_diseases,
                 injuries: active_injuries

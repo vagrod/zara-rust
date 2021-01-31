@@ -43,6 +43,8 @@ pub struct SideEffectDeltasC {
     pub water_level_bonus: f32,
     /// Delta relative to the current stamina value (relative delta)
     pub stamina_bonus: f32,
-    /// Delta that will be added to the healthy value (absolute delta)
+    /// Delta that will be added to the healthy oxygen value (relative delta)
+    pub oxygen_level_bonus: f32,
+    /// Delta that will be added to the healthy fatigue value (absolute delta)
     pub fatigue_bonus: f32
 }

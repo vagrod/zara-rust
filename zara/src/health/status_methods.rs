@@ -30,5 +30,7 @@ impl Health {
     pub fn stamina_level(&self) -> f32 { self.stamina_level.get() }
     /// Current fatigue level (0..100 percents)
     pub fn fatigue_level(&self) -> f32 { self.fatigue_level.get() }
+    /// Current oxygen level (0..100 percents)
+    pub fn oxygen_level(&self) -> f32 { self.oxygen_level.get() }
 
 }

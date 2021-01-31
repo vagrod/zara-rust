@@ -29,6 +29,8 @@ pub struct Health {
     pub stamina_regain_rate: Cell<f32>,
     /// How fast blood recovers (percents per game second)
     pub blood_regain_rate: Cell<f32>,
+    /// How fast oxygen recovers (percents per game second)
+    pub oxygen_regain_rate: Cell<f32>,
     /// All active or scheduled diseases
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
     /// All active or scheduled injuries
@@ -55,6 +57,8 @@ pub struct Health {
     stamina_level: Cell<f32>,
     /// Fatigue level (0..100)
     fatigue_level: Cell<f32>,
+    /// Oxygen level (0..100)
+    oxygen_level: Cell<f32>,
     /// Stores all registered disease monitors
     disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
     /// Stores all registered side effects monitors
@@ -137,6 +141,7 @@ impl Health {
             injuries: Arc::new(RefCell::new(HashMap::new())),
             stamina_regain_rate: Cell::new(0.1),
             blood_regain_rate: Cell::new(0.006),
+            oxygen_regain_rate: Cell::new(0.05),
             message_queue: RefCell::new(BTreeMap::new()),
             medical_agents: Arc::new(MedicalAgentsMonitor::new()),
 
@@ -148,6 +153,7 @@ impl Health {
             top_pressure: Cell::new(healthy.top_pressure),
             bottom_pressure: Cell::new(healthy.bottom_pressure),
             food_level: Cell::new(healthy.food_level),
+            oxygen_level: Cell::new(healthy.oxygen_level),
             water_level: Cell::new(healthy.water_level),
             heart_rate: Cell::new(healthy.heart_rate),
             stamina_level: Cell::new(healthy.stamina_level),

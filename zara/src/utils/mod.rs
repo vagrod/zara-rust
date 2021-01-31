@@ -329,6 +329,8 @@ pub struct HealthC {
     pub stamina_level: f32,
     /// Fatigue level (0..100)
     pub fatigue_level: f32,
+    /// Oxygen level (0..100)
+    pub oxygen_level: f32,
     /// List of active (or scheduled) diseases
     pub diseases: Vec<ActiveDiseaseC>,
     /// List of active (or scheduled) injuries
@@ -346,6 +348,7 @@ impl HealthC {
             heart_rate: 64.,
             stamina_level: 100.,
             fatigue_level: 0.,
+            oxygen_level: 100.,
             diseases: Vec::new(),
             injuries: Vec::new()
         }

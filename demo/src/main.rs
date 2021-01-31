@@ -63,10 +63,11 @@ fn main() {
                 is_item_consumed = true;
             }
 
-            if person.environment.game_time.minute.get() == 5 && !is_jacket_off {
+            /*if person.environment.game_time.minute.get() == 5 && !is_jacket_off {
                 person.take_off_clothes(&format!("Jacket"));
+                //person.player_state.is_running.set(true);
                 is_jacket_off = true;
-            }
+            }*/
 
             // Disease "invert" test
             if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 42 {
@@ -84,16 +85,17 @@ fn main() {
             }
 
             // Wetness/drying test
-            if person.environment.game_time.minute.get() == 6 && person.environment.game_time.second.get() < 30. {
+            /*if person.environment.game_time.minute.get() == 6 && person.environment.game_time.second.get() < 30. {
                 if !person.player_state.is_underwater.get() {
                     person.player_state.is_underwater.set(true);
                 }
             }
-            if person.environment.game_time.minute.get() == 7 && person.environment.game_time.second.get() < 20. {
+            if person.environment.game_time.minute.get() == 8 && person.environment.game_time.second.get() < 20. {
+                //person.player_state.is_running.set(false);
                 if person.player_state.is_underwater.get() {
                     person.player_state.is_underwater.set(false);
                 }
-            }
+            }*/
 
             // Update Zara state
             person.update(frame_time);

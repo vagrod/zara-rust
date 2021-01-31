@@ -33,11 +33,12 @@ impl Health {
 
         let mut snapshot = HealthC::healthy();
 
-        // Stamina, blood, food and water are relative
+        // Stamina, blood, oxygen, food and water are relative
         snapshot.stamina_level = self.stamina_level.get();
         snapshot.food_level = self.food_level.get();
         snapshot.water_level = self.water_level.get();
         snapshot.blood_level = self.blood_level.get();
+        snapshot.oxygen_level = self.oxygen_level.get();
 
         // For pretty picture, freeze fatigue value when sleeping
         if frame.data.player.is_sleeping {
@@ -71,6 +72,11 @@ impl Health {
         {
             let value = snapshot.blood_level + self.blood_regain_rate.get() * frame.data.game_time_delta;
             snapshot.blood_level = crate::utils::clamp(value, 0., 100.);
+        }
+        // Will always regain oxygen. Side effects must "fight" it
+        {
+            let value = snapshot.oxygen_level + self.oxygen_regain_rate.get() * frame.data.game_time_delta;
+            snapshot.oxygen_level = crate::utils::clamp(value, 0., 100.);
         }
 
         // Apply the resulted health snapshot
@@ -108,6 +114,7 @@ impl Health {
             side_effects_summary.water_level_bonus += res.water_level_bonus;
             side_effects_summary.food_level_bonus += res.food_level_bonus;
             side_effects_summary.stamina_bonus += res.stamina_bonus;
+            side_effects_summary.oxygen_level_bonus += res.oxygen_level_bonus;
 
             // Just for pretty picture
             if !frame_data.player.is_sleeping {
@@ -207,6 +214,7 @@ impl Health {
 
             // Those are % per game second drains
             result.stamina_drain += d.stamina_drain * game_time_delta; // stamina drain is cumulative
+            result.oxygen_drain += d.oxygen_drain * game_time_delta; // oxtgen drain is cumulative
             result.food_drain += d.food_drain * game_time_delta; // food drain is cumulative
             result.water_drain += d.water_drain * game_time_delta; // water drain is cumulative
         }
@@ -324,6 +332,7 @@ impl Health {
         snapshot.food_level += deltas.food_level_bonus;
         snapshot.water_level += deltas.water_level_bonus;
         snapshot.stamina_level += deltas.stamina_bonus;
+        snapshot.oxygen_level += deltas.oxygen_level_bonus;
         snapshot.fatigue_level += deltas.fatigue_bonus;
     }
 
@@ -336,6 +345,7 @@ impl Health {
         snapshot.food_level -= deltas.food_drain;
         snapshot.water_level -= deltas.water_drain;
         snapshot.stamina_level -= deltas.stamina_drain;
+        snapshot.oxygen_level -= deltas.oxygen_drain;
     }
 
     fn apply_injury_deltas(&self, snapshot: &mut HealthC, deltas: &InjuryDeltasC) {
@@ -352,6 +362,7 @@ impl Health {
         self.water_level.set(crate::utils::clamp(snapshot.water_level, 0., 100.));
         self.blood_level.set(crate::utils::clamp(snapshot.blood_level, 0., 100.));
         self.stamina_level.set(crate::utils::clamp(snapshot.stamina_level, 0., 100.));
+        self.oxygen_level.set(crate::utils::clamp(snapshot.oxygen_level, 0., 100.));
         self.fatigue_level.set(crate::utils::clamp(snapshot.fatigue_level, 0., 100.));
     }
 

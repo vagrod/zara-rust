@@ -5,10 +5,16 @@ mod side_fluctuate;
 mod side_fatigue;
 mod side_food_drain;
 mod side_water_drain;
+mod side_underwater;
 
 /// Side effects monitor that checks if player is running and increases his
 /// heart rate, blood pressure, affects stamina, fatigue and water level
 pub struct RunningSideEffects {
+    /// Stamina drain speed, 0..100 percents per game second
+    stamina_drain_amount: Cell<f32>,
+    /// Water level drain speed, 0..100 percents per game second
+    water_drain_amount: Cell<f32>,
+
     running_state: Cell<bool>,
     sleeping_state: Cell<bool>,
     running_time: Cell<f32>, // game seconds
@@ -44,4 +50,17 @@ pub struct FoodDrainOverTimeSideEffect {
 pub struct WaterDrainOverTimeSideEffect {
     /// Drain speed, 0..100 percents per game second
     drain_amount: Cell<f32>
+}
+
+/// Will enable oxygen drain over time when under water
+pub struct UnderwaterSideEffect {
+    /// Oxygen drain speed, 0..100 percents per game second
+    oxygen_drain_amount: Cell<f32>,
+    /// Stamina drain speed, 0..100 percents per game second
+    stamina_drain_amount: Cell<f32>,
+
+    sleeping_state: Cell<bool>,
+    gained_fatigue: Cell<f32>,
+    underwater_state: Cell<bool>,
+    time_under_water: Cell<f32> // game seconds
 }

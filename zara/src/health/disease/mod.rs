@@ -187,6 +187,7 @@ pub struct DiseaseDeltasC {
     pub pressure_bottom_delta: f32,
     pub fatigue_delta: f32,
     pub stamina_drain: f32,
+    pub oxygen_drain: f32,
     pub food_drain: f32,
     pub water_drain: f32
 }
@@ -200,11 +201,12 @@ impl DiseaseDeltasC {
             pressure_bottom_delta: 0.,
             fatigue_delta: 0.,
             stamina_drain: 0.,
+            oxygen_drain: 0.,
             food_drain: 0.,
             water_drain: 0.
         }
     }
-    pub fn for_related() -> Self {
+    pub(crate) fn for_related() -> Self {
         DiseaseDeltasC {
             body_temperature_delta: -1000.,
             heart_rate_delta: -1000.,
@@ -213,7 +215,8 @@ impl DiseaseDeltasC {
             fatigue_delta: 0.,
             stamina_drain: 0.,
             food_drain: 0.,
-            water_drain: 0.
+            water_drain: 0.,
+            oxygen_drain: 0.
         }
     }
     pub(crate) fn cleanup(&mut self){
@@ -231,7 +234,8 @@ impl DiseaseDeltasC {
             fatigue_delta: self.fatigue_delta,
             stamina_drain: self.stamina_drain,
             food_drain: self.food_drain,
-            water_drain: self.water_drain
+            water_drain: self.water_drain,
+            oxygen_drain: self.oxygen_drain
         }
     }
 }
