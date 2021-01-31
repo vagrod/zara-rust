@@ -17,6 +17,28 @@ mod chain;
 mod status_methods;
 
 /// Macro for declaring a simple injury
+///
+/// # Examples
+///
+/// ```
+/// zara::injury!(Cut, "Cut",
+///     Some(Box::new(CutTreatment)),
+///     vec![
+///         StageBuilder::start()
+///             .build_for(StageLevel::InitialStage)
+///                 .self_heal(20)
+///                 .drains()
+///                     .stamina(0.2)
+///                     .blood_level(0.08)
+///                 .deadly()
+///                     .with_chance_of_death(0)
+///                 .will_reach_target_in(0.3)
+///                 .will_end()
+///             .build(),
+///         // and so on...
+///     ]
+/// );
+/// ```
 #[macro_export]
 macro_rules! injury(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
@@ -34,6 +56,31 @@ macro_rules! injury(
 );
 
 /// Macro for declaring a fracture injury
+///
+/// # Examples
+///
+/// ```
+/// use zara::health::disease::StageBuilder;
+/// use zara::health::StageLevel;
+///
+/// zara::fracture!(Fracture, "Fracture",
+///     Some(Box::new(FractureTreatment)),
+///     vec![
+///         StageBuilder::start()
+///             .build_for(StageLevel::InitialStage)
+///                 .no_self_heal()
+///                 .drains()
+///                     .stamina(0.2)
+///                     .blood_level(0.08)
+///                 .deadly()
+///                     .with_chance_of_death(0)
+///                 .will_reach_target_in(0.3)
+///                 .will_end()
+///             .build(),
+///         // and so on...
+///     ]
+/// );
+/// ```
 #[macro_export]
 macro_rules! fracture(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (

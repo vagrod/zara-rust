@@ -16,7 +16,38 @@ mod lerp;
 mod chain;
 mod status_methods;
 
-/// Macro for declaring a disease
+/// Macro for declaring a disease. Use [`StageBuilder`](crate::zara::health::disease::StageBuilder)
+/// to create a stage
+///
+/// # Examples
+///
+/// ```
+/// use zara::health::disease::StageBuilder;
+/// use zara::health::StageLevel;
+///
+/// zara::disease!(Flu, "Flu",
+///     Some(Box::new(FluTreatment)),
+///     vec! [
+///         StageBuilder::start()
+///             .build_for(StageLevel::InitialStage)
+///                 .self_heal(15)
+///                 .vitals()
+///                     .with_target_body_temp(37.6)
+///                     .with_target_heart_rate(85.)
+///                     .with_target_blood_pressure(130., 90.)
+///                     .will_reach_target_in(0.1)
+///                     .will_end()
+///                 .drains()
+///                     .stamina(0.2)
+///                     .food_level(0.05)
+///                     .water_level(0.1)
+///                 .affects_fatigue(5.)
+///                 .no_death_probability()
+///             .build(),
+///             // and so on...
+///     ]
+/// );
+/// ```
 #[macro_export]
 macro_rules! disease(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (

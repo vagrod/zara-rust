@@ -2,7 +2,8 @@ use crate::body::Body;
 use crate::utils::{clamp, clamp_01, lerp};
 
 impl Body {
-    pub(crate) fn update_wetness_level_if_needed(&self, game_time_delta: f32, player_in_water: bool, rain_intensity: f32, world_temp: f32, wind_speed: f32) {
+    pub(crate) fn update_wetness_level_if_needed(&self, game_time_delta: f32, player_in_water: bool,
+                                                 rain_intensity: f32, world_temp: f32, wind_speed: f32) {
         let eps = 0.0001;
 
         if f32::abs(self.cached_world_temp.get() - world_temp) > eps ||

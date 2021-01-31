@@ -39,7 +39,6 @@ impl Body {
     ///     ]
     ///  );
     ///```
-    ///
     pub fn register_clothes_groups(&self, groups: Vec<ClothesGroup>) {
         for group in groups {
             self.clothes_groups.borrow_mut().insert(group.name.to_string(), group);
