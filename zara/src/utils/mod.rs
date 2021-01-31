@@ -453,7 +453,8 @@ pub struct PlayerStatusC {
     pub appliances: Vec<BodyAppliance>,
     pub clothes_group: Option<ClothesGroupC>,
     pub total_water_resistance: usize,
-    pub total_cold_resistance: usize
+    pub total_cold_resistance: usize,
+    pub inventory_weight: f32
 }
 
 /// Classic linear lerp

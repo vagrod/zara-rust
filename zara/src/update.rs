@@ -192,7 +192,8 @@ impl<E: Listener + 'static> ZaraController<E> {
                 clothes_group: self.body.clothes_group(),
                 appliances: self.body.appliances.borrow().clone(),
                 total_water_resistance: self.body.total_water_resistance(),
-                total_cold_resistance: self.body.total_cold_resistance()
+                total_cold_resistance: self.body.total_cold_resistance(),
+                inventory_weight: self.inventory.get_weight()
             },
             environment: EnvironmentC {
                 wind_speed: self.environment.wind_speed.get(),
