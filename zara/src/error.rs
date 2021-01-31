@@ -102,7 +102,17 @@ pub enum ApplianceTakeErr {
     /// When passed body part is unknown
     UnknownBodyPart,
     /// When could not update item count
-    CouldNotUseItem(InventoryUseErr)
+    CouldNotUseItem(InventoryUseErr),
+    /// Is this kind of body appliance already applied to a given body part
+    AlreadyApplied
+}
+
+/// Is used by `ZaraController.remove_appliance` method
+pub enum ApplianceRemoveErr {
+    /// When `consume` called on a dead character
+    CharacterIsDead,
+    /// When given appliance kind is not found on a body part
+    ApplianceNotFound
 }
 
 /// Is used by `ZaraController.update` method

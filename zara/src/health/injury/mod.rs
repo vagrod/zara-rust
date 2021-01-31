@@ -1,6 +1,6 @@
 use crate::utils::event::{MessageQueue, Event};
 use crate::utils::{GameTimeC};
-use crate::health::StageLevel;
+use crate::health::{StageLevel, InjuryKey};
 use crate::health::injury::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ApplianceC};
 use crate::body::{BodyParts};
@@ -50,11 +50,6 @@ macro_rules! fracture(
     );
 );
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct InjuryKey {
-    pub injury: String,
-    pub body_part: BodyParts
-}
 impl InjuryKey {
     pub fn new(injury: String, body_part: BodyParts) -> Self {
         InjuryKey {

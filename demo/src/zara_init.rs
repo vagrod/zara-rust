@@ -4,8 +4,8 @@ use crate::inventory::Knife;
 use super::inventory::{PantsClothes, JacketClothes};
 
 use zara::health::medagent::{CurveType};
-use zara::health::MedicalAgentBuilder;
-use zara::body::ClothesGroupBuilder;
+use zara::health::{MedicalAgentBuilder};
+use zara::body::{ClothesGroupBuilder, BodyParts};
 use zara::inventory::crafting;
 
 pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
@@ -77,6 +77,7 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     let aspirin = inventory::AspirinPills{ count: 2 };
     let pants = inventory::Pants{ count: 1 };
     let jacket = inventory::Jacket{ count: 1 };
+    let bandage = inventory::Bandage{ count: 5 };
 
     person.inventory.add_item(Box::new(aspirin));
     person.inventory.add_item(Box::new(meat));
@@ -87,6 +88,7 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     person.inventory.add_item(Box::new(mre));
     person.inventory.add_item(Box::new(pants));
     person.inventory.add_item(Box::new(jacket));
+    person.inventory.add_item(Box::new(bandage));
 
     person.inventory.register_crafting_combinations(
         vec![
@@ -107,7 +109,7 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
             format!("SharpStone")
         ]);
 
-    let res = person.inventory.execute_combination(&ids[0]);
+    person.inventory.execute_combination(&ids[0]);
 
     println!("");
 }

@@ -9,6 +9,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 mod status_methods;
+mod body_appliance;
 
 pub mod clothes;
 
@@ -20,6 +21,12 @@ pub struct Body {
     /// `ZaraController.take_off_clothes`, otherwise clothes will not be correctly synchronized
     /// between controllers
     pub clothes: Arc<RefCell<Vec<String>>>,
+    /// Clothes that character is wearing now.
+    ///
+    /// # Important
+    /// Currently active body appliances. Do not alter this collection manually, use `ZaraController.take_appliance` and
+    /// `ZaraController.remove_appliance`
+    pub appliances: Arc<RefCell<Vec<BodyAppliance>>>,
 
     /// Game time when player slept last time
     last_sleep_time: RefCell<Option<GameTimeC>>,
@@ -51,6 +58,15 @@ pub struct Body {
 struct ClothesItemC {
     cold_resistance: usize,
     water_resistance: usize,
+}
+
+/// Body appliance data
+#[derive(Clone)]
+pub struct BodyAppliance {
+    /// Unique name of an appliance inventory item
+    pub item_name: String,
+    /// Body part where this appliance is located
+    pub body_part: BodyParts
 }
 
 /// Used to describe a new clothes group. Use `start` method to begin.
@@ -119,6 +135,7 @@ impl Body {
     pub fn new() -> Self {
         Body {
             clothes: Arc::new(RefCell::new(Vec::new())),
+            appliances: Arc::new(RefCell::new(Vec::new())),
             last_sleep_time: RefCell::new(Option::None),
             is_sleeping: Cell::new(false),
             sleeping_counter: Cell::new(0.),

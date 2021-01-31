@@ -8,6 +8,7 @@ use crate::ui::ui_frame;
 use crate::zara_init::init_zara_instance;
 
 use zara::body::BodyParts;
+use zara::health::InjuryKey;
 use crossterm::terminal;
 use crossterm::execute;
 
@@ -113,4 +114,13 @@ fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
 fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
     person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
     person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::Forehead, zara::utils::GameTimeC::new(0,0,7,25.));
+
+    // Body appliances test
+    person.take_appliance(&format!("Bandage"), BodyParts::LeftShoulder);
+    person.health.injuries.borrow().get(&InjuryKey {
+        injury: format!("Cut"),
+        body_part: BodyParts::LeftShoulder
+    }).unwrap().stop_blood_loss();
+
+    //person.remove_appliance(&format!("Bandage"), BodyParts::LeftShoulder);
 }

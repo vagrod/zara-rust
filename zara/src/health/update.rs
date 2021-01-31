@@ -1,9 +1,9 @@
-use crate::health::{Health, StageLevel};
+use crate::health::{Health, StageLevel, InjuryKey};
 use crate::health::side::{SideEffectDeltasC};
 use crate::health::disease::{DiseaseDeltasC};
 use crate::utils::{HealthC, FrameC, GameTimeC, FrameSummaryC};
 use crate::utils::event::{Event, Listener, Dispatcher, MessageQueue};
-use crate::health::injury::{InjuryDeltasC, InjuryKey};
+use crate::health::injury::{InjuryDeltasC};
 
 use std::cell::RefMut;
 use std::collections::BTreeMap;

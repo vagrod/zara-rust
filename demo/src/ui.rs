@@ -455,6 +455,24 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
         cursor::MoveToNextLine(1),
     ).ok();
 
+    // Body appliances
+    let appl_col_base = 178;
+    execute!(w,
+        cursor::MoveToNextLine(1),
+        cursor::MoveToColumn(appl_col_base),
+        style::SetForegroundColor(style::Color::DarkBlue),
+        style::Print("Body Appliances"),
+        style::SetForegroundColor(style::Color::Blue),
+        cursor::MoveToNextLine(1),
+    ).ok();
+    for appliance in person.body.appliances.borrow().iter() {
+        execute!(w,
+            cursor::MoveToColumn(appl_col_base + 3),
+            style::Print(format!("{} on {:?}", appliance.item_name, appliance.body_part)),
+            cursor::MoveToNextLine(1),
+        ).ok();
+    }
+
     w.flush().ok();
 }
 

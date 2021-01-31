@@ -1,7 +1,7 @@
 use crate::utils::event::{Event, MessageQueue};
 use crate::utils::{GameTimeC, HealthC};
 use crate::health::disease::{DiseaseMonitor, ActiveDisease};
-use crate::health::injury::{ActiveInjury, InjuryKey};
+use crate::health::injury::{ActiveInjury};
 use crate::health::side::{SideEffectsMonitor};
 use crate::health::medagent::{MedicalAgentsMonitor, CurveType};
 use crate::health::medagent::fluent::{AgentStart};
@@ -66,6 +66,12 @@ pub struct Health {
 
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct InjuryKey {
+    pub injury: String,
+    pub body_part: BodyParts
 }
 
 /// Disease or injury stage level of seriousness

@@ -1,5 +1,5 @@
 use crate::health::StageLevel;
-use crate::body::BodyParts;
+use crate::body::{BodyParts, BodyAppliance};
 
 use std::time::{Duration};
 use std::cell::Cell;
@@ -450,6 +450,7 @@ pub struct PlayerStatusC {
     pub warmth_level: f32,
     pub wetness_level: f32,
     pub clothes: Vec<String>,
+    pub appliances: Vec<BodyAppliance>,
     pub clothes_group: Option<ClothesGroupC>,
     pub total_water_resistance: usize,
     pub total_cold_resistance: usize

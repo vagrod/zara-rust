@@ -1,6 +1,6 @@
 use crate::utils::event::{Event, MessageQueue};
-use crate::health::Health;
-use crate::health::injury::{ActiveInjury, Injury, InjuryKey};
+use crate::health::{Health, InjuryKey};
+use crate::health::injury::{ActiveInjury, Injury};
 use crate::utils::GameTimeC;
 use crate::error::{SpawnInjuryErr, RemoveInjuryErr};
 use crate::body::BodyParts;

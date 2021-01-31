@@ -147,7 +147,7 @@ macro_rules! inv_item_clothes (
 #[macro_export]
 macro_rules! inv_body_appliance (
     ($t:ty) => (
-        impl zara::inventory::items::ConsumableBehavior for $t {
+        impl zara::inventory::items::ApplianceBehavior for $t {
             fn is_body_appliance(&self) -> bool { true }
             fn is_injection(&self) -> bool { false }
         }
@@ -164,7 +164,7 @@ macro_rules! inv_body_appliance (
 #[macro_export]
 macro_rules! inv_injection_appliance (
     ($t:ty) => (
-        impl zara::inventory::items::ConsumableBehavior for $t {
+        impl zara::inventory::items::ApplianceBehavior for $t {
             fn is_body_appliance(&self) -> bool { false }
             fn is_injection(&self) -> bool { true }
         }

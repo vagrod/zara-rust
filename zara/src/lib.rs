@@ -213,7 +213,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Ok on success
     ///
     /// ## Note
-    /// Borrows `inventory.items` collection
+    /// Borrows `inventory.items` collection, can borrow `body.appliances` collection
     ///
     /// # Examples
     ///
@@ -238,7 +238,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             items_count = item.get_count();
 
-            if items_count - 1 <= 0 { // 1 so far
+            if !item.get_is_infinite() && items_count - 1 <= 0 { // 1 so far
                 return Err(ApplianceTakeErr::InsufficientResources);
             }
 
@@ -252,6 +252,10 @@ impl<E: Listener + 'static> ZaraController<E> {
             appliance.is_injection = a.is_injection();
             appliance.taken_count = 1; // so far
 
+            if appliance.is_body_appliance && self.body.is_applied(item_name, body_part) {
+                return Err(ApplianceTakeErr::AlreadyApplied);
+            }
+
             let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
 
             // Notify health controller about the event
@@ -262,10 +266,33 @@ impl<E: Listener + 'static> ZaraController<E> {
         self.inventory.use_item(item_name, appliance.taken_count)
             .or_else(|err| Err(ApplianceTakeErr::CouldNotUseItem(err)))?;
 
+        if appliance.is_body_appliance {
+            // Notify body controller
+            self.body.on_body_appliance_put_on(item_name, body_part);
+        }
+
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance, body_part));
 
         return Ok(());
+    }
+
+    /// Removes body appliance
+    ///
+    /// # Parameters
+    /// - `item_name`: inventory kind of appliance to remove
+    /// - `body_part`: from which body part
+    ///
+    /// ## Note
+    /// Borrows `body.appliances` collection
+    pub fn remove_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceRemoveErr> {
+        if !self.health.is_alive() { return Err(ApplianceRemoveErr::CharacterIsDead); }
+
+        if !self.body.remove_appliance(item_name, body_part) {
+            return Err(ApplianceRemoveErr::ApplianceNotFound);
+        }
+
+        Ok(())
     }
 
     /// Sets controller alive state to `false`

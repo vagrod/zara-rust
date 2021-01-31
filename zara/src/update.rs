@@ -190,6 +190,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                 wetness_level: self.body.wetness_level(),
                 clothes: self.body.clothes.borrow().clone(),
                 clothes_group: self.body.clothes_group(),
+                appliances: self.body.appliances.borrow().clone(),
                 total_water_resistance: self.body.total_water_resistance(),
                 total_cold_resistance: self.body.total_cold_resistance()
             },

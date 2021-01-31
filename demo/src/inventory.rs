@@ -66,3 +66,13 @@ zara::inv_clothes!(
     /* cold resistance, 0..100% */ 2.,
     /* water resistance, 0..100% */ 38.
 );
+
+pub struct Bandage {pub count: usize }
+pub struct BandageAppliance;
+zara::inv_item_appl!(
+    Bandage,
+    "Bandage",
+    /* weight per unit */ 59.,
+    Some(&BandageAppliance)
+);
+zara::inv_body_appliance!(BandageAppliance);
