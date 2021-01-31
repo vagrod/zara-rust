@@ -8,6 +8,24 @@ macro_rules! inv_item(
             fn get_count(&self) -> usize { self.count }
             fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
+            fn get_is_infinite(&self) -> bool { false }
+            fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
+            fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
+            fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
+            fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+        }
+    );
+);
+
+/// Macro for declaring an infinite inventory item with particular weight
+#[macro_export]
+macro_rules! inv_infinite(
+    ($t:ty, $nm:expr, $wt:expr) => (
+        impl zara::inventory::items::InventoryItem for $t {
+            fn get_count(&self) -> usize { self.count }
+            fn set_count(&mut self, new_count: usize) { self.count = new_count; }
+            fn get_name(&self) -> String { String::from($nm) }
+            fn get_is_infinite(&self) -> bool { true }
             fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
@@ -24,6 +42,7 @@ macro_rules! inv_item_cons(
             fn get_count(&self) -> usize { self.count }
             fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
+            fn get_is_infinite(&self) -> bool { false }
             fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { $cons }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
@@ -40,6 +59,7 @@ macro_rules! inv_item_appl (
             fn get_count(&self) -> usize { self.count }
             fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
+            fn get_is_infinite(&self) -> bool { false }
             fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { $appl }
@@ -56,6 +76,7 @@ macro_rules! inv_item_clothes (
             fn get_count(&self) -> usize { self.count }
             fn set_count(&mut self, new_count: usize) { self.count = new_count; }
             fn get_name(&self) -> String { String::from($nm) }
+            fn get_is_infinite(&self) -> bool { false }
             fn get_total_weight(&self) -> f32 { self.count as f32 * $wt }
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableBehavior> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceBehavior> { None }
@@ -217,6 +238,9 @@ pub trait InventoryItem {
     /// let s = item.get_name();
     /// ```
     fn get_name(&self) -> String;
+
+    /// Returns `true` is this item is an infinite resource
+    fn get_is_infinite(&self) -> bool;
 
     /// Gets calculated weight of all items of this kind, in grams.
     ///

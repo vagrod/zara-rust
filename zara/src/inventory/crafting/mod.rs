@@ -75,7 +75,7 @@ impl Inventory {
                 for (name, item_data) in cmb.items.borrow().iter() {
                     match self.items.borrow().get(name) {
                         Some(item) => {
-                            if item.get_count() < item_data.count {
+                            if !item.get_is_infinite() && item.get_count() < item_data.count {
                                 return Err(CheckForResourcesErr::InsufficientResources(name.to_string()));
                             }
                         },
@@ -124,8 +124,7 @@ impl Inventory {
                 Some(item) => {
                     // Increase count if we have item already
                     item.set_count(item.get_count() + resulted.get_count())
-                }
-                ,
+                },
                 None => {
                     // Add a new instance otherwise
                     b.insert(cmb.result_item.to_string(), resulted);

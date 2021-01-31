@@ -105,7 +105,9 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
             format!("SharpStone")
         ]);
 
-    person.inventory.execute_combination(&ids[0]);
+    let res = person.inventory.execute_combination(&ids[0]);
+
+    println!("");
 }
 
 fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {

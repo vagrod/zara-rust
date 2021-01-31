@@ -62,7 +62,7 @@ impl Inventory {
     }
 
     /// Decreases item count for a given item kind. If count becomes zero, removes item from
-    /// the inventory.
+    /// the inventory. If item is an infinite resource, nothing will happen.
     ///
     /// Will recalculate weight automatically on success
     ///
@@ -85,6 +85,8 @@ impl Inventory {
     fn use_item_internal(&self, name: &String, amount: usize, items_mut: &mut HashMap<String, Box<dyn InventoryItem>>) -> Result<(), InventoryUseErr> {
         match items_mut.get_mut(name) {
             Some(o) => {
+                if o.get_is_infinite() { return Ok(()) }
+
                 let c = o.get_count();
                 if amount > c { return Err(InventoryUseErr::InsufficientResources) }
 
