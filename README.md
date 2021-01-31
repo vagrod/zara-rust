@@ -2,7 +2,7 @@ This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](h
 
 This code is **WIP** and changes all the time.
 
-![Zara Rust Demo](http://imw.su/zara_rust_007.png)
+![Zara Rust Demo](http://imw.su/zara_rust_008.png)
 
 ## What's done at the moment
 - Game time
@@ -36,6 +36,7 @@ This code is **WIP** and changes all the time.
   + Body parts for injuries and treatment with appliances
   + Injury can be a fracture
   + Medical agents
+  + Oxygen level (and optional "side effect" to control it: underwater side effect)
  
 - Player status
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -49,9 +50,7 @@ This code is **WIP** and changes all the time.
 - Game events system
 
 ## What's in progress
-- Oxygen level (and optional "side effect" to control it)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
 - Trait to get and restore state of every engine node
-- Optional easing variants for lerping diseases/injuries/vitals
 
 The demo is using `crossterm`.
