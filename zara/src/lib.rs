@@ -171,7 +171,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             items_count = item.get_count();
 
-            if items_count - 1 <= 0 { // 1 so far
+            if !item.get_is_infinite() && items_count - 1 <= 0 { // 1 so far
                 return Err(ItemConsumeErr::InsufficientResources);
             }
 
