@@ -30,6 +30,7 @@ fn main() {
 
         let mut is_disease_inverted = false;
         let mut is_item_consumed = false;
+        let mut is_jacket_off = false;
 
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
@@ -60,6 +61,11 @@ fn main() {
             if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
                 person.consume(&format!("Aspirin Pills"));
                 is_item_consumed = true;
+            }
+
+            if person.environment.game_time.minute.get() == 5 && !is_jacket_off {
+                person.take_off_clothes(&format!("Jacket"));
+                is_jacket_off = true;
             }
 
             // Disease "invert" test

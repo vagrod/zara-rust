@@ -277,7 +277,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         return Ok(());
     }
 
-    /// Removes body appliance
+    /// Removes body appliance. Item is **not** added back to the inventory.
     ///
     /// # Parameters
     /// - `item_name`: inventory kind of appliance to remove
@@ -321,6 +321,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                                 Err(ClothesOnActionErr::AlreadyHaveThisItemOn)
                             },
                             _ => {
+                                self.inventory.update_clothes_cache(self.body.clothes.borrow().clone());
                                 Ok(())
                             }
                         }
@@ -360,6 +361,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                 Err(ClothesOffActionErr::ItemIsNotOn)
             },
             _ => {
+                self.inventory.update_clothes_cache(self.body.clothes.borrow().clone());
                 Ok(())
             }
         }

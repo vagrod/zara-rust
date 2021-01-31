@@ -35,6 +35,8 @@ pub struct Inventory {
     crafting_combinations: Rc<RefCell<HashMap<String, CraftingCombination>>>,
     /// Registered inventory monitors
     inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
+    /// Clothes cache
+    clothes_cache: RefCell<Vec<String>>,
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
@@ -57,7 +59,8 @@ impl Inventory {
             crafting_combinations: Rc::new(RefCell::new(HashMap::new())),
             inventory_monitors: Rc::new(RefCell::new(HashMap::new())),
             weight: Cell::new(0.),
-            message_queue: RefCell::new(BTreeMap::new())
+            message_queue: RefCell::new(BTreeMap::new()),
+            clothes_cache: RefCell::new(Vec::new())
         }
     }
 
@@ -112,11 +115,20 @@ impl Inventory {
 
         total_weight = 0.;
 
-        for (_key, item) in self.items.borrow().iter() {
-            total_weight += item.get_total_weight();
+        let cc = self.clothes_cache.borrow();
+        for (name, item) in self.items.borrow().iter() {
+            // Do not count clothes we're wearing
+            if !cc.contains(name) {
+                total_weight += item.get_total_weight();
+            }
         }
 
         self.weight.set(total_weight);
+    }
+
+    pub(crate) fn update_clothes_cache(&self, new_clothes: Vec<String>) {
+        self.clothes_cache.replace(new_clothes);
+        self.recalculate_weight();
     }
 }
 

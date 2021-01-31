@@ -5,7 +5,7 @@ use super::inventory::{PantsClothes, JacketClothes};
 
 use zara::health::medagent::{CurveType};
 use zara::health::{MedicalAgentBuilder};
-use zara::body::{ClothesGroupBuilder, BodyParts};
+use zara::body::{ClothesGroupBuilder};
 use zara::inventory::crafting;
 
 pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
@@ -109,7 +109,7 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
             format!("SharpStone")
         ]);
 
-    person.inventory.execute_combination(&ids[0]);
+    person.inventory.execute_combination(&ids[0]).ok();
 
     println!("");
 }
