@@ -24,7 +24,7 @@ impl Health {
     /// Registers new medical agent.
     ///
     /// ## Parameters
-    /// - `agent`: medical agent to register. Use [`MedicalAgentBuilder`](crate::health::MedicalAgentBuilder)
+    /// - `agents`: medical agents to register. Use [`MedicalAgentBuilder`](crate::health::MedicalAgentBuilder)
     ///     to create one.
     ///
     /// ## Examples
@@ -33,17 +33,23 @@ impl Health {
     /// use crate::zara::health::MedicalAgentBuilder;
     /// use crate::zara::health::medagent::CurveType;
     ///
-    /// person.health.register_medical_agent(
-    ///     MedicalAgentBuilder::start()
-    ///         .for_agent("Agent Name")
-    ///             .activates(CurveType::Immediately)
-    ///             //.. and so on
-    ///     // .build()
+    /// person.health.register_medical_agents(
+    ///     vec![
+    ///         MedicalAgentBuilder::start()
+    ///             .for_agent("Agent Name")
+    ///                 .activates(CurveType::Immediately)
+    ///                 //.. and so on
+    ///         // .build()
+    ///     ]
     ///  );
     ///```
     ///
-    pub fn register_medical_agent(&self, agent: MedicalAgent) {
-        self.medical_agents.agents.borrow_mut().insert(agent.name.to_string(), agent);
+    pub fn register_medical_agents (&self, agents: Vec<MedicalAgent>) {
+        let mut b = self.medical_agents.agents.borrow_mut();
+
+        for agent in agents {
+            b.insert(agent.name.to_string(), agent);
+        }
     }
 }
 

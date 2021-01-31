@@ -21,20 +21,22 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
             events_listener, environment
         );
 
-    person.health.register_medical_agent (
-        MedicalAgentBuilder::start()
-            .for_agent("Aspirin")
-                .activates(CurveType::Immediately)
-                .and_lasts_for_minutes(23.)
-                .includes(
-                    vec![
-                        "Aspirin Pills",
-                        "Big Green Leaves",
-                        "Syringe With Aspirin",
-                        "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
-                    ]
-                )
-            .build()
+    person.health.register_medical_agents (
+        vec![
+            MedicalAgentBuilder::start()
+                .for_agent("Aspirin")
+                    .activates(CurveType::Immediately)
+                    .and_lasts_for_minutes(23.)
+                    .includes(
+                        vec![
+                            "Aspirin Pills",
+                            "Big Green Leaves",
+                            "Syringe With Aspirin",
+                            "This Strange Glowy Pink Goop That I Found In Thaaaaat Very Cave Yesterday When I Was Wandering Here At Night And..."
+                        ]
+                    )
+                .build()
+        ]
     );
 
     person.body.register_clothes_groups(
