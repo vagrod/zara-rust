@@ -26,6 +26,7 @@ impl SideEffectsMonitor for UnderwaterSideEffect {
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC {
         const TIME_TO_REACH_UNDERWATER_TOPS: f32 = 60. * 5.; // game seconds
         const TIME_TO_REACH_FATIGUE_CAP: f32 = 3.*60.*60.; // game seconds
+        const MAX_HEART_RATE_IMPACT: f32 = 79.;
         const MAX_TOP_PRESSURE_IMPACT: f32 = 35.;
         const MAX_BOTTOM_PRESSURE_IMPACT: f32 = 29.;
 
@@ -65,6 +66,7 @@ impl SideEffectsMonitor for UnderwaterSideEffect {
                 stamina_bonus: -self.stamina_drain_amount.get() * frame_data.game_time_delta,
                 top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                 bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
+                heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
                 fatigue_bonus: self.gained_fatigue.get(),
 
                 ..Default::default()
@@ -83,6 +85,7 @@ impl SideEffectsMonitor for UnderwaterSideEffect {
                 return SideEffectDeltasC {
                     top_pressure_bonus: crate::utils::lerp(0., MAX_TOP_PRESSURE_IMPACT, p),
                     bottom_pressure_bonus: crate::utils::lerp(0., MAX_BOTTOM_PRESSURE_IMPACT, p),
+                    heart_rate_bonus: crate::utils::lerp(0., MAX_HEART_RATE_IMPACT, p),
                     fatigue_bonus: self.gained_fatigue.get(),
 
                     ..Default::default()
