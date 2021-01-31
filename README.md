@@ -2,7 +2,7 @@ This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](h
 
 This code is **WIP** and changes all the time.
 
-![Zara Rust Demo](http://imw.su/zara_rust_006.png)
+![Zara Rust Demo](http://imw.su/zara_rust_007.png)
 
 ## What's done at the moment
 - Game time
@@ -16,6 +16,7 @@ This code is **WIP** and changes all the time.
   + Macros to write less code describing items (one-liners)
   + Appliances as inventory item type
   + Actual getting new item from a crafting combination and spending resources on it
+  + Checking crafting recipe for resources availability
   
 - Health:
   + Sleeping
@@ -40,6 +41,7 @@ This code is **WIP** and changes all the time.
   + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
   + Warmth and wetness levels
   + Clothes and clothes groups
+  + Body appliances (bandages, splints, etc.)
 
 - Weather status
   + Rain intensity, temperature, wind speed that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
@@ -47,10 +49,8 @@ This code is **WIP** and changes all the time.
 - Game events system
 
 ## What's in progress
-- Body appliances (bandages, splints, etc.)
 - Oxygen level (and optional "side effect" to control it)
 - More death events (vitals death, suffocation, starvation, thirst, etc)
-- Checking crafting recipe for resources availability
 - Trait to get and restore state of every engine node
 - Optional easing variants for lerping diseases/injuries/vitals
 
