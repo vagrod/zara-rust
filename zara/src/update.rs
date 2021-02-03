@@ -25,7 +25,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// This method should be called every frame.
     ///
     /// # Parameters
-    /// - `frame_time`: time, `in seconds`, since last `update` call.
+    /// - `frame_time`: time, **in seconds**`, since last `update` call.
     ///
     /// # Examples
     ///
@@ -36,6 +36,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     pub fn update(&self, frame_time: f32) -> Result<(), ZaraUpdateErr>{
         if !self.health.is_alive() { return Err(ZaraUpdateErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ZaraUpdateErr::InstancePaused); }
 
         let elapsed = self.update_counter.get() + frame_time;
         let elapsed_for_queue = self.queue_counter.get() + frame_time;
@@ -176,7 +177,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             };
 
         FrameSummaryC {
-            game_time : self.environment.game_time.to_contract(),
+            game_time: self.environment.game_time.to_contract(),
             game_time_delta: time_delta.as_secs_f32(),
             player: PlayerStatusC {
                 is_walking: self.player_state.is_walking.get(),

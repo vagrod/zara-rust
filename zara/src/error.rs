@@ -40,7 +40,7 @@ pub enum SpawnInjuryErr {
 
 /// Is used by `Health.remove_disease` method
 pub enum RemoveDiseaseErr {
-    /// When `spawn_disease` called on a dead character
+    /// When `remove_disease` called on a dead character
     CharacterIsDead,
     /// When disease you trying to delete was not found
     DiseaseNotFound
@@ -86,12 +86,14 @@ pub enum ItemConsumeErr {
     /// When item has no `consumable` option
     ItemIsNotConsumable,
     /// When could not update item count
-    CouldNotUseItem(InventoryUseErr)
+    CouldNotUseItem(InventoryUseErr),
+    /// When controller is paused
+    InstancePaused
 }
 
 /// Is used by `ZaraController.take_appliance` method
 pub enum ApplianceTakeErr {
-    /// When `consume` called on a dead character
+    /// When `take_appliance` called on a dead character
     CharacterIsDead,
     /// When given item key was not found in the inventory
     ItemNotFound,
@@ -104,21 +106,27 @@ pub enum ApplianceTakeErr {
     /// When could not update item count
     CouldNotUseItem(InventoryUseErr),
     /// Is this kind of body appliance already applied to a given body part
-    AlreadyApplied
+    AlreadyApplied,
+    /// When controller is paused
+    InstancePaused
 }
 
 /// Is used by `ZaraController.remove_appliance` method
 pub enum ApplianceRemoveErr {
-    /// When `consume` called on a dead character
+    /// When `remove_appliance` called on a dead character
     CharacterIsDead,
     /// When given appliance kind is not found on a body part
-    ApplianceNotFound
+    ApplianceNotFound,
+    /// When controller is paused
+    InstancePaused
 }
 
 /// Is used by `ZaraController.update` method
 pub enum ZaraUpdateErr {
     /// When `update` called on a dead character
-    CharacterIsDead
+    CharacterIsDead,
+    /// When controller is paused
+    InstancePaused
 }
 
 /// Is used by `MedicalAgentsMonitor.is_active` method
@@ -136,7 +144,11 @@ pub enum ClothesOnActionErr {
     /// When given clothes is already on
     AlreadyHaveThisItemOn,
     /// When given item has no `clothes` option
-    IsNotClothesType
+    IsNotClothesType,
+    /// When controller is paused
+    InstancePaused,
+    /// When `put_on_clothes` called on a dead character
+    CharacterIsDead
 }
 
 /// Is used by `ZaraController.take_off_clothes` method
@@ -148,7 +160,11 @@ pub enum ClothesOffActionErr {
     /// When given clothes is not on
     ItemIsNotOn,
     /// When given item has no `clothes` option
-    IsNotClothesType
+    IsNotClothesType,
+    /// When controller is paused
+    InstancePaused,
+    /// When `take_off_clothes` called on a dead character
+    CharacterIsDead
 }
 
 pub(crate) enum RequestClothesOnErr {
@@ -157,6 +173,11 @@ pub(crate) enum RequestClothesOnErr {
 
 pub(crate) enum RequestClothesOffErr {
     ItemIsNotOn
+}
+
+pub enum DeclareDeadErr {
+    /// When controller is paused
+    InstancePaused
 }
 
 /// Is used by `Inventory.check_for_resources` method

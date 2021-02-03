@@ -57,6 +57,8 @@ pub struct ZaraController<E: Listener + 'static> {
     last_update_game_time: Cell<Duration>,
     /// Game time of the last update frame
     last_frame_game_time: Cell<Duration>,
+    /// Is controller paused
+    is_paused: Cell<bool>,
     /// Events dispatcher
     dispatcher: Arc<RefCell<Dispatcher<E>>>,
     // Need this reference here to keep listener in memory
@@ -130,6 +132,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             last_update_game_time: Cell::new(Duration::new(0,0)),
             last_frame_game_time: Cell::new(Duration::new(0,0)),
             player_state: Arc::new(PlayerStatus::empty()),
+            is_paused: Cell::new(false),
 
             dispatcher: Arc::new(RefCell::new(dispatcher)),
             listener: listener_rc
@@ -158,6 +161,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         if !self.health.is_alive() { return Err(ItemConsumeErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ItemConsumeErr::InstancePaused); }
 
         let mut consumable = ConsumableC::new();
         {
@@ -224,6 +228,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     pub fn take_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceTakeErr> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ApplianceTakeErr::InstancePaused); }
         if body_part == BodyParts::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
 
         let mut appliance = ApplianceC::new();
@@ -287,6 +292,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Borrows `body.appliances` collection
     pub fn remove_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceRemoveErr> {
         if !self.health.is_alive() { return Err(ApplianceRemoveErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ApplianceRemoveErr::InstancePaused); }
 
         if !self.body.remove_appliance(item_name, body_part) {
             return Err(ApplianceRemoveErr::ApplianceNotFound);
@@ -296,9 +302,18 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Sets controller alive state to `false`
-    pub fn declare_dead(&self) { self.health.declare_dead(); }
+    pub fn declare_dead(&self) -> Result<(), DeclareDeadErr> {
+        if self.is_paused() { return Err(DeclareDeadErr::InstancePaused); }
+        self.health.declare_dead();
 
-    /// Adds given item to the `body.clothes` collection.
+        Ok(())
+    }
+    /// Pause this instance (all `update` calls will be ignored)
+    pub fn pause(&self) { self.is_paused.set(true); }
+    /// Resume this instance (all `update` calls will be working again)
+    pub fn resume(&self) { self.is_paused.set(true); }
+
+    /// Adds given item to the `body.clothes` collection and recalculates inventory weight.
     ///
     /// # Parameters
     /// - `item_name`: unique inventory item name. Item must have `clothes` option present.
@@ -309,6 +324,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     pub fn put_on_clothes(&self, item_name: &String) -> Result<(), ClothesOnActionErr> {
+        if !self.health.is_alive() { return Err(ClothesOnActionErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ClothesOnActionErr::InstancePaused); }
+
         return match self.inventory.items.borrow().get(item_name) {
             Some(item) => {
                 if item.get_count() <= 0 {
@@ -333,7 +351,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         }
     }
 
-    /// Removes given item from the `body.clothes` collection.
+    /// Removes given item from the `body.clothes` collection and recalculates inventory weight.
     ///
     /// # Parameters
     /// - `item_name`: unique name of the inventory item that was put on earlier.
@@ -344,6 +362,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     pub fn take_off_clothes(&self, item_name: &String) -> Result<(), ClothesOffActionErr> {
+        if !self.health.is_alive() { return Err(ClothesOffActionErr::CharacterIsDead); }
+        if self.is_paused() { return Err(ClothesOffActionErr::InstancePaused); }
+
         match self.inventory.items.borrow().get(item_name) {
             Some(item) => {
                 if item.get_count() <= 0 {
