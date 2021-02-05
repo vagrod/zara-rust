@@ -10,7 +10,7 @@ pub trait SideEffectsMonitor {
     /// - `frame_data`: summary containing all environmental data, game time, health snapshot and etc.
     ///
     /// # Returns
-    /// [`SideEffectDeltasC`](crate::health::side::SideEffectDeltasC) structure containing deltas
+    /// [`SideEffectDeltasC`](crate::zara::health::side::SideEffectDeltasC) structure containing deltas
     /// that will be added to the `healthy player state`, and NOT THE CURRENT health state
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC;
 }

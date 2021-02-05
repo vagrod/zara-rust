@@ -14,7 +14,7 @@ impl Body {
     /// Registers a list of clothes groups.
     ///
     /// # Parameters
-    /// - `groups`: a list of clothes groups to register. Use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
+    /// - `groups`: a list of clothes groups to register. Use [`ClothesGroupBuilder`](crate::zara::body::ClothesGroupBuilder)
     ///     to create one.
     ///
     /// # Examples

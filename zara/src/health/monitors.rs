@@ -8,7 +8,7 @@ impl Health {
     ///
     /// # Parameters
     /// - `monitor`: an instance of an object that implements
-    /// [`DiseaseMonitor`](crate::health::disease::DiseaseMonitor) trait
+    /// [`DiseaseMonitor`](crate::zara::health::disease::DiseaseMonitor) trait
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance

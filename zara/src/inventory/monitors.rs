@@ -17,7 +17,7 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `monitor`: an instance of an object that implements
-    /// [`InventoryMonitor`](crate::inventory::monitors::InventoryMonitor) trait
+    /// [`InventoryMonitor`](crate::zara::inventory::monitors::InventoryMonitor) trait
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance

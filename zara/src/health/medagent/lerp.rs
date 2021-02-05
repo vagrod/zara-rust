@@ -79,7 +79,5 @@ pub struct KeyFrame {
 }
 
 impl KeyFrame {
-    pub fn new(time: f32, value: f32) -> Self {
-        KeyFrame { time, value }
-    }
+    pub fn new(time: f32, value: f32) -> Self { KeyFrame { time, value } }
 }

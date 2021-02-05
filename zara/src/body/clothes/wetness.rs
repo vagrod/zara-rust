@@ -4,11 +4,11 @@ use crate::utils::{clamp, clamp_01, lerp};
 impl Body {
     pub(crate) fn update_wetness_level_if_needed(&self, game_time_delta: f32, player_in_water: bool,
                                                  rain_intensity: f32, world_temp: f32, wind_speed: f32) {
-        let eps = 0.0001;
+        const EPS: f32 = 0.0001;
 
-        if f32::abs(self.cached_world_temp.get() - world_temp) > eps ||
-            f32::abs(self.cached_wind_speed.get() - wind_speed) > eps ||
-            f32::abs(self.cached_rain_intensity.get() - rain_intensity) > eps ||
+        if f32::abs(self.cached_world_temp.get() - world_temp) > EPS ||
+            f32::abs(self.cached_wind_speed.get() - wind_speed) > EPS ||
+            f32::abs(self.cached_rain_intensity.get() - rain_intensity) > EPS ||
             self.cached_player_in_water.get() != player_in_water
         {
             self.cached_world_temp.set(world_temp);
@@ -55,7 +55,7 @@ impl Body {
                 const FREEZE_TEMPERATURE: f32 = -80.; // C (and higher)
 
                 const WIND_SPEED_FOR_MAX_DRYING: f32 = 7.; // m/s
-                const MAX_WIND_DRYING_RATE: f32 = 0.0422;   // percent per real second
+                const MAX_WIND_DRYING_RATE: f32 = 0.0422;  // percent per real second
 
                 let current_rate = match self.cached_world_temp.get() {
                     t if t <= FREEZE_TEMPERATURE => {

@@ -13,7 +13,7 @@ impl Health {
     /// `Err` will be returned
     ///
     /// # Parameters
-    /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
+    /// - `injury`: instance of an object with the [`Injury`](crate::zara::health::injury::Injury) trait
     /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will activate. Use the
     ///     current game time to activate immediately (on the next `update` pass)

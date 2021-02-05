@@ -18,13 +18,13 @@ pub trait ClothesGroupStart {
 
 pub trait ClothesGroupCold {
     /// Bonus cold resistance level that gets applied when player is wearing the whole
-    /// clothes group on top of all other resistances. 0..100 percents.
+    /// clothes group set on top of all other resistances. 0..100 percents.
     fn bonus_cold_resistance(&self, value: usize) -> &dyn ClothesGroupWater;
 }
 
 pub trait ClothesGroupWater {
     /// Bonus water resistance level that gets applied when player is wearing the whole
-    /// clothes group on top of all other resistances. 0..100 percents.
+    /// clothes group set on top of all other resistances. 0..100 percents.
     fn bonus_water_resistance(&self, value: usize) -> &dyn ClothesGroupItems;
 }
 
@@ -33,6 +33,16 @@ pub trait ClothesGroupItems {
     ///
     /// First argument is a unique inventory item name, second is a description of the item's
     /// `ClothesDescription` option.
+    ///
+    /// # Examples:
+    /// ```
+    /// includes(
+    ///     vec![
+    ///         ("Jacket", Box::new(JacketClothes)),
+    ///         ("Pants", Box::new(PantsClothes))
+    ///     ]
+    /// )
+    /// ```
     fn includes(&self, items: Vec<(&str, Box<dyn ClothesDescription>)>) -> &dyn ClothesGroupEnd;
 }
 

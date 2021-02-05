@@ -355,7 +355,7 @@ impl ActiveInjury {
     /// Creates new active disease object
     ///
     /// # Parameters
-    /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
+    /// - `injury`: instance of an object with the [`Injury`](crate::zara::health::injury::Injury) trait
     /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately

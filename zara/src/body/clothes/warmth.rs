@@ -1,12 +1,11 @@
 use crate::body::Body;
 
 impl Body {
-
     pub(crate) fn update_warmth_level_if_needed(&self, world_temp: f32, wind_speed: f32) {
-        let eps = 0.0001;
+        const EPS: f32 = 0.0001;
 
-        if f32::abs(self.cached_world_temp.get() - world_temp) > eps ||
-            f32::abs(self.cached_wind_speed.get() - wind_speed) > eps {
+        if f32::abs(self.cached_world_temp.get() - world_temp) > EPS ||
+            f32::abs(self.cached_wind_speed.get() - wind_speed) > EPS {
             self.cached_world_temp.set(world_temp);
             self.cached_wind_speed.set(wind_speed);
 
@@ -42,5 +41,4 @@ impl Body {
 
         self.warmth_level.set(level);
     }
-
 }

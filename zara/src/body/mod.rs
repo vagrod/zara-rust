@@ -21,7 +21,7 @@ pub struct Body {
     /// `ZaraController.take_off_clothes`, otherwise clothes will not be correctly synchronized
     /// between controllers
     pub clothes: Arc<RefCell<Vec<String>>>,
-    /// Clothes that character is wearing now.
+    /// Body appliances that character is wearing now.
     ///
     /// # Important
     /// Currently active body appliances. Do not alter this collection manually, use `ZaraController.take_appliance` and

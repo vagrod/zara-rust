@@ -23,11 +23,11 @@ pub enum CurveType {
 impl Health {
     /// Registers new medical agent.
     ///
-    /// ## Parameters
-    /// - `agents`: medical agents to register. Use [`MedicalAgentBuilder`](crate::health::MedicalAgentBuilder)
+    /// # Parameters
+    /// - `agents`: medical agents to register. Use [`MedicalAgentBuilder`](crate::zara::health::MedicalAgentBuilder)
     ///     to create one.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     ///```
     /// use crate::zara::health::MedicalAgentBuilder;

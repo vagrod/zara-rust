@@ -418,7 +418,7 @@ impl ActiveDisease {
     /// Creates new active disease object
     ///
     /// # Parameters
-    /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
+    /// - `disease`: instance of an object with the [`Disease`](crate::zara::health::disease::Disease) trait
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {

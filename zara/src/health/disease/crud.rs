@@ -14,7 +14,7 @@ impl Health {
     /// `Err` will be returned
     ///
     /// # Parameters
-    /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
+    /// - `disease`: instance of an object with the [`Disease`](crate::zara::health::disease::Disease) trait
     /// - `activation_time`: game time when this disease will activate. Use the
     ///     current game time to activate immediately (on the next `update` pass)
     ///

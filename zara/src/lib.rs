@@ -41,7 +41,7 @@ pub struct ZaraController<E: Listener + 'static> {
     pub inventory: Arc<inventory::Inventory>,
     /// Body node.
     ///
-    /// Use this to sleep, control clothes and see wetness and warmth levels.
+    /// Use this to sleep, see clothes and body appliances and look at wetness and warmth levels.
     pub body: Arc<body::Body>,
     /// Player status runtime data
     ///
@@ -77,7 +77,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// [`with_environment`]: #method.with_environment
     ///
     /// # Parameters
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
+    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose `notify` will be
     ///     called when Zara event occurs
     ///
     /// # Examples
@@ -98,9 +98,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// [`new`]: #method.new
     ///
     /// # Parameters
-    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
+    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose `notify` will be
     ///     called when Zara event occurs
-    /// - `env`: [`EnvironmentC`](crate::utils::EnvironmentC) object that describes initial state of the environment
+    /// - `env`: [`EnvironmentC`](crate::zara::utils::EnvironmentC) object that describes initial state of the environment
     ///
     /// # Examples
     ///
@@ -140,7 +140,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Consumes the item. Item which name is passed must have the
-    /// [`ConsumableBehavior`](crate::inventory::ConsumableBehavior) option present, or
+    /// [`ConsumableBehavior`](crate::zara::inventory::ConsumableBehavior) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters
@@ -206,7 +206,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Takes an appliance (like bandage or injection). Item which name is passed must have the
-    /// [`ApplianceBehavior`](crate::inventory::ApplianceBehavior) option present, or
+    /// [`ApplianceBehavior`](crate::zara::inventory::ApplianceBehavior) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters
