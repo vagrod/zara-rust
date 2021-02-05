@@ -50,7 +50,6 @@ This code is stable.
 - Game events system
 
 ## What's in progress
-- More death events (vitals death, suffocation, starvation, thirst, etc)
 - Saving and restoring engine state
 
 The demo is using `crossterm`.
