@@ -10,6 +10,12 @@ impl Health {
     pub fn is_exhausted(&self) -> bool { self.fatigue_level.get() >= 90. }
     /// Player has low stamina (`stamina_level` 5% and less)
     pub fn is_no_strength(&self) -> bool { self.stamina_level.get() <= 5. }
+    /// Player has low oxygen level
+    pub fn is_low_oxygen(&self) -> bool { self.oxygen_level.get() <= 5. }
+    /// Player has low food level
+    pub fn is_low_food(&self) -> bool { self.food_level.get() <= 5. }
+    /// Player has low water level
+    pub fn is_low_water(&self) -> bool { self.water_level.get() <= 5. }
     /// Player has active non-zero blood loss from some injury
     pub fn is_blood_loss(&self) -> bool { self.has_blood_loss.get() }
     /// Current body temperature (degrees C)

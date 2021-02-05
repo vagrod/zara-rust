@@ -4,7 +4,9 @@ pub struct ZaraEventsListener;
 impl Listener for ZaraEventsListener {
     fn notify(&mut self, event: &Event) {
         match event {
-            _ => { }
+            _ => {
+                //println!("{:?}", event)
+            }
         }
     }
 }

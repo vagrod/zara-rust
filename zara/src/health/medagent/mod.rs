@@ -2,9 +2,10 @@ use crate::error::MedicalAgentErr;
 use crate::health::Health;
 use crate::health::medagent::lerp::{MultiKeyedLerp, KeyFrame};
 use crate::utils::GameTimeC;
+use crate::utils::event::{Event, MessageQueue};
 
-use std::collections::HashMap;
-use std::cell::{Cell, RefCell};
+use std::collections::{HashMap, BTreeMap};
+use std::cell::{Cell, RefCell, RefMut};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -102,7 +103,10 @@ pub struct MedicalAgent {
     percent_of_presence: Cell<f32>,
     is_active: Cell<bool>,
     last_dose_end_time: RefCell<Option<GameTimeC>>,
-    doses: RefCell<HashMap<AgentDoseKey, AgentDose>>
+    doses: RefCell<HashMap<AgentDoseKey, AgentDose>>,
+
+    /// Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
 impl MedicalAgent {
@@ -116,7 +120,8 @@ impl MedicalAgent {
             percent_of_activity: Cell::new(0.),
             percent_of_presence: Cell::new(0.),
             last_dose_end_time: RefCell::new(None),
-            doses: RefCell::new(HashMap::new())
+            doses: RefCell::new(HashMap::new()),
+            message_queue: RefCell::new(BTreeMap::new()),
         }
     }
 
@@ -172,6 +177,13 @@ impl MedicalAgent {
             self.last_dose_end_time.replace(None);
         }
 
+        if !self.is_active.get() && is_active {
+            self.queue_message(Event::MedicalAgentActivated(self.name.to_string()));
+        }
+        if self.is_active.get() && !is_active {
+            self.queue_message(Event::MedicalAgentDeactivated(self.name.to_string()));
+        }
+
         self.is_active.set(is_active);
         self.percent_of_activity.set(max_percent_of_activity);
 
@@ -187,7 +199,7 @@ impl MedicalAgent {
 
             let frames = MedicalAgent::generate_frames(gt, duration_secs, self.activation_curve);
             let key = AgentDoseKey {
-                item: item_name,
+                item: item_name.to_string(),
                 timestamp: gt as i32
             };
             let dose = AgentDose {
@@ -201,6 +213,7 @@ impl MedicalAgent {
                 GameTimeC::from_duration(Duration::from_secs_f32(dose.end_time))
             ));
             self.doses.borrow_mut().insert(key, dose);
+            self.queue_message(Event::MedicalAgentDoseReceived(self.name.to_string(), item_name.to_string()));
         }
     }
 
@@ -248,13 +261,16 @@ impl MedicalAgent {
 pub struct MedicalAgentsMonitor {
     pub agents: Arc<RefCell<HashMap<String, MedicalAgent>>>,
 
-    active_count: Cell<i32>
+    active_count: Cell<i32>,
+    /// Messages queued for sending on the next frame
+    message_queue: RefCell<BTreeMap<usize, Event>>
 }
 impl MedicalAgentsMonitor {
     pub fn new() -> Self {
         MedicalAgentsMonitor {
             agents: Arc::new(RefCell::new(HashMap::new())),
-            active_count: Cell::new(0)
+            active_count: Cell::new(0),
+            message_queue: RefCell::new(BTreeMap::new())
         }
     }
 
@@ -270,10 +286,62 @@ impl MedicalAgentsMonitor {
         for (_, agent) in self.agents.borrow().iter() {
             let result = agent.update(game_time);
 
+            if agent.has_messages() {
+                self.flush_queue(agent.get_message_queue());
+            }
+
             if result.is_active { active_count += 1; }
         }
         self.active_count.set(active_count);
     }
 
     pub fn active_count(&self) -> i32 { self.active_count.get() }
+
+    fn flush_queue(&self, mut q: RefMut<BTreeMap<usize, Event>>) {
+        if q.len() == 0 { return }
+
+        let mut key = 0;
+
+        loop {
+            match q.get(&key) {
+                Some(event) => {
+                    self.queue_message(event.clone());
+
+                    q.remove(&key);
+                },
+                None => break
+            }
+
+            key += 1;
+        }
+    }
+}
+
+impl MessageQueue for MedicalAgent {
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
+
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
+    }
+}
+impl MessageQueue for MedicalAgentsMonitor {
+    fn has_messages(&self) -> bool { self.message_queue.borrow().len() > 0 }
+
+    fn queue_message(&self, message: Event) {
+        let mut q = self.message_queue.borrow_mut();
+        let id = q.len();
+
+        q.insert(id, message);
+    }
+
+    fn get_message_queue(&self) -> RefMut<'_, BTreeMap<usize, Event>> {
+        self.message_queue.borrow_mut()
+    }
 }

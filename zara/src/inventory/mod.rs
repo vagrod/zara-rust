@@ -88,7 +88,10 @@ impl Inventory {
     fn use_item_internal(&self, name: &String, amount: usize, items_mut: &mut HashMap<String, Box<dyn InventoryItem>>) -> Result<(), InventoryUseErr> {
         match items_mut.get_mut(name) {
             Some(o) => {
-                if o.get_is_infinite() { return Ok(()) }
+                if o.get_is_infinite() {
+                    self.queue_message(Event::InventoryItemUsedPartially(name.to_string(), amount));
+                    return Ok(())
+                }
 
                 let c = o.get_count();
                 if amount > c { return Err(InventoryUseErr::InsufficientResources) }
@@ -96,8 +99,11 @@ impl Inventory {
                 if c - amount == 0 {
                     // Need to clean up
                     items_mut.remove(name);
+                    self.queue_message(Event::InventoryItemUsedAll(name.to_string(), amount));
                 } else {
                     o.set_count(c - amount);
+
+                    self.queue_message(Event::InventoryItemUsedPartially(name.to_string(), amount));
                 }
             },
             None => return Err(InventoryUseErr::ItemNotFound)
@@ -111,19 +117,24 @@ impl Inventory {
 
     /// Recalculates the inventory weight
     fn recalculate_weight(&self) {
-        let mut total_weight: f32;
+        let old_weight = self.weight.get();
+        let mut new_weight: f32;
 
-        total_weight = 0.;
+        new_weight = 0.;
 
         let cc = self.clothes_cache.borrow();
         for (name, item) in self.items.borrow().iter() {
             // Do not count clothes we're wearing
             if !cc.contains(name) {
-                total_weight += item.get_total_weight();
+                new_weight += item.get_total_weight();
             }
         }
 
-        self.weight.set(total_weight);
+        self.weight.set(new_weight);
+
+        if old_weight != new_weight {
+            self.queue_message(Event::InventoryWeightChanged(old_weight, new_weight));
+        }
     }
 
     pub(crate) fn update_clothes_cache(&self, new_clothes: Vec<String>) {

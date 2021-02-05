@@ -267,7 +267,7 @@ macro_rules! inv_clothes(
 );
 
 /// Describes consumable contract
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ConsumableC {
     /// Unique name of the item
     pub name: String,
@@ -290,7 +290,7 @@ impl ConsumableC {
 }
 
 /// Describes appliance  contract
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ApplianceC {
     /// Unique name of the item
     pub name: String,

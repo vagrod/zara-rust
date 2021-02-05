@@ -2,6 +2,7 @@ use crate::body::{Body, ClothesItemC};
 use crate::error::{RequestClothesOffErr, RequestClothesOnErr};
 use crate::inventory::items::ClothesDescription;
 use crate::utils::ClothesGroupC;
+use crate::utils::event::{MessageQueue, Event};
 
 use std::collections::HashMap;
 
@@ -64,6 +65,8 @@ impl Body {
         self.refresh_clothes_group();
         self.recalculate_warmth_level();
 
+        self.queue_message(Event::ClothesOn(item_name.to_string()));
+
         Ok(())
     }
 
@@ -87,6 +90,8 @@ impl Body {
 
         self.refresh_clothes_group();
         self.recalculate_warmth_level();
+
+        self.queue_message(Event::ClothesOff(item_name.to_string()));
 
         Ok(())
     }

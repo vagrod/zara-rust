@@ -2,6 +2,7 @@ use crate::error::{CheckForResourcesErr, CombinationExecuteErr};
 use crate::inventory::crafting::fluent::BuilderStepResultItem;
 use crate::inventory::Inventory;
 use crate::inventory::items::InventoryItem;
+use crate::utils::event::{MessageQueue, Event};
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -133,6 +134,7 @@ impl Inventory {
         }
 
         self.recalculate_weight();
+        self.queue_message(Event::CraftingCombinationExecuted(combination_id.to_string()));
 
         Ok(())
     }

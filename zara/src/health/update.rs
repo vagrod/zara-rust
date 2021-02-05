@@ -30,6 +30,9 @@ impl Health {
 
         // Update medical agents
         self.medical_agents.update(&frame.data.game_time);
+        if self.medical_agents.has_messages() {
+            self.flush_queue(self.medical_agents.get_message_queue());
+        }
 
         let mut snapshot = HealthC::healthy();
 
@@ -92,6 +95,15 @@ impl Health {
         if self.is_no_strength() {
             events.dispatch(Event::StaminaDrained);
         }
+        if self.is_low_oxygen() {
+            events.dispatch(Event::OxygenDrained);
+        }
+        if self.is_low_food() {
+            events.dispatch(Event::FoodDrained);
+        }
+        if self.is_low_water() {
+            events.dispatch(Event::WaterDrained);
+        }
         if self.is_tired() {
             events.dispatch(Event::Tired);
         }
@@ -132,6 +144,7 @@ impl Health {
             let diseases = self.diseases.borrow();
             for (name, disease) in diseases.iter() {
                 if disease.is_old(game_time) {
+                    self.queue_message(Event::DiseaseExpired(disease.disease.get_name()));
                     diseases_to_remove.push(name.clone());
                 }
             }
@@ -235,6 +248,7 @@ impl Health {
             let injuries = self.injuries.borrow();
             for (key, injury) in injuries.iter() {
                 if injury.is_old(game_time) {
+                    self.queue_message(Event::InjuryExpired(injury.injury.get_name(), key.body_part));
                     injuries_to_remove.push(InjuryKey::new(key.injury.to_string(), key.body_part));
                 }
             }

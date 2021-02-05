@@ -15,14 +15,26 @@ pub trait MessageQueue {
 }
 
 /// All Zara public events
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Event {
     WokeUp,
     ItemConsumed(ConsumableC),
     ApplianceTaken(ApplianceC, BodyParts),
     StaminaDrained,
+    OxygenDrained,
+    FoodDrained,
+    WaterDrained,
     Tired,
     Exhausted,
+
+    MedicalAgentActivated(String),
+    MedicalAgentDeactivated(String),
+    MedicalAgentDoseReceived(String, String),
+
+    BodyApplianceOn(String, BodyParts),
+    BodyApplianceOff(String, BodyParts),
+    ClothesOn(String),
+    ClothesOff(String),
 
     DeathFromDisease(String),
     DeathFromInjury(String, BodyParts),
@@ -32,17 +44,23 @@ pub enum Event {
     DiseaseSelfHealStarted(String),
     DiseaseInverted(String),
     DiseaseResumed(String),
+    DiseaseExpired(String),
 
     InjurySpawned(String, BodyParts),
     InjuryRemoved(String, BodyParts),
     InjurySelfHealStarted(String, BodyParts),
     InjuryInverted(String, BodyParts),
     InjuryResumed(String, BodyParts),
+    InjuryExpired(String, BodyParts),
     BloodLossStopped(String, BodyParts),
     BloodLossResumed(String, BodyParts),
 
     InventoryItemAdded(String),
-    InventoryItemRemoved(String)
+    InventoryItemRemoved(String),
+    CraftingCombinationExecuted(String),
+    InventoryWeightChanged(f32, f32),
+    InventoryItemUsedAll(String, usize),
+    InventoryItemUsedPartially(String, usize),
 }
 
 pub trait Listener {

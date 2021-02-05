@@ -18,7 +18,7 @@ impl ActiveDisease {
     ///
     /// [`invert_back`]: #method.invert_back
     ///
-    /// ## Returns
+    /// # Returns
     /// Ok on success.
     ///
     /// # Parameters
