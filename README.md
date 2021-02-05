@@ -1,6 +1,6 @@
 This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](https://www.rust-lang.org).
 
-This code is **WIP** and changes all the time.
+This code is stable.
 
 ![Zara Rust Demo](http://imw.su/zara_rust_008.png)
 
@@ -51,6 +51,6 @@ This code is **WIP** and changes all the time.
 
 ## What's in progress
 - More death events (vitals death, suffocation, starvation, thirst, etc)
-- Trait to get and restore state of every engine node
+- Saving and restoring engine state
 
 The demo is using `crossterm`.
