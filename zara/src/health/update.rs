@@ -92,6 +92,15 @@ impl Health {
     }
 
     fn dispatch_events<E: Listener + 'static>(&self, events: &mut Dispatcher<E>) {
+        const HEART_RATE_LOW_DANGER: f32 = 20.;
+        const HEART_RATE_HIGH_DANGER: f32 = 200.;
+        const BLOOD_PRESSURE_TOP_LOW_DANGER: f32 = 50.;
+        const BLOOD_PRESSURE_TOP_HIGH_DANGER: f32 = 230.;
+        const BLOOD_PRESSURE_BOTTOM_LOW_DANGER: f32 = 35.;
+        const BLOOD_PRESSURE_BOTTOM_HIGH_DANGER: f32 = 130.;
+        const TEMPERATURE_LOW_DANGER: f32 = 33.6;
+        const TEMPERATURE_HIGH_DANGER: f32 = 41.2;
+
         if self.is_no_strength() {
             events.dispatch(Event::StaminaDrained);
         }
@@ -109,6 +118,28 @@ impl Health {
         }
         if self.is_exhausted() {
             events.dispatch(Event::Exhausted);
+        }
+        if self.top_pressure.get() <= BLOOD_PRESSURE_TOP_LOW_DANGER ||
+           self.bottom_pressure.get() <= BLOOD_PRESSURE_BOTTOM_LOW_DANGER
+        {
+            events.dispatch(Event::BloodPressureLowDanger);
+        }
+        if self.top_pressure.get() >= BLOOD_PRESSURE_TOP_HIGH_DANGER ||
+            self.bottom_pressure.get() >= BLOOD_PRESSURE_BOTTOM_HIGH_DANGER
+        {
+            events.dispatch(Event::BloodPressureHighDanger);
+        }
+        if self.body_temperature.get() <= TEMPERATURE_LOW_DANGER {
+            events.dispatch(Event::BodyTemperatureLowDanger);
+        }
+        if self.body_temperature.get() >= TEMPERATURE_HIGH_DANGER {
+            events.dispatch(Event::BodyTemperatureHighDanger);
+        }
+        if self.heart_rate.get() <= HEART_RATE_LOW_DANGER {
+            events.dispatch(Event::HeartRateLowDanger);
+        }
+        if self.heart_rate.get() >= HEART_RATE_HIGH_DANGER {
+            events.dispatch(Event::HeartRateHighDanger);
         }
     }
 

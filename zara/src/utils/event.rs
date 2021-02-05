@@ -17,6 +17,7 @@ pub trait MessageQueue {
 /// All Zara public events
 #[derive(Clone, Debug)]
 pub enum Event {
+    SleepStarted(f32),
     WokeUp,
     ItemConsumed(ConsumableC),
     ApplianceTaken(ApplianceC, BodyParts),
@@ -61,6 +62,14 @@ pub enum Event {
     InventoryWeightChanged(f32, f32),
     InventoryItemUsedAll(String, usize),
     InventoryItemUsedPartially(String, usize),
+
+    BloodPressureHighDanger,
+    BloodPressureLowDanger,
+    HeartRateHighDanger,
+    HeartRateLowDanger,
+    BodyTemperatureHighDanger,
+    BodyTemperatureLowDanger,
+    DeclaredDead
 }
 
 pub trait Listener {

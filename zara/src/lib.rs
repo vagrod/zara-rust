@@ -306,6 +306,9 @@ impl<E: Listener + 'static> ZaraController<E> {
         if self.is_paused() { return Err(DeclareDeadErr::InstancePaused); }
         self.health.declare_dead();
 
+        // Send the event
+        self.dispatcher.borrow_mut().dispatch(Event::DeclaredDead);
+
         Ok(())
     }
     /// Pause this instance (all `update` calls will be ignored)

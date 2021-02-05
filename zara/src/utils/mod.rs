@@ -211,7 +211,6 @@ impl GameTime {
 }
 
 /// Structure for storing simple game time slice
-/// #[derive(Copy)]
 pub struct GameTimeC {
     pub day: u64,
     pub hour: u64,

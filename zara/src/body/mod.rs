@@ -201,6 +201,8 @@ impl Body {
         self.sleeping_counter.set(game_hours as f64 * 60. * 60.);
         self.last_sleep_duration.set(game_hours);
 
+        self.queue_message(Event::SleepStarted(game_hours));
+
         return true;
     }
 }
