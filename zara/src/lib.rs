@@ -11,6 +11,7 @@ use std::time::Duration;
 
 mod update;
 mod status_methods;
+mod state;
 
 pub mod world;
 pub mod utils;
@@ -30,7 +31,7 @@ pub struct ZaraController<E: Listener + 'static> {
     /// Environment node.
     ///
     /// Use this to control weather and game time.
-    pub environment : Arc<world::EnvironmentData>,
+    pub environment: Arc<world::EnvironmentData>,
     /// Health node.
     ///
     /// Use this to check and control health.

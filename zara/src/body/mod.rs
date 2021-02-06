@@ -11,6 +11,7 @@ use std::sync::Arc;
 mod status_methods;
 mod body_appliance;
 
+pub(crate) mod state;
 pub mod clothes;
 
 pub struct Body {

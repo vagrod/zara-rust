@@ -6,14 +6,14 @@ use std::rc::Rc;
 /// Contains runtime environment data and game time
 pub struct EnvironmentData {
     /// Game time for this Zara instance
-    pub game_time : Rc<GameTime>,
+    pub game_time: Rc<GameTime>,
 
     /// Wind speed (m/s)
-    pub wind_speed : Cell<f32>,
+    pub wind_speed: Cell<f32>,
     /// Temperature, degrees C
-    pub temperature : Cell<f32>,
+    pub temperature: Cell<f32>,
     /// Rain intensity, 0..1
-    pub rain_intensity : Cell<f32>
+    pub rain_intensity: Cell<f32>
 }
 
 impl EnvironmentData {

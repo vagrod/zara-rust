@@ -18,6 +18,7 @@ mod update;
 mod status_methods;
 mod monitors;
 
+pub(crate) mod state;
 pub mod disease;
 pub mod injury;
 pub mod side;
