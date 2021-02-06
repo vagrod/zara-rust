@@ -11,6 +11,7 @@ use std::time::Duration;
 
 mod lerp;
 
+pub(crate) mod state;
 pub mod fluent;
 
 /// Describes medical agent activation curve type
@@ -261,7 +262,8 @@ impl MedicalAgent {
 pub struct MedicalAgentsMonitor {
     pub agents: Arc<RefCell<HashMap<String, MedicalAgent>>>,
 
-    active_count: Cell<i32>,
+    active_count: Cell<usize>,
+
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
@@ -295,7 +297,7 @@ impl MedicalAgentsMonitor {
         self.active_count.set(active_count);
     }
 
-    pub fn active_count(&self) -> i32 { self.active_count.get() }
+    pub fn active_count(&self) -> usize { self.active_count.get() }
 
     fn flush_queue(&self, mut q: RefMut<BTreeMap<usize, Event>>) {
         if q.len() == 0 { return }

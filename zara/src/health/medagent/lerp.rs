@@ -3,7 +3,8 @@ use std::cell::RefCell;
 
 pub struct MultiKeyedLerp {
     segments: Vec<(KeyFrame, KeyFrame)>,
-    last_segment: RefCell<Option<(KeyFrame, KeyFrame)>>
+    last_segment: RefCell<Option<(KeyFrame, KeyFrame)>>,
+    pub(crate) keyframes: Vec<KeyFrame>
 }
 
 impl MultiKeyedLerp {
@@ -20,7 +21,8 @@ impl MultiKeyedLerp {
 
         MultiKeyedLerp {
             segments,
-            last_segment: RefCell::new(None)
+            last_segment: RefCell::new(None),
+            keyframes
         }
     }
 

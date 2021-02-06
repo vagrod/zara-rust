@@ -63,12 +63,12 @@ pub enum Event {
     InventoryItemUsedAll(String, usize),
     InventoryItemUsedPartially(String, usize),
 
-    BloodPressureHighDanger,
-    BloodPressureLowDanger,
-    HeartRateHighDanger,
-    HeartRateLowDanger,
-    BodyTemperatureHighDanger,
-    BodyTemperatureLowDanger,
+    HighBloodPressureDanger,
+    LowBloodPressureDanger,
+    HighHeartRateDanger,
+    LowHeartRateDanger,
+    HighBodyTemperatureDanger,
+    LowBodyTemperatureDanger,
     DeclaredDead
 }
 

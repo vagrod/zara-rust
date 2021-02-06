@@ -122,24 +122,24 @@ impl Health {
         if self.top_pressure.get() <= BLOOD_PRESSURE_TOP_LOW_DANGER ||
            self.bottom_pressure.get() <= BLOOD_PRESSURE_BOTTOM_LOW_DANGER
         {
-            events.dispatch(Event::BloodPressureLowDanger);
+            events.dispatch(Event::LowBloodPressureDanger);
         }
         if self.top_pressure.get() >= BLOOD_PRESSURE_TOP_HIGH_DANGER ||
             self.bottom_pressure.get() >= BLOOD_PRESSURE_BOTTOM_HIGH_DANGER
         {
-            events.dispatch(Event::BloodPressureHighDanger);
+            events.dispatch(Event::HighBloodPressureDanger);
         }
         if self.body_temperature.get() <= TEMPERATURE_LOW_DANGER {
-            events.dispatch(Event::BodyTemperatureLowDanger);
+            events.dispatch(Event::LowBodyTemperatureDanger);
         }
         if self.body_temperature.get() >= TEMPERATURE_HIGH_DANGER {
-            events.dispatch(Event::BodyTemperatureHighDanger);
+            events.dispatch(Event::HighBodyTemperatureDanger);
         }
         if self.heart_rate.get() <= HEART_RATE_LOW_DANGER {
-            events.dispatch(Event::HeartRateLowDanger);
+            events.dispatch(Event::LowHeartRateDanger);
         }
         if self.heart_rate.get() >= HEART_RATE_HIGH_DANGER {
-            events.dispatch(Event::HeartRateHighDanger);
+            events.dispatch(Event::HighHeartRateDanger);
         }
     }
 
