@@ -10,6 +10,8 @@ use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 
+pub(crate) mod state;
+
 mod crud;
 mod fluent;
 mod lerp;

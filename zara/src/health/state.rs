@@ -63,5 +63,4 @@ impl Health {
         self.has_blood_loss.set(state.has_blood_loss);
         self.medical_agents.set_state(state.medical_agents);
     }
-
 }
