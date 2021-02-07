@@ -1,55 +1,30 @@
-This is my attempt to rewrite [Zara](https://github.com/vagrod/zara) in [Rust](https://www.rust-lang.org).
+Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org).
 
-This code is stable.
+The code is stable.
 
 ![Zara Rust Demo](http://imw.su/zara_rust_008.png)
 
-## What's done at the moment
-- Game time
+## Description
+Zara will be useful for you if you want your game to have weather-aware health control with ton of intertwined parameters, sleeping, fatigue, diseases, injuries (cuts, fractures), food, water, inventory with crafting, clothes with different water/cold resistance levels and more.
 
-- Inventory:
-  + Adding/Removing items
-  + Inventory weight support
-  + Describing and registering crafting combinations (via fluent interface)
-  + Getting recipes available for a given set of items
-  + Consumables: water and food, consuming items
-  + Macros to write less code describing items (one-liners)
-  + Appliances as inventory item type
-  + Actual getting new item from a crafting combination and spending resources on it
-  + Checking crafting recipe for resources availability
-  
-- Health:
-  + Sleeping
-  + "Side effects" monitors as traits
-  + Vitals (body temperature, heart rate, blood pressure, stamina, fatigue). 
-  + Most common "side effects" implemented like "fluctuating vitals", running (stamina and fatigue drain), fatgue based on sleepng time and sleepng duration, food drain, water drain
-  + Describng diseases via fluent interface
-  + Diseases as traits (fully implemented). 
-  + Disease montors as traits
-  + Inverting ("curing") a disease, "invertng back"
-  + Disease treatment (with consumables and appliances)
-  + Spawning/removing a disease
-  + Injuries (w/fluent)
-  + Injury treatment with appliances (like injections/bandages/splints/etc)
-  + Spawning/removing an injury
-  + Inverting ("curing") an injury, "invertng back"
-  + Body parts for injuries and treatment with appliances
-  + Injury can be a fracture
-  + Medical agents
-  + Oxygen level (and optional "side effect" to control it: underwater side effect)
- 
-- Player status
-  + Walking/running/swimming/underwater states that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
-  + Warmth and wetness levels
-  + Clothes and clothes groups
-  + Body appliances (bandages, splints, etc.)
+## Features
+- Health engine with support for diseases, injuries (cuts, fractures, etc.), their treatment (with pills, injections and/or appliances)
+- Ability to affect vitals based on any imaginable condition (weather, health, clothes, inventory,...)
+- Inventory with crafting (any number of items in a crafting recipe)
+- Support for weather (temperature, wind speed, rain intensity) and player status (running, walking, swimming and so on)
+- Water, food, pills, injections
+- Clothes with different water- and cold-resistances; body appliances (like bandages)
+- Warmth and wetness levels built-in
+- Sleep mechanics; fatigue mechanics
+- Dozen of vital parameters like heart rate, blood pressure, oxygen, food, water levels and more
+- Game events support
+- Every complex entity can be constructed using simple fluent interface
+- Medical agents, side effects, inventory monitors (to control spoiling for example), disease monitors
+- Number of built-in side effects like running effects, underwater effects and such
 
-- Weather status
-  + Rain intensity, temperature, wind speed that can be used by "side effect monitors" and "disease monitors" to spawn a disease, affect vitals and other parameters
-
-- Game events system
+Saving and restoring engine state is supported: everything except inventory. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands.
 
 ## What's in progress
-- Saving and restoring engine state
+- Wiki; preparing for a release
 
 The demo is using `crossterm`.
