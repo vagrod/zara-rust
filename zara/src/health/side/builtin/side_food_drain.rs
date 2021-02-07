@@ -4,6 +4,10 @@ use crate::utils::FrameSummaryC;
 
 use std::cell::Cell;
 
+pub struct FoodDrainOverTimeSideEffectStateContract {
+    pub drain_amount: f32
+}
+
 impl FoodDrainOverTimeSideEffect {
     /// Creates new `FoodDrainOverTimeSideEffect` instance.
     ///
@@ -13,6 +17,14 @@ impl FoodDrainOverTimeSideEffect {
         FoodDrainOverTimeSideEffect {
             drain_amount: Cell::new(drain_amount)
         }
+    }
+    pub fn get_state(&self) -> FoodDrainOverTimeSideEffectStateContract {
+        FoodDrainOverTimeSideEffectStateContract {
+            drain_amount: self.drain_amount.get()
+        }
+    }
+    pub fn restore_state(&self, state: &FoodDrainOverTimeSideEffectStateContract) {
+        self.drain_amount.set(state.drain_amount);
     }
 }
 

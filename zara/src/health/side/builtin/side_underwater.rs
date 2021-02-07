@@ -4,6 +4,15 @@ use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
 
+pub struct UnderwaterSideEffectStateContract {
+    pub oxygen_drain_amount: f32,
+    pub stamina_drain_amount: f32,
+    pub sleeping_state: bool,
+    pub gained_fatigue: f32,
+    pub underwater_state: bool,
+    pub time_under_water: f32
+}
+
 impl UnderwaterSideEffect {
     /// Creates new `UnderwaterSideEffect` instance.
     ///
@@ -19,6 +28,24 @@ impl UnderwaterSideEffect {
             time_under_water: Cell::new(0.),
             underwater_state: Cell::new(false)
         }
+    }
+    pub fn get_state(&self) -> UnderwaterSideEffectStateContract {
+        UnderwaterSideEffectStateContract {
+            oxygen_drain_amount: self.oxygen_drain_amount.get(),
+            stamina_drain_amount: self.stamina_drain_amount.get(),
+            sleeping_state: self.sleeping_state.get(),
+            gained_fatigue: self.gained_fatigue.get(),
+            underwater_state: self.underwater_state.get(),
+            time_under_water: self.time_under_water.get()
+        }
+    }
+    pub fn restore_state(&self, state: &UnderwaterSideEffectStateContract) {
+        self.oxygen_drain_amount.set(state.oxygen_drain_amount);
+        self.stamina_drain_amount.set(state.stamina_drain_amount);
+        self.sleeping_state.set(state.sleeping_state);
+        self.gained_fatigue.set(state.gained_fatigue);
+        self.underwater_state.set(state.underwater_state);
+        self.time_under_water.set(state.time_under_water);
     }
 }
 

@@ -4,7 +4,16 @@ use crate::utils::{FrameSummaryC};
 
 use std::cell::Cell;
 
-/// DynamicVitalsSideEffect implementation
+pub struct DynamicVitalsSideEffectStateContract {
+    pub first_iteration: bool,
+    pub counter: f32,
+    pub half_duration: f32,
+    pub direction: f32,
+    pub body_temperature_ceiling: f32,
+    pub heart_rate_ceiling: f32,
+    pub top_pressure_ceiling: f32,
+    pub bottom_pressure_ceiling: f32
+}
 
 impl DynamicVitalsSideEffect {
     pub fn new() -> Self {
@@ -18,6 +27,28 @@ impl DynamicVitalsSideEffect {
             top_pressure_ceiling: Cell::new(0.0),
             bottom_pressure_ceiling: Cell::new(0.0)
         }
+    }
+    pub fn get_state(&self) -> DynamicVitalsSideEffectStateContract {
+        DynamicVitalsSideEffectStateContract {
+            body_temperature_ceiling: self.body_temperature_ceiling.get(),
+            bottom_pressure_ceiling: self.bottom_pressure_ceiling.get(),
+            counter: self.counter.get(),
+            direction: self.direction.get(),
+            first_iteration: self.first_iteration.get(),
+            half_duration: self.half_duration.get(),
+            heart_rate_ceiling: self.heart_rate_ceiling.get(),
+            top_pressure_ceiling: self.top_pressure_ceiling.get()
+        }
+    }
+    pub fn restore_state(&self, state: &DynamicVitalsSideEffectStateContract) {
+        self.body_temperature_ceiling.set(state.body_temperature_ceiling);
+        self.bottom_pressure_ceiling.set(state.bottom_pressure_ceiling);
+        self.counter.set(state.counter);
+        self.direction.set(state.direction);
+        self.first_iteration.set(state.first_iteration);
+        self.half_duration.set(state.half_duration);
+        self.heart_rate_ceiling.set(state.heart_rate_ceiling);
+        self.top_pressure_ceiling.set(state.top_pressure_ceiling);
     }
 }
 impl SideEffectsMonitor for DynamicVitalsSideEffect {

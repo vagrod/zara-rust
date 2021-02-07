@@ -4,7 +4,14 @@ use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
 
-/// RunningSideEffects implementation
+pub struct RunningSideEffectsStateContract {
+    pub stamina_drain_amount: f32,
+    pub water_drain_amount: f32,
+    pub running_state: bool,
+    pub sleeping_state: bool,
+    pub running_time: f32,
+    pub gained_fatigue: f32
+}
 
 impl RunningSideEffects {
     pub fn new(stamina_drain: f32, water_drain: f32) -> Self {
@@ -16,6 +23,24 @@ impl RunningSideEffects {
             stamina_drain_amount: Cell::new(stamina_drain),
             water_drain_amount: Cell::new(water_drain)
         }
+    }
+    pub fn get_state(&self) -> RunningSideEffectsStateContract {
+        RunningSideEffectsStateContract {
+            stamina_drain_amount: self.stamina_drain_amount.get(),
+            water_drain_amount: self.water_drain_amount.get(),
+            running_state: self.running_state.get(),
+            sleeping_state: self.sleeping_state.get(),
+            running_time: self.running_time.get(),
+            gained_fatigue: self.gained_fatigue.get()
+        }
+    }
+    pub fn restore_state(&self, state: &RunningSideEffectsStateContract) {
+        self.stamina_drain_amount.set(state.stamina_drain_amount);
+        self.water_drain_amount.set(state.water_drain_amount);
+        self.running_state.set(state.running_state);
+        self.sleeping_state.set(state.sleeping_state);
+        self.running_time.set(state.running_time);
+        self.gained_fatigue.set(state.gained_fatigue);
     }
 }
 impl SideEffectsMonitor for RunningSideEffects {

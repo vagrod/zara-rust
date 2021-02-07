@@ -5,11 +5,23 @@ use crate::utils::FrameSummaryC;
 use std::time::Duration;
 use std::cell::Cell;
 
+pub struct FatigueSideEffectsStateContract {
+    pub hours_until_exhausted: usize
+}
+
 impl FatigueSideEffects {
     pub fn new(hours_until_exhausted: usize) -> Self {
         FatigueSideEffects {
             hours_until_exhausted: Cell::new(hours_until_exhausted)
         }
+    }
+    pub fn get_state(&self) -> FatigueSideEffectsStateContract {
+        FatigueSideEffectsStateContract {
+            hours_until_exhausted: self.hours_until_exhausted.get()
+        }
+    }
+    pub fn restore_state(&self, state: &FatigueSideEffectsStateContract) {
+        self.hours_until_exhausted.set(state.hours_until_exhausted);
     }
 }
 impl SideEffectsMonitor for FatigueSideEffects {
