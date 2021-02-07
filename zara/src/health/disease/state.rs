@@ -142,7 +142,7 @@ impl Health {
     ///
     /// ## Notes
     /// Borrows `diseases` collection
-    pub fn restore_active_disease(&self, disease_data: ActiveDiseaseStateContract, disease: Box<dyn Disease>) {
+    pub fn restore_disease(&self, disease_data: ActiveDiseaseStateContract, disease: Box<dyn Disease>) {
         let mut b = self.diseases.borrow_mut();
         let treatment = disease.get_treatment();
         let name = disease.get_name().to_string();
