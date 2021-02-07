@@ -67,7 +67,7 @@ pub struct BodyAppliance {
     /// Unique name of an appliance inventory item
     pub item_name: String,
     /// Body part where this appliance is located
-    pub body_part: BodyParts
+    pub body_part: BodyPart
 }
 
 /// Used to describe a new clothes group. Use `start` method to begin.
@@ -91,7 +91,7 @@ impl ClothesGroupBuilder {
 
 /// All body parts enum
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
-pub enum BodyParts {
+pub enum BodyPart {
     Unknown = -1,
     Forehead = 0,
     Nape = 1,

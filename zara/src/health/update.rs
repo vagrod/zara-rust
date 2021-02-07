@@ -113,11 +113,15 @@ impl Health {
         if self.is_low_water() {
             events.dispatch(Event::WaterDrained);
         }
-        if self.is_tired() {
-            events.dispatch(Event::Tired);
+        if self.is_low_blood() {
+            events.dispatch(Event::BloodDrained);
         }
         if self.is_exhausted() {
             events.dispatch(Event::Exhausted);
+        } else {
+            if self.is_tired() {
+                events.dispatch(Event::Tired);
+            }
         }
         if self.top_pressure.get() <= BLOOD_PRESSURE_TOP_LOW_DANGER ||
            self.bottom_pressure.get() <= BLOOD_PRESSURE_BOTTOM_LOW_DANGER

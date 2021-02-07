@@ -6,7 +6,7 @@ use crate::health::side::{SideEffectsMonitor};
 use crate::health::medagent::{MedicalAgentsMonitor, CurveType};
 use crate::health::medagent::fluent::{AgentStart};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
-use crate::body::BodyParts;
+use crate::body::BodyPart;
 
 use std::collections::{HashMap, BTreeMap};
 use std::cell::{RefCell, Cell, RefMut};
@@ -76,7 +76,7 @@ pub struct Health {
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InjuryKey {
     pub injury: String,
-    pub body_part: BodyParts
+    pub body_part: BodyPart
 }
 
 /// Disease or injury stage level of seriousness
@@ -185,7 +185,7 @@ impl Health {
 
     /// Called by zara controller when appliance item is taken
     pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC,
-                              body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+                                     body_part: BodyPart, inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_appliance_taken(self, game_time, item, body_part, inventory_items);

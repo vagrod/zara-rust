@@ -3,7 +3,7 @@ use crate::health::{Health, StageLevel};
 use crate::utils::{FrameSummaryC, GameTimeC};
 use crate::health::disease::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ConsumableC, ApplianceC};
-use crate::body::BodyParts;
+use crate::body::BodyPart;
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell, RefMut};
@@ -142,9 +142,9 @@ pub trait DiseaseTreatment {
    ///     "curing" the disease
    /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
    ///     moment of this call
-    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
-                            active_stage: &ActiveStage, disease: &ActiveDisease,
-                            inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart,
+                          active_stage: &ActiveStage, disease: &ActiveDisease,
+                          inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Describes disease stage
@@ -341,7 +341,7 @@ pub trait DiseaseMonitor {
     /// - `inventory_items`: all inventory items. Applied item is still in this list at the
     ///     moment of this call
     fn on_appliance_taken(&self, health: &Health, game_time: &GameTimeC, item: &ApplianceC,
-                          body_part: BodyParts, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+                          body_part: BodyPart, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
 
 /// Trait that must be implemented by all diseases
@@ -494,8 +494,8 @@ impl ActiveDisease {
     }
 
     /// Is called by Zara from the health engine when appliance is taken
-    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
-                       inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart,
+                                     inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
         match self.treatment.as_ref() {

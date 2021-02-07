@@ -2,7 +2,7 @@
 /// https://stackoverflow.com/questions/37572734/how-can-i-implement-the-observer-pattern-in-rust
 
 use crate::inventory::items::{ConsumableC, ApplianceC};
-use crate::body::BodyParts;
+use crate::body::BodyPart;
 
 use std::sync::{Arc, Weak};
 use std::cell::{RefCell, RefMut};
@@ -17,58 +17,188 @@ pub trait MessageQueue {
 /// All Zara public events
 #[derive(Clone, Debug)]
 pub enum Event {
+    /// When sleep is started.
+    /// # Parameters
+    /// - Duration, in game hours
     SleepStarted(f32),
+    /// When woke up
     WokeUp,
-    ItemConsumed(ConsumableC),
-    ApplianceTaken(ApplianceC, BodyParts),
+
+    /// When stamina level is less than 5%
     StaminaDrained,
+    /// When oxygen level is less than 5%
     OxygenDrained,
+    /// When blood level is less than 5%
+    BloodDrained,
+    /// When food level is less than 5%
     FoodDrained,
+    /// When water level is less than 5%
     WaterDrained,
+
+    /// When fatigue level is more than 70%
     Tired,
+    /// When fatigue level is more than 90%
     Exhausted,
 
+    /// When medical agent is getting activated
+    /// # Parameters
+    /// - Medical agent unique name
     MedicalAgentActivated(String),
+    /// When medical agent is getting deactivated
+    /// # Parameters
+    /// - Medical agent unique name
     MedicalAgentDeactivated(String),
+    /// When medical agent receives a new dose
+    /// # Parameters
+    /// - Medical agent unique name
+    /// - Appliance item unique name
     MedicalAgentDoseReceived(String, String),
 
-    BodyApplianceOn(String, BodyParts),
-    BodyApplianceOff(String, BodyParts),
+    /// When body appliance is put on
+    /// # Parameters
+    /// - Appliance item unique name
+    /// - Body part
+    BodyApplianceOn(String, BodyPart),
+    /// When body appliance is taken off
+    /// # Parameters
+    /// - Appliance item unique name
+    /// - Body part
+    BodyApplianceOff(String, BodyPart),
+    /// When clothes item is put on
+    /// # Parameters
+    /// - Clothes item unique name
     ClothesOn(String),
+    /// When clothes item is taken off
+    /// # Parameters
+    /// - Clothes item unique name
     ClothesOff(String),
 
+    /// When disease stage death chance is satisfied
+    /// # Parameters
+    /// - Disease unique name
     DeathFromDisease(String),
-    DeathFromInjury(String, BodyParts),
+    /// When injury stage death chance is satisfied
+    /// # Parameters
+    /// - Injury unique name
+    DeathFromInjury(String, BodyPart),
 
+    /// When disease is spawned or scheduled
+    /// # Parameters
+    /// - Unique disease name
     DiseaseSpawned(String),
+    /// When disease is removed
+    /// # Parameters
+    /// - Unique disease name
     DiseaseRemoved(String),
+    /// When disease starts self-healing process
+    /// # Parameters
+    /// - Unique disease name
     DiseaseSelfHealStarted(String),
+    /// When disease chain is inverted
+    /// # Parameters
+    /// - Unique disease name
     DiseaseInverted(String),
+    /// When disease chain is inverted back
+    /// # Parameters
+    /// - Unique disease name
     DiseaseResumed(String),
+    /// When disease passed its lifetime
+    /// # Parameters
+    /// - Unique disease name
     DiseaseExpired(String),
 
-    InjurySpawned(String, BodyParts),
-    InjuryRemoved(String, BodyParts),
-    InjurySelfHealStarted(String, BodyParts),
-    InjuryInverted(String, BodyParts),
-    InjuryResumed(String, BodyParts),
-    InjuryExpired(String, BodyParts),
-    BloodLossStopped(String, BodyParts),
-    BloodLossResumed(String, BodyParts),
+    /// When injury is spawned or scheduled
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjurySpawned(String, BodyPart),
+    /// When injury is removed
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjuryRemoved(String, BodyPart),
+    /// When injury starts self-healing process
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjurySelfHealStarted(String, BodyPart),
+    /// When injury chain is inverted
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjuryInverted(String, BodyPart),
+    /// When injury chain is inverted back
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjuryResumed(String, BodyPart),
+    /// When injury passed its lifetime
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    InjuryExpired(String, BodyPart),
+    /// When injury blood loss forcibly stopped
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    BloodLossStopped(String, BodyPart),
+    /// When injury blood loss forcibly resumed
+    /// # Parameters
+    /// - Unique injury name
+    /// - Body part
+    BloodLossResumed(String, BodyPart),
 
+    /// When item is consumed
+    /// # Parameters
+    /// - Consumable option description
+    ItemConsumed(ConsumableC),
+    /// When appliance is taken (like injection)
+    /// # Parameters
+    /// - Appliance option description
+    /// - Body part
+    ApplianceTaken(ApplianceC, BodyPart),
+
+    /// When inventory item is added
+    /// # Parameters
+    /// - Item unique name
     InventoryItemAdded(String),
+    /// When inventory item is removed
+    /// # Parameters
+    /// - Item unique name
     InventoryItemRemoved(String),
+    /// When inventory crafting combination successfully executed
+    /// # Parameters
+    /// - Combination unique key
     CraftingCombinationExecuted(String),
+    /// When inventory weight has changed
+    /// # Parameters
+    /// - Old weight value (grams)
+    /// - New weight value (grams)
     InventoryWeightChanged(f32, f32),
+    /// When inventory item is used (wasted) completely and removed from the inventory
+    /// # Parameters
+    /// - Unique item name
+    /// - Amount of items of this kind used
     InventoryItemUsedAll(String, usize),
+    /// When inventory item is used (wasted) partially
+    /// # Parameters
+    /// - Unique item name
+    /// - Amount of items of this kind used
     InventoryItemUsedPartially(String, usize),
 
+    /// When blood pressure is too high
     HighBloodPressureDanger,
+    /// When blood pressure is too low
     LowBloodPressureDanger,
+    /// When heart rate is too high
     HighHeartRateDanger,
+    /// When heart rate is too low
     LowHeartRateDanger,
+    /// When body temperature is too high
     HighBodyTemperatureDanger,
+    /// When body temperature is too low
     LowBodyTemperatureDanger,
+    /// When character forcibly declared dead
     DeclaredDead
 }
 

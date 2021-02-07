@@ -3,7 +3,7 @@ use crate::health::{Health, InjuryKey};
 use crate::health::injury::{ActiveInjury, Injury};
 use crate::utils::GameTimeC;
 use crate::error::{SpawnInjuryErr, RemoveInjuryErr};
-use crate::body::BodyParts;
+use crate::body::BodyPart;
 
 use std::rc::Rc;
 
@@ -23,8 +23,8 @@ impl Health {
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
-    pub fn spawn_injury(&self, injury: Box<dyn Injury>, body_part: BodyParts, activation_time: GameTimeC)
-                                                                    -> Result<(), SpawnInjuryErr> {
+    pub fn spawn_injury(&self, injury: Box<dyn Injury>, body_part: BodyPart, activation_time: GameTimeC)
+                        -> Result<(), SpawnInjuryErr> {
         if !self.is_alive.get() { return Err(SpawnInjuryErr::CharacterIsDead); }
 
         let mut b = self.injuries.borrow_mut();
@@ -58,7 +58,7 @@ impl Health {
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
-    pub fn remove_injury(&self, injury_name: String, body_part: BodyParts) -> Result<(), RemoveInjuryErr> {
+    pub fn remove_injury(&self, injury_name: String, body_part: BodyPart) -> Result<(), RemoveInjuryErr> {
         if !self.is_alive.get() { return Err(RemoveInjuryErr::CharacterIsDead); }
 
         let mut b = self.injuries.borrow_mut();

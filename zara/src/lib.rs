@@ -3,7 +3,7 @@ use utils::{GameTime, EnvironmentC};
 use utils::event::{Event, Listener, Dispatcher, Dispatchable};
 use player::{PlayerStatus};
 use inventory::items::{ConsumableC, ApplianceC};
-use body::BodyParts;
+use body::BodyPart;
 
 use std::sync::Arc;
 use std::cell::{Cell, RefCell};
@@ -227,10 +227,10 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// zara_controller.take_appliance(item_name, body_part);
     /// ```
-    pub fn take_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceTakeErr> {
+    pub fn take_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceTakeErr> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
         if self.is_paused() { return Err(ApplianceTakeErr::InstancePaused); }
-        if body_part == BodyParts::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
+        if body_part == BodyPart::Unknown { return Err(ApplianceTakeErr::UnknownBodyPart); }
 
         let mut appliance = ApplianceC::new();
         {
@@ -291,7 +291,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// ## Note
     /// Borrows `body.appliances` collection
-    pub fn remove_appliance(&self, item_name: &String, body_part: BodyParts) -> Result<(), ApplianceRemoveErr> {
+    pub fn remove_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceRemoveErr> {
         if !self.health.is_alive() { return Err(ApplianceRemoveErr::CharacterIsDead); }
         if self.is_paused() { return Err(ApplianceRemoveErr::InstancePaused); }
 

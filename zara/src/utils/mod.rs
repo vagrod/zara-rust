@@ -1,5 +1,5 @@
 use crate::health::StageLevel;
-use crate::body::{BodyParts, BodyAppliance};
+use crate::body::{BodyPart, BodyAppliance};
 
 use std::time::{Duration};
 use std::cell::Cell;
@@ -377,7 +377,7 @@ pub struct ActiveInjuryC {
     pub is_healing: bool,
     pub needs_treatment: bool,
     pub is_blood_stopped: bool,
-    pub body_part: BodyParts,
+    pub body_part: BodyPart,
     pub is_fracture: bool
 }
 

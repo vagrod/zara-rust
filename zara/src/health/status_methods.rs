@@ -16,6 +16,8 @@ impl Health {
     pub fn is_low_food(&self) -> bool { self.food_level.get() <= 5. }
     /// Player has low water level
     pub fn is_low_water(&self) -> bool { self.water_level.get() <= 5. }
+    /// Player has low blood level
+    pub fn is_low_blood(&self) -> bool { self.blood_level.get() <= 5. }
     /// Player has active non-zero blood loss from some injury
     pub fn is_blood_loss(&self) -> bool { self.has_blood_loss.get() }
     /// Current body temperature (degrees C)

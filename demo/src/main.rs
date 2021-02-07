@@ -7,7 +7,7 @@ use crate::events::ZaraEventsListener;
 use crate::ui::ui_frame;
 use crate::zara_init::init_zara_instance;
 
-use zara::body::BodyParts;
+use zara::body::BodyPart;
 use zara::health::InjuryKey;
 use crossterm::terminal;
 use crossterm::execute;
@@ -60,6 +60,9 @@ fn main() {
 
             if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
                 person.consume(&format!("Aspirin Pills"));
+                let st = person.get_state();
+                println!("{}", st.is_paused);
+                person.restore_state(st);
                 is_item_consumed = true;
             }
 
@@ -120,14 +123,14 @@ fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
 }
 
 fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
-    person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
-    person.health.spawn_injury(Box::new(injuries::Cut), BodyParts::Forehead, zara::utils::GameTimeC::new(0,0,7,25.));
+    person.health.spawn_injury(Box::new(injuries::Cut), BodyPart::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
+    person.health.spawn_injury(Box::new(injuries::Cut), BodyPart::Forehead, zara::utils::GameTimeC::new(0,0,7,25.));
 
     // Body appliances test
-    person.take_appliance(&format!("Bandage"), BodyParts::LeftShoulder);
+    person.take_appliance(&format!("Bandage"), BodyPart::LeftShoulder);
     person.health.injuries.borrow().get(&InjuryKey {
         injury: format!("Cut"),
-        body_part: BodyParts::LeftShoulder
+        body_part: BodyPart::LeftShoulder
     }).unwrap().stop_blood_loss();
 
     //person.remove_appliance(&format!("Bandage"), BodyParts::LeftShoulder);

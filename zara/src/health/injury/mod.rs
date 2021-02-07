@@ -3,7 +3,7 @@ use crate::utils::{GameTimeC};
 use crate::health::{StageLevel, InjuryKey};
 use crate::health::injury::fluent::{StageInit};
 use crate::inventory::items::{InventoryItem, ApplianceC};
-use crate::body::{BodyParts};
+use crate::body::{BodyPart};
 
 use std::rc::Rc;
 use std::cell::{Cell, RefCell, RefMut};
@@ -98,7 +98,7 @@ macro_rules! fracture(
 );
 
 impl InjuryKey {
-    pub fn new(injury: String, body_part: BodyParts) -> Self {
+    pub fn new(injury: String, body_part: BodyPart) -> Self {
         InjuryKey {
             injury,
             body_part
@@ -159,7 +159,7 @@ pub trait InjuryTreatment {
     ///     "curing" the injury
     /// - `inventory_items`: all inventory items. Used item is still in this list at the
     ///     moment of this call
-    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
+    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart,
                           active_stage: &ActiveStage, injury: &ActiveInjury,
                           inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 }
@@ -322,7 +322,7 @@ pub struct ActiveInjury {
     /// Total duration of all stages, from first start to last peak.
     pub total_duration: Duration,
     /// Body part associated with this injury
-    pub body_part: BodyParts,
+    pub body_part: BodyPart,
     /// Is this injury a fracture
     pub is_fracture: bool,
 
@@ -359,7 +359,7 @@ impl ActiveInjury {
     /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately
-    pub fn new(injury: Box<dyn Injury>, body_part: BodyParts, activation_time: GameTimeC) -> Self {
+    pub fn new(injury: Box<dyn Injury>, body_part: BodyPart, activation_time: GameTimeC) -> Self {
         let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();
         let mut will_end = true;
@@ -423,8 +423,8 @@ impl ActiveInjury {
 
 
     /// Is called by Zara from the health engine when person takes an appliance
-    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyParts,
-                       inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+    pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart,
+                                     inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
         match self.treatment.as_ref() {
