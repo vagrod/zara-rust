@@ -93,7 +93,7 @@ impl Body {
         }
     }
 
-    pub(crate) fn restore_state(&self, state: BodyStateContract) {
+    pub(crate) fn restore_state(&self, state: &BodyStateContract) {
         self.wetness_level.set(state.wetness_level);
         self.warmth_level.set(state.warmth_level);
         self.cached_player_in_water.set(state.cached_player_in_water);
@@ -105,7 +105,7 @@ impl Body {
         self.sleeping_counter.set(state.sleeping_counter);
 
         self.clothes_group.replace(
-            match state.clothes_group {
+            match &state.clothes_group {
                 Some(g) => Some(ClothesGroupC {
                     name: g.name.to_string(),
                     bonus_water_resistance: g.bonus_water_resistance,
@@ -125,7 +125,7 @@ impl Body {
 
             b.clear();
 
-            for c in state.clothes {
+            for c in &state.clothes {
                 b.push(c.to_string());
             }
         }
@@ -134,7 +134,7 @@ impl Body {
 
             b.clear();
 
-            for a in state.appliances {
+            for a in &state.appliances {
                 b.push(BodyAppliance{
                     item_name: a.item_name.to_string(),
                     body_part: a.body_part
@@ -146,7 +146,7 @@ impl Body {
 
             b.clear();
 
-            for d in state.clothes_data {
+            for d in &state.clothes_data {
                 b.insert(d.key.to_string(), ClothesItemC{
                     cold_resistance: d.cold_resistance,
                     water_resistance: d.water_resistance

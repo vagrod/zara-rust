@@ -12,6 +12,8 @@ use std::rc::Rc;
 mod crud;
 mod update;
 
+pub(crate) mod state;
+
 pub mod items;
 pub mod crafting;
 pub mod monitors;

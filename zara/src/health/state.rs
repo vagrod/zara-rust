@@ -45,7 +45,7 @@ impl Health {
         }
     }
 
-    pub(crate) fn restore_state(&self, state: HealthStateContract) {
+    pub(crate) fn restore_state(&self, state: &HealthStateContract) {
         self.stamina_regain_rate.set(state.stamina_regain_rate);
         self.blood_regain_rate.set(state.blood_regain_rate);
         self.oxygen_regain_rate.set(state.oxygen_regain_rate);
@@ -61,6 +61,6 @@ impl Health {
         self.oxygen_level.set(state.oxygen_level);
         self.is_alive.set(state.is_alive);
         self.has_blood_loss.set(state.has_blood_loss);
-        self.medical_agents.set_state(state.medical_agents);
+        self.medical_agents.set_state(&state.medical_agents);
     }
 }

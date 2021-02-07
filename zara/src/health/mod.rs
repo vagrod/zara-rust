@@ -73,7 +73,7 @@ pub struct Health {
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InjuryKey {
     pub injury: String,
     pub body_part: BodyPart

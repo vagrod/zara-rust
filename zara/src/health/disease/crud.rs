@@ -19,12 +19,12 @@ impl Health {
     ///     current game time to activate immediately (on the next `update` pass)
     ///
     /// # Returns
-    /// Ok on success
+    /// Disease key on success
     ///
     /// # Notes
     /// This method borrows the `diseases` collection
     pub fn spawn_disease(&self, disease: Box<dyn Disease>, activation_time: GameTimeC)
-                                                                    -> Result<(), SpawnDiseaseErr> {
+                                                                    -> Result<String, SpawnDiseaseErr> {
         if !self.is_alive.get() { return Err(SpawnDiseaseErr::CharacterIsDead); }
 
         let mut b = self.diseases.borrow_mut();
@@ -36,12 +36,12 @@ impl Health {
 
         self.queue_message(Event::DiseaseSpawned(disease_name.to_string()));
 
-        b.insert(disease_name, Rc::new(ActiveDisease::new(
+        b.insert(disease_name.to_string(), Rc::new(ActiveDisease::new(
             disease,
             activation_time
         )));
 
-        return Ok(());
+        return Ok(disease_name);
     }
 
     /// Removes active disease if exists. Returns `Err` if not.

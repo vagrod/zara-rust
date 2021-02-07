@@ -2,6 +2,7 @@ use crate::ZaraController;
 use crate::utils::event::Listener;
 use crate::body::state::BodyStateContract;
 use crate::health::state::HealthStateContract;
+use crate::inventory::state::InventoryStateContract;
 
 use std::time::Duration;
 
@@ -10,6 +11,7 @@ pub struct ZaraControllerStateContract {
     pub player_status: PlayerStatusContract,
     pub body: BodyStateContract,
     pub health: HealthStateContract,
+    pub inventory: InventoryStateContract,
 
     pub update_counter: f32,
     pub queue_counter: f32,
@@ -33,6 +35,10 @@ pub struct PlayerStatusContract {
 }
 
 impl<E: Listener + 'static> ZaraController<E> {
+    /// Gets Zara state snapshot, **not** including active diseases, active injuries and inventory items.
+    ///
+    /// For diseases and injuries, you need to call `get_state` for every active disease or
+    /// injury, and when needed call `restore_disease` and `restore_injury` on `health` node.
     pub fn get_state(&self) -> ZaraControllerStateContract {
         ZaraControllerStateContract {
             environment: EnvironmentStateContract {
@@ -49,6 +55,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             },
             body: self.body.get_state(),
             health: self.health.get_state(),
+            inventory: self.inventory.get_state(),
 
             update_counter: self.update_counter.get(),
             queue_counter: self.queue_counter.get(),
@@ -57,7 +64,12 @@ impl<E: Listener + 'static> ZaraController<E> {
             is_paused: self.is_paused.get()
         }
     }
-    pub fn restore_state(&self, state: ZaraControllerStateContract) {
+    /// Restores previously captured state.
+    ///
+    /// To restore a disease or injury, call `restore_disease` or `restore_injury` on a `health` node.
+    ///
+    /// This method will not restore inventory items.
+    pub fn restore_state(&self, state: &ZaraControllerStateContract) {
         self.update_counter.set(state.update_counter);
         self.queue_counter.set(state.queue_counter);
         self.last_update_game_time.set(state.last_update_game_time);
@@ -65,8 +77,8 @@ impl<E: Listener + 'static> ZaraController<E> {
         self.is_paused.set(state.is_paused);
 
         self.environment.rain_intensity.set(state.environment.rain_intensity);
-        self.environment.temperature.set(state.environment.rain_intensity);
-        self.environment.wind_speed.set(state.environment.rain_intensity);
+        self.environment.temperature.set(state.environment.temperature);
+        self.environment.wind_speed.set(state.environment.wind_speed);
         self.environment.game_time.update_from_duration(state.environment.game_time);
 
         self.player_state.is_walking.set(state.player_status.is_walking);
@@ -74,7 +86,8 @@ impl<E: Listener + 'static> ZaraController<E> {
         self.player_state.is_swimming.set(state.player_status.is_swimming);
         self.player_state.is_underwater.set(state.player_status.is_underwater);
 
-        self.body.restore_state(state.body);
-        self.health.restore_state(state.health);
+        self.body.restore_state(&state.body);
+        self.health.restore_state(&state.health);
+        self.inventory.restore_state(&state.inventory)
     }
 }

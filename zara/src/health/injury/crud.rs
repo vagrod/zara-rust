@@ -19,18 +19,19 @@ impl Health {
     ///     current game time to activate immediately (on the next `update` pass)
     ///
     /// # Returns
-    /// Ok on success
+    /// Injury instance key on success
     ///
     /// # Notes
     /// This method borrows the `injuries` collection
     pub fn spawn_injury(&self, injury: Box<dyn Injury>, body_part: BodyPart, activation_time: GameTimeC)
-                        -> Result<(), SpawnInjuryErr> {
+                        -> Result<InjuryKey, SpawnInjuryErr> {
         if !self.is_alive.get() { return Err(SpawnInjuryErr::CharacterIsDead); }
 
         let mut b = self.injuries.borrow_mut();
         let injury_name = injury.get_name();
         let name_for_message= injury.get_name().to_string();
         let key = InjuryKey::new(injury_name, body_part);
+        let result = key.clone();
 
         if b.contains_key(&key) {
             return Err(SpawnInjuryErr::InjuryAlreadyAdded);
@@ -44,7 +45,7 @@ impl Health {
 
         self.queue_message(Event::InjurySpawned(name_for_message, body_part));
 
-        return Ok(());
+        return Ok(result);
     }
 
     /// Removes active injury if exists. Returns `Err` if not.

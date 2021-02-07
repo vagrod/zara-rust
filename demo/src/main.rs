@@ -6,6 +6,8 @@ use std::thread::sleep;
 use crate::events::ZaraEventsListener;
 use crate::ui::ui_frame;
 use crate::zara_init::init_zara_instance;
+use crate::diseases::Flu;
+use crate::injuries::Cut;
 
 use zara::body::BodyPart;
 use zara::health::InjuryKey;
@@ -31,6 +33,11 @@ fn main() {
         let mut is_disease_inverted = false;
         let mut is_item_consumed = false;
         let mut is_jacket_off = false;
+
+        let mut state = None;
+        let mut disease_state = None;
+        let mut injury1_state = None;
+        let mut injury2_state = None;
 
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
@@ -60,16 +67,66 @@ fn main() {
 
             if person.environment.game_time.minute.get() == 4 && !is_item_consumed {
                 person.consume(&format!("Aspirin Pills"));
-                let st = person.get_state();
-                println!("{}", st.is_paused);
-                person.restore_state(st);
                 is_item_consumed = true;
             }
 
-            /*if person.environment.game_time.minute.get() == 5 && !is_jacket_off {
+            if person.environment.game_time.minute.get() == 5 {
+                match &state {
+                    None => {
+                        let b = person.health.injuries.borrow();
+                        let i1 = b.get(&InjuryKey { injury: format!("Cut"), body_part: BodyPart::LeftShoulder }).unwrap();
+                        let i2 = b.get(&InjuryKey { injury: format!("Cut"), body_part: BodyPart::Forehead }).unwrap();
+
+                        state = Some(person.get_state());
+                        disease_state = Some(person.health.diseases.borrow().get("Flu").unwrap().get_state());
+                        injury1_state = Some(i1.get_state());
+                        injury2_state = Some(i2.get_state());
+                    },
+                    Some(_) => {}
+                }
+            }
+
+            if person.environment.game_time.minute.get() == 6 && !is_jacket_off {
                 person.take_off_clothes(&format!("Jacket"));
-                //person.player_state.is_running.set(true);
+                person.player_state.is_running.set(true);
                 is_jacket_off = true;
+            }
+
+            /* State restore test -- roll back to 5 min mark
+            if person.environment.game_time.minute.get() == 10 {
+                match &state {
+                    Some(st) => {
+                        person.restore_state(st);
+
+                        person.health.diseases.borrow_mut().clear();
+                        person.health.injuries.borrow_mut().clear();
+
+                        match &disease_state {
+                            Some(st) => {
+                                person.health.restore_disease(st, Box::new(Flu));
+                            },
+                            None => { }
+                        }
+                        match &injury1_state {
+                            Some(st) => {
+                                person.health.restore_injury(st, Box::new(Cut));
+                            },
+                            None => { }
+                        }
+                        match &injury2_state {
+                            Some(st) => {
+                                person.health.restore_injury(st, Box::new(Cut));
+                            },
+                            None => { }
+                        }
+
+                        state = None;
+                        disease_state = None;
+                        injury1_state = None;
+                        injury2_state = None;
+                    },
+                    None => { }
+                }
             }*/
 
             // Disease "invert" test
@@ -123,15 +180,16 @@ fn spawn_diseases(person: &zara::ZaraController<ZaraEventsListener>) {
 }
 
 fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
-    person.health.spawn_injury(Box::new(injuries::Cut), BodyPart::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
+    let key_result = person.health.spawn_injury(Box::new(injuries::Cut), BodyPart::LeftShoulder, zara::utils::GameTimeC::new(0,0,2,25.));
+
     person.health.spawn_injury(Box::new(injuries::Cut), BodyPart::Forehead, zara::utils::GameTimeC::new(0,0,7,25.));
 
     // Body appliances test
     person.take_appliance(&format!("Bandage"), BodyPart::LeftShoulder);
-    person.health.injuries.borrow().get(&InjuryKey {
-        injury: format!("Cut"),
-        body_part: BodyPart::LeftShoulder
-    }).unwrap().stop_blood_loss();
 
+    match key_result {
+        Ok(key) => person.health.injuries.borrow().get(&key).unwrap().stop_blood_loss(),
+        _ => { }
+    }
     //person.remove_appliance(&format!("Bandage"), BodyParts::LeftShoulder);
 }

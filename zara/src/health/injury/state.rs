@@ -114,7 +114,7 @@ impl Health {
     ///
     /// ## Notes
     /// Borrows `injuries` collection
-    pub fn restore_injury(&self, injury_data: ActiveInjuryStateContract, injury: Box<dyn Injury>) {
+    pub fn restore_injury(&self, injury_data: &ActiveInjuryStateContract, injury: Box<dyn Injury>) {
         let mut b = self.injuries.borrow_mut();
         let treatment = injury.get_treatment();
         let name = injury.get_name().to_string();
@@ -175,7 +175,7 @@ impl ActiveInjury {
         }
     }
 
-    pub(crate) fn set_state(&self, state: ActiveInjuryStateContract) {
+    pub(crate) fn set_state(&self, state: &ActiveInjuryStateContract) {
         self.activation_time.replace(GameTimeC::from_duration(state.activation_time));
         self.will_end.set(state.will_end);
 
@@ -200,7 +200,7 @@ impl ActiveInjury {
 
             b.clear();
 
-            for stage in state.stages {
+            for stage in &state.stages {
                 b.insert(stage.key.clone(), ActiveStage{
                     start_time: GameTimeC::from_duration(stage.start_time),
                     peak_time: GameTimeC::from_duration(stage.peak_time),
@@ -223,7 +223,7 @@ impl ActiveInjury {
             blood_drain: state.last_deltas.blood_drain
         });
 
-        match state.lerp_data {
+        match &state.lerp_data {
             Some(l) => Some(LerpDataNodeC{
                 start_time: l.start_time,
                 end_time: l.end_time,

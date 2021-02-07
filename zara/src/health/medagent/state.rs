@@ -132,7 +132,7 @@ impl MedicalAgentsMonitor {
             agents: self.agents.borrow().iter().map(|(_, x)| x.get_state()).collect()
         }
     }
-    pub(crate) fn set_state(&self, state: MedicalAgentsMonitorStateContract) {
+    pub(crate) fn set_state(&self, state: &MedicalAgentsMonitorStateContract) {
         self.active_count.set(state.active_count);
 
         let mut b = self.agents.borrow_mut();
