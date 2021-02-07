@@ -22,7 +22,7 @@ Zara will be useful for you if you want your game to have weather-aware health c
 - Medical agents, side effects, inventory monitors (to control spoiling for example), disease monitors
 - Number of built-in side effects like running effects, underwater effects and such
 
-Saving and restoring engine state is supported: everything except inventory. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands.
+Saving and restoring engine state is supported: everything except inventory items. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands.
 
 ## What's in progress
 - Wiki; preparing for a release
