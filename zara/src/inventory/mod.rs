@@ -30,13 +30,14 @@ pub struct Inventory {
     /// [`add_item`]: #method.add_item
     /// [`remove_item`]: #method.remove_item
     pub items: Arc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
+    /// Registered inventory monitors. Do not alter this collection manually. Use
+    /// `register_monitor` and `unregister_monitor` methods instead
+    pub inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
 
     /// Weight of all inventory items (in grams)
     weight: Cell<f32>,
     /// Registered crafting combinations (recipes)
     crafting_combinations: Rc<RefCell<HashMap<String, CraftingCombination>>>,
-    /// Registered inventory monitors
-    inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
     /// Clothes cache
     clothes_cache: RefCell<Vec<String>>,
     /// Messages queued for sending on the next frame
