@@ -64,7 +64,7 @@ impl Inventory {
     ///     ]
     /// );
     /// ```
-    pub fn get_suitable_combinations_for(&self, items: Vec<&str>) -> Vec<String> {
+    pub fn get_suitable_combinations_for(&self, items: Vec<&String>) -> Vec<String> {
         let key_to_check_against = get_match_key(items);
         let mut result = Vec::new();
 
@@ -201,7 +201,7 @@ impl CraftingCombination {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
-        let mut item_names: Vec<&str> = Vec::new();
+        let mut item_names: Vec<&String> = Vec::new();
         let mut b = [0; 2];
         let sep = '\u{0003}'.encode_utf8(&mut b);
 
@@ -257,7 +257,7 @@ impl Builder {
     }
 }
 
-fn get_match_key(items: Vec<&str>) -> String {
+fn get_match_key(items: Vec<&String>) -> String {
     let mut match_key: String = String::new();
     let mut copy = Vec::from(items);
     let mut b = [0; 2];
