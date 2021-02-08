@@ -62,6 +62,7 @@ macro_rules! disease(
             fn get_treatment(&self) -> Option<Box<dyn zara::health::disease::DiseaseTreatment>> {
                 $trt
             }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -362,6 +363,8 @@ pub trait Disease {
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this disease object
     fn get_treatment(&self) -> Option<Box<dyn DiseaseTreatment>>;
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any;
 }
 
 struct LerpDataNodeC {

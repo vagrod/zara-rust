@@ -58,9 +58,9 @@ impl Inventory {
     /// ```
     /// let ids = person.inventory.get_suitable_combinations_for(
     ///     vec![
-    ///         "Stick",
-    ///         "Rope",
-    ///         "Stone"
+    ///         &format!("Stick"),
+    ///         &format!("Rope"),
+    ///         &format!("SharpStone")
     ///     ]
     /// );
     /// ```

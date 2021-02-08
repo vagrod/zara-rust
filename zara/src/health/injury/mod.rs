@@ -9,6 +9,7 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
+use std::any::Any;
 
 pub(crate) mod state;
 
@@ -56,6 +57,7 @@ macro_rules! injury(
                 $trt
             }
             fn get_is_fracture(&self) -> bool { false }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -98,6 +100,7 @@ macro_rules! fracture(
                 $trt
             }
             fn get_is_fracture(&self) -> bool { true }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -295,6 +298,8 @@ pub trait Injury {
     fn get_treatment(&self) -> Option<Box<dyn InjuryTreatment>>;
     /// True if injury is a fracture
     fn get_is_fracture(&self) -> bool;
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any;
 }
 
 struct LerpDataNodeC {
