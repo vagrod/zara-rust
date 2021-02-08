@@ -21,6 +21,7 @@ impl Body {
         self.recalculate_wetness_level(game_time_delta);
     }
 
+    /// Recalculates cached wetness level. This is automatically called every update.
     pub fn recalculate_wetness_level(&self, game_time_delta: f32) {
         if self.cached_player_in_water.get() {
             self.wetness_level.set(100.);

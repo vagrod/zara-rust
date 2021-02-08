@@ -44,18 +44,7 @@ pub struct Inventory {
 }
 
 impl Inventory {
-    /// Creates new ready-to-use `Inventory`.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// use zara::inv;
-    ///
-    /// let inv = inv::Inventory::new();
-    /// ```
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Inventory{
             items: Arc::new(RefCell::new(HashMap::new())),
             crafting_combinations: Rc::new(RefCell::new(HashMap::new())),
@@ -117,7 +106,8 @@ impl Inventory {
     /// Returns total cached inventory weight (in grams)
     pub fn get_weight(&self) -> f32 { self.weight.get() }
 
-    /// Recalculates the inventory weight
+    /// Recalculates the inventory weight. Is called automatically every time inventory
+    /// or clothes changes
     fn recalculate_weight(&self) {
         let old_weight = self.weight.get();
         let mut new_weight: f32;

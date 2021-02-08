@@ -6,10 +6,7 @@ use crate::error::{SpawnDiseaseErr, RemoveDiseaseErr};
 
 use std::rc::Rc;
 
-/// Contains code related to disease handling
-
 impl Health {
-
     /// Spawns a new disease. If disease is already scheduled or active, nothing will happen, and
     /// `Err` will be returned
     ///
@@ -69,5 +66,4 @@ impl Health {
 
         return Ok(());
     }
-
 }

@@ -48,7 +48,11 @@ pub trait BuilderStepDone {
     /// Builds the crafting combination based on the info provided.
     ///
     /// # Parameters
-    /// - `create`: function that returns an instance of the resulted object
+    /// - `create`: function that returns an instance of the resulted object. You can use `inv_result!`
+    ///     macro here
+    /// ```
+    /// build(zara::inv_result!(FishingRod { count: 1 }))
+    /// ```
     fn build(&self, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> CraftingCombination;
 }
 

@@ -88,7 +88,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// use zara;
     ///
-    /// let zara = zara::ZaraController::new(listener);
+    /// let person = zara::ZaraController::new(listener);
     /// ```
     pub fn new(listener : E) -> Self { ZaraController::init(listener, EnvironmentC::default()) }
 
@@ -110,7 +110,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// use zara;
     ///
-    /// let zara = zara::ZaraController::with_environment(listener, env);
+    /// let person = zara::ZaraController::with_environment(listener, env);
     /// ```
     pub fn with_environment(listener : E, env: EnvironmentC) -> Self { ZaraController::init(listener, env) }
 
@@ -158,7 +158,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Basic usage:
     ///
     /// ```
-    /// zara_controller.consume(item_name);
+    /// person.consume(item_name);
     /// ```
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         if !self.health.is_alive() { return Err(ItemConsumeErr::CharacterIsDead); }
@@ -225,7 +225,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Basic usage:
     ///
     /// ```
-    /// zara_controller.take_appliance(item_name, body_part);
+    /// person.take_appliance(item_name, body_part);
     /// ```
     pub fn take_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceTakeErr> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
@@ -291,6 +291,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// ## Note
     /// Borrows `body.appliances` collection
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.remove_appliance(item_name, body_part);
+    /// ```
     pub fn remove_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceRemoveErr> {
         if !self.health.is_alive() { return Err(ApplianceRemoveErr::CharacterIsDead); }
         if self.is_paused() { return Err(ApplianceRemoveErr::InstancePaused); }
@@ -303,6 +311,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Sets controller alive state to `false`
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.declare_dead();
+    /// ```
     pub fn declare_dead(&self) -> Result<(), DeclareDeadErr> {
         if self.is_paused() { return Err(DeclareDeadErr::InstancePaused); }
         self.health.declare_dead();
@@ -313,8 +329,24 @@ impl<E: Listener + 'static> ZaraController<E> {
         Ok(())
     }
     /// Pause this instance (all `update` calls will be ignored)
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.pause();
+    /// ```
     pub fn pause(&self) { self.is_paused.set(true); }
     /// Resume this instance (all `update` calls will be working again)
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.resume();
+    /// ```
     pub fn resume(&self) { self.is_paused.set(true); }
 
     /// Adds given item to the `body.clothes` collection and recalculates inventory weight.
@@ -327,6 +359,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Returns
     /// Ok on success
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.put_on_clothes(jacket_name);
+    /// ```
     pub fn put_on_clothes(&self, item_name: &String) -> Result<(), ClothesOnActionErr> {
         if !self.health.is_alive() { return Err(ClothesOnActionErr::CharacterIsDead); }
         if self.is_paused() { return Err(ClothesOnActionErr::InstancePaused); }
@@ -365,6 +405,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Returns
     /// Ok on success
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// person.take_off_clothes(jacket_name);
+    /// ```
     pub fn take_off_clothes(&self, item_name: &String) -> Result<(), ClothesOffActionErr> {
         if !self.health.is_alive() { return Err(ClothesOffActionErr::CharacterIsDead); }
         if self.is_paused() { return Err(ClothesOffActionErr::InstancePaused); }

@@ -114,8 +114,6 @@ pub trait StageEnd {
     fn build(&self) -> StageDescription;
 }
 
-
-
 impl StageInit for StageBuilder {
     fn build_for(&self, level: StageLevel) -> &dyn StageSelfHeal {
         self.level.replace(level);

@@ -167,7 +167,7 @@ impl ActiveInjury {
     }
 
     /// Gets injury drain delta for a given time
-    pub fn get_drains_deltas(&self, game_time: &GameTimeC) -> InjuryDeltasC {
+    pub(crate) fn get_drains_deltas(&self, game_time: &GameTimeC) -> InjuryDeltasC {
         let mut result = InjuryDeltasC::empty();
 
         if !self.has_lerp_data_for(game_time) {

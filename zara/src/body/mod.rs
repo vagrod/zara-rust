@@ -71,6 +71,23 @@ pub struct BodyAppliance {
 }
 
 /// Used to describe a new clothes group. Use `start` method to begin.
+///
+/// # Examples
+/// ```
+/// use zara::body::ClothesGroupBuilder;
+///
+/// ClothesGroupBuilder.start()
+///     .with_name("Water Resistant Suit")
+///         .bonus_cold_resistance(5)
+///         .bonus_water_resistance(16)
+///         .includes(
+///             vec![
+///                 ("Jacket", Box::new(JacketClothes)),
+///                 ("Pants", Box::new(PantsClothes))
+///             ]
+///         )
+///     .build()
+/// ```
 pub struct ClothesGroupBuilder {
     pub(crate) name: RefCell<String>,
     pub(crate) bonus_cold_resistance: Cell<usize>,
@@ -122,18 +139,7 @@ pub enum BodyPart {
 }
 
 impl Body {
-    /// Creates new ready-to-use `Body`.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// use zara::body;
-    ///
-    /// let b = body::Body::new();
-    /// ```
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Body {
             clothes: Arc::new(RefCell::new(Vec::new())),
             appliances: Arc::new(RefCell::new(Vec::new())),

@@ -185,7 +185,8 @@ pub struct CraftingCombination {
 }
 
 impl CraftingCombination {
-    pub fn new(result_item: String, items: Vec<ItemInCombination>, create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {
+    pub fn new(result_item: String, items: Vec<ItemInCombination>,
+               create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
@@ -229,7 +230,7 @@ impl CraftingCombination {
 ///     .plus("Liana", 1)
 ///     .plus("Pin", 1)
 ///     .and("Worm", 2)
-///   .build();
+///   .build(zara::inv_result!(FishingRod { count: 1 }));
 /// ```
 pub struct Builder {
     result_item: RefCell<String>,

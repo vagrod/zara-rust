@@ -17,8 +17,11 @@ pub mod fluent;
 /// Describes medical agent activation curve type
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum CurveType {
+    /// Will activate fully in a first third
     Immediately,
+    /// Will activate fully in a second half of the time
     MostActiveInSecondHalf,
+    /// Will be activating linearly
     Linearly
 }
 
@@ -45,7 +48,6 @@ impl Health {
     ///     ]
     ///  );
     ///```
-    ///
     pub fn register_medical_agents (&self, agents: Vec<MedicalAgent>) {
         let mut b = self.medical_agents.agents.borrow_mut();
 
@@ -218,9 +220,13 @@ impl MedicalAgent {
         }
     }
 
+    /// Tells if this medical agent is active now
     pub fn is_active(&self) -> bool { self.is_active.get() }
+    /// Returns medical agent percent of presence in blood (0..100%)
     pub fn percent_of_presence(&self) -> usize { self.percent_of_presence.get() as usize }
+    /// Returns medical agent percent of overall activity (0..100%)
     pub fn percent_of_activity(&self) -> usize { self.percent_of_activity.get() as usize }
+    /// Returns time when the last dose for this agent was taken
     pub fn last_dose_end_time(&self) -> Option<GameTimeC> {
         match self.last_dose_end_time.borrow().as_ref() {
             Some(t) => Some(t.copy()),
@@ -259,7 +265,9 @@ impl MedicalAgent {
     }
 }
 
+/// Node that controls all the medical agents
 pub struct MedicalAgentsMonitor {
+    /// All registered medical agents
     pub agents: Arc<RefCell<HashMap<String, MedicalAgent>>>,
 
     active_count: Cell<usize>,
@@ -276,8 +284,12 @@ impl MedicalAgentsMonitor {
         }
     }
 
-    pub fn is_active(&self, agent_name: String) -> Result<bool, MedicalAgentErr> {
-        match self.agents.borrow().get(&agent_name) {
+    /// Checks if a given medical agent is active now.
+    ///
+    /// # Parameters
+    /// - `agent_name` unique medical agent name
+    pub fn is_active(&self, agent_name: &String) -> Result<bool, MedicalAgentErr> {
+        match self.agents.borrow().get(agent_name) {
             Some(agent) => Ok(agent.is_active()),
             None => Err(MedicalAgentErr::AgentNotFound)
         }
@@ -297,6 +309,7 @@ impl MedicalAgentsMonitor {
         self.active_count.set(active_count);
     }
 
+    /// Returns number of active medical agents
     pub fn active_count(&self) -> usize { self.active_count.get() }
 
     fn flush_queue(&self, mut q: RefMut<BTreeMap<usize, Event>>) {

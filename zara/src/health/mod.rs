@@ -19,6 +19,7 @@ mod status_methods;
 mod monitors;
 
 pub(crate) mod state;
+
 pub mod disease;
 pub mod injury;
 pub mod side;
@@ -73,6 +74,7 @@ pub struct Health {
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
 
+/// Compound injury key that consists of a "injury name"-"body part" pair
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InjuryKey {
     pub injury: String,
@@ -121,18 +123,7 @@ impl MedicalAgentBuilder {
 }
 
 impl Health {
-    /// Creates new ready-to-use `Health`.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```
-    /// use zara::health;
-    ///
-    /// let h = health::Health::new();
-    /// ```
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let healthy = HealthC::healthy();
 
         Health {

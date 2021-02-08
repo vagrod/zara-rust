@@ -262,7 +262,7 @@ impl Health {
 
             // Those are % per game second drains
             result.stamina_drain += d.stamina_drain * game_time_delta; // stamina drain is cumulative
-            result.oxygen_drain += d.oxygen_drain * game_time_delta; // oxtgen drain is cumulative
+            result.oxygen_drain += d.oxygen_drain * game_time_delta; // oxygen drain is cumulative
             result.food_drain += d.food_drain * game_time_delta; // food drain is cumulative
             result.water_drain += d.water_drain * game_time_delta; // water drain is cumulative
         }
@@ -362,7 +362,7 @@ impl Health {
         for d in injury_deltas.iter() {
             // Those are % per game second drains
             result.stamina_drain += d.stamina_drain * game_time_delta; // stamina drain is cumulative
-            result.blood_drain += d.blood_drain * game_time_delta; // food drain is cumulative
+            result.blood_drain += d.blood_drain * game_time_delta; // blood drain is cumulative
         }
 
         result.cleanup();

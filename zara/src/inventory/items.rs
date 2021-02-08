@@ -348,6 +348,14 @@ pub trait InventoryItem {
     fn get_name(&self) -> String;
 
     /// Returns `true` is this item is an infinite resource
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// let f = item.get_is_infinite();
+    /// ```
     fn get_is_infinite(&self) -> bool;
 
     /// Gets calculated weight of all items of this kind, in grams.

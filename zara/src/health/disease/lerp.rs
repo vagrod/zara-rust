@@ -300,7 +300,7 @@ impl ActiveDisease {
     }
 
     /// Gets disease vitals delta for a given time
-    pub fn get_vitals_deltas(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
+    pub(crate) fn get_vitals_deltas(&self, game_time: &GameTimeC) -> DiseaseDeltasC {
         let mut result = DiseaseDeltasC::empty();
 
         if !self.has_lerp_data_for(game_time) {

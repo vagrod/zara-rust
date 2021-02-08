@@ -23,6 +23,9 @@ mod status_methods;
 /// # Examples
 ///
 /// ```
+/// use crate::zara::health::injury::StageBuilder;
+/// use crate::zara::health::StageLevel;
+///
 /// zara::injury!(Cut, "Cut",
 ///     Some(Box::new(CutTreatment)),
 ///     vec![
@@ -62,7 +65,7 @@ macro_rules! injury(
 /// # Examples
 ///
 /// ```
-/// use zara::health::disease::StageBuilder;
+/// use zara::health::injury::StageBuilder;
 /// use zara::health::StageLevel;
 ///
 /// zara::fracture!(Fracture, "Fracture",
@@ -113,8 +116,8 @@ impl InjuryKey {
 /// # Examples
 /// Start with `start` method and call `build` when you're done.
 /// ```
-/// use zara::health::injury::{StageBuilder};
-/// use zara::health::{StageLevel};
+/// use zara::health::injury::StageBuilder;
+/// use zara::health::StageLevel;
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
@@ -155,7 +158,7 @@ pub trait InjuryTreatment {
     /// # Parameters
     /// - `game_time`: game time when this call happened
     /// - `item`: appliance item description
-    /// - `body_part`: part of the body where this appliance was applied
+    /// - `body_part`: part of the body where this item was applied
     /// - `active_stage`: instance of the active stage of an injury
     /// - `injury`: injury object itself. You can call `invert` or `invert_back` to start or stop
     ///     "curing" the injury

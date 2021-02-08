@@ -288,6 +288,9 @@ impl ActiveStage {
     }
 
     /// Returns percent of activity of this stage. Always in 0..100 range.
+    ///
+    /// # Parameters
+    /// - `game_time`: game time for which to calculate the value
     pub fn percent_active(&self, game_time: &GameTimeC) -> usize {
         let gt = game_time.as_secs_f32();
         let start = self.start_time.as_secs_f32();

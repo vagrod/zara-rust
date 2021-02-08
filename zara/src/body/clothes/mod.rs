@@ -111,6 +111,7 @@ impl Body {
     }
 }
 
+/// Holds the information about clothes item
 #[derive(Clone)]
 pub struct ClothesItem {
     pub name: String,
@@ -127,6 +128,7 @@ impl ClothesItem {
     }
 }
 
+/// Holds the information about clothes group set
 pub struct ClothesGroup {
     pub name: String,
     pub items: HashMap<String, ClothesItem>,
@@ -134,6 +136,7 @@ pub struct ClothesGroup {
     pub bonus_water_resistance: usize
 }
 impl ClothesGroup {
+    /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::zara::body::ClothesGroupBuilder) to construct new group.
     pub fn new(name: String, items: Vec<ClothesItem>, bonus_cold_resistance: usize, bonus_water_resistance: usize) -> Self {
         let mut items_map = HashMap::new();
 

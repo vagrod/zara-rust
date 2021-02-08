@@ -8,9 +8,8 @@ use crate::body::BodyPart;
 use std::rc::Rc;
 
 impl Health {
-
-    /// Spawns a new injury. If injury is already scheduled or active, nothing will happen, and
-    /// `Err` will be returned
+    /// Spawns a new injury. If injury of this type on this body part is already scheduled or active,
+    /// nothing will happen, and `Err` will be returned
     ///
     /// # Parameters
     /// - `injury`: instance of an object with the [`Injury`](crate::zara::health::injury::Injury) trait
@@ -75,5 +74,4 @@ impl Health {
 
         return Ok(());
     }
-
 }

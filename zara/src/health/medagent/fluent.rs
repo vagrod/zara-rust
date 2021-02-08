@@ -25,6 +25,17 @@ pub trait AgentDuration {
 
 pub trait AgentItems {
     /// What kinds of inventory items are describing this agent
+    ///
+    /// # Examples
+    /// ```
+    /// includes(
+    ///     vec![
+    ///         "Syringe with Epinephrine",
+    ///         "Epinephrine Pills",
+    ///         "Yka-Yka Leaf"
+    ///     ]
+    /// )
+    /// ```
     fn includes(&self, items: Vec<&str>) -> &dyn AgentEnd;
 }
 

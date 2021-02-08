@@ -13,6 +13,8 @@ impl Body {
         }
     }
 
+    /// Recalculates cached warmth level value. This is automatically called every time
+    /// environment temperature, wind speed or clothing changes
     pub fn recalculate_warmth_level(&self) {
         const COMFORT_TEMPERATURE_NAKED: f32 = 22.; // degrees C
         const MAXIMUM_WETNESS_TEMPERATURE_DECREASE: f32 = 10.; // degrees C

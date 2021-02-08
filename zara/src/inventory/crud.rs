@@ -40,9 +40,7 @@ impl Inventory {
     /// - `item_kind`: unique name of the item ("InventoryItem.name")
     ///
     /// # Returns
-    /// `true` on success.
-    ///
-    /// `false` if a given kind was not found.
+    /// Ok on success.
     ///
     /// # Notes
     /// Borrows the `items` collection
