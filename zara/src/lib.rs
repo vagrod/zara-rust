@@ -11,8 +11,8 @@ use std::time::Duration;
 
 mod update;
 mod status_methods;
-mod state;
 
+pub mod state;
 pub mod world;
 pub mod utils;
 pub mod error;

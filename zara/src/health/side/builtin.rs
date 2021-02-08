@@ -64,3 +64,44 @@ pub struct UnderwaterSideEffect {
     underwater_state: Cell<bool>,
     time_under_water: Cell<f32> // game seconds
 }
+
+pub struct FatigueSideEffectsStateContract {
+    pub hours_until_exhausted: usize
+}
+
+pub struct DynamicVitalsSideEffectStateContract {
+    pub first_iteration: bool,
+    pub counter: f32,
+    pub half_duration: f32,
+    pub direction: f32,
+    pub body_temperature_ceiling: f32,
+    pub heart_rate_ceiling: f32,
+    pub top_pressure_ceiling: f32,
+    pub bottom_pressure_ceiling: f32
+}
+
+pub struct FoodDrainOverTimeSideEffectStateContract {
+    pub drain_amount: f32
+}
+
+pub struct RunningSideEffectsStateContract {
+    pub stamina_drain_amount: f32,
+    pub water_drain_amount: f32,
+    pub running_state: bool,
+    pub sleeping_state: bool,
+    pub running_time: f32,
+    pub gained_fatigue: f32
+}
+
+pub struct UnderwaterSideEffectStateContract {
+    pub oxygen_drain_amount: f32,
+    pub stamina_drain_amount: f32,
+    pub sleeping_state: bool,
+    pub gained_fatigue: f32,
+    pub underwater_state: bool,
+    pub time_under_water: f32
+}
+
+pub struct WaterDrainOverTimeSideEffectStateContract {
+    pub drain_amount: f32
+}

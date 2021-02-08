@@ -1,17 +1,8 @@
-use crate::health::side::builtin::UnderwaterSideEffect;
+use crate::health::side::builtin::{UnderwaterSideEffect, UnderwaterSideEffectStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
-
-pub struct UnderwaterSideEffectStateContract {
-    pub oxygen_drain_amount: f32,
-    pub stamina_drain_amount: f32,
-    pub sleeping_state: bool,
-    pub gained_fatigue: f32,
-    pub underwater_state: bool,
-    pub time_under_water: f32
-}
 
 impl UnderwaterSideEffect {
     /// Creates new `UnderwaterSideEffect` instance.

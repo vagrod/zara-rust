@@ -1,13 +1,9 @@
-use crate::health::side::builtin::FatigueSideEffects;
+use crate::health::side::builtin::{FatigueSideEffects, FatigueSideEffectsStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::FrameSummaryC;
 
 use std::time::Duration;
 use std::cell::Cell;
-
-pub struct FatigueSideEffectsStateContract {
-    pub hours_until_exhausted: usize
-}
 
 impl FatigueSideEffects {
     pub fn new(hours_until_exhausted: usize) -> Self {

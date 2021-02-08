@@ -1,28 +1,12 @@
 use crate::health::{StageLevel, Health, InjuryKey};
 use crate::health::injury::{ActiveStage, LerpDataNodeC, LerpDataC, StageDescription, Injury, ActiveInjury, InjuryDeltasC};
 use crate::utils::GameTimeC;
-use crate::body::BodyPart;
+use crate::state::ActiveInjuryStateContract;
 
 use std::time::Duration;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::cell::{RefCell, Cell};
-
-pub struct ActiveInjuryStateContract {
-    pub needs_treatment: bool,
-    pub is_fracture: bool,
-    pub body_part: BodyPart,
-    pub will_self_heal_on: StageLevel,
-    pub total_duration: Duration,
-    pub initial_data: Vec<StageDescriptionStateContract>,
-    pub stages: Vec<ActiveStageStateContract>,
-    pub lerp_data: Option<LerpDataNodeStateContract>,
-    pub last_deltas: InjuryDeltasStateContract,
-    pub is_inverted: bool,
-    pub activation_time: Duration,
-    pub will_end: bool,
-    pub end_time: Option<Duration>
-}
 
 pub struct StageDescriptionStateContract {
     pub level: StageLevel,

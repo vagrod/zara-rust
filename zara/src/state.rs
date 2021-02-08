@@ -20,6 +20,36 @@ pub struct ZaraControllerStateContract {
     pub is_paused: bool
 }
 
+pub struct ActiveDiseaseStateContract {
+    pub needs_treatment: bool,
+    pub will_self_heal_on: crate::health::StageLevel,
+    pub total_duration: Duration,
+    pub initial_data: Vec<crate::health::disease::state::StageDescriptionStateContract>,
+    pub stages: Vec<crate::health::disease::state::ActiveStageStateContract>,
+    pub lerp_data: Option<crate::health::disease::state::LerpDataNodeStateContract>,
+    pub last_deltas: crate::health::disease::state::DiseaseDeltasStateContract,
+    pub is_inverted: bool,
+    pub activation_time: Duration,
+    pub will_end: bool,
+    pub end_time: Option<Duration>
+}
+
+pub struct ActiveInjuryStateContract {
+    pub needs_treatment: bool,
+    pub is_fracture: bool,
+    pub body_part: crate::body::BodyPart,
+    pub will_self_heal_on: crate::health::StageLevel,
+    pub total_duration: Duration,
+    pub initial_data: Vec<crate::health::injury::state::StageDescriptionStateContract>,
+    pub stages: Vec<crate::health::injury::state::ActiveStageStateContract>,
+    pub lerp_data: Option<crate::health::injury::state::LerpDataNodeStateContract>,
+    pub last_deltas: crate::health::injury::state::InjuryDeltasStateContract,
+    pub is_inverted: bool,
+    pub activation_time: Duration,
+    pub will_end: bool,
+    pub end_time: Option<Duration>
+}
+
 pub struct EnvironmentStateContract {
     pub game_time: Duration,
     pub wind_speed: f32,

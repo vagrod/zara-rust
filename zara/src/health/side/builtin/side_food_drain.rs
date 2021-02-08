@@ -1,12 +1,8 @@
-use crate::health::side::builtin::FoodDrainOverTimeSideEffect;
+use crate::health::side::builtin::{FoodDrainOverTimeSideEffect, FoodDrainOverTimeSideEffectStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::FrameSummaryC;
 
 use std::cell::Cell;
-
-pub struct FoodDrainOverTimeSideEffectStateContract {
-    pub drain_amount: f32
-}
 
 impl FoodDrainOverTimeSideEffect {
     /// Creates new `FoodDrainOverTimeSideEffect` instance.

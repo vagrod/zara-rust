@@ -1,19 +1,8 @@
-use crate::health::side::builtin::DynamicVitalsSideEffect;
+use crate::health::side::builtin::{DynamicVitalsSideEffect, DynamicVitalsSideEffectStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC};
 
 use std::cell::Cell;
-
-pub struct DynamicVitalsSideEffectStateContract {
-    pub first_iteration: bool,
-    pub counter: f32,
-    pub half_duration: f32,
-    pub direction: f32,
-    pub body_temperature_ceiling: f32,
-    pub heart_rate_ceiling: f32,
-    pub top_pressure_ceiling: f32,
-    pub bottom_pressure_ceiling: f32
-}
 
 impl DynamicVitalsSideEffect {
     pub fn new() -> Self {

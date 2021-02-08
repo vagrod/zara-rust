@@ -1,17 +1,8 @@
-use crate::health::side::builtin::RunningSideEffects;
+use crate::health::side::builtin::{RunningSideEffects, RunningSideEffectsStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
-
-pub struct RunningSideEffectsStateContract {
-    pub stamina_drain_amount: f32,
-    pub water_drain_amount: f32,
-    pub running_state: bool,
-    pub sleeping_state: bool,
-    pub running_time: f32,
-    pub gained_fatigue: f32
-}
 
 impl RunningSideEffects {
     pub fn new(stamina_drain: f32, water_drain: f32) -> Self {

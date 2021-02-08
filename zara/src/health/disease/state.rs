@@ -1,25 +1,12 @@
 use crate::health::{StageLevel, Health};
 use crate::health::disease::{ActiveStage, LerpDataNodeC, DiseaseDeltasC, ActiveDisease, Disease, LerpDataC, StageDescription};
 use crate::utils::GameTimeC;
+use crate::state::ActiveDiseaseStateContract;
 
 use std::time::Duration;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::cell::{RefCell, Cell};
-
-pub struct ActiveDiseaseStateContract {
-    pub needs_treatment: bool,
-    pub will_self_heal_on: StageLevel,
-    pub total_duration: Duration,
-    pub initial_data: Vec<StageDescriptionStateContract>,
-    pub stages: Vec<ActiveStageStateContract>,
-    pub lerp_data: Option<LerpDataNodeStateContract>,
-    pub last_deltas: DiseaseDeltasStateContract,
-    pub is_inverted: bool,
-    pub activation_time: Duration,
-    pub will_end: bool,
-    pub end_time: Option<Duration>
-}
 
 pub struct StageDescriptionStateContract {
     pub level: StageLevel,

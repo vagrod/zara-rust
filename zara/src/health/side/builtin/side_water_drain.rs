@@ -1,12 +1,8 @@
-use crate::health::side::builtin::WaterDrainOverTimeSideEffect;
+use crate::health::side::builtin::{WaterDrainOverTimeSideEffect, WaterDrainOverTimeSideEffectStateContract};
 use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::FrameSummaryC;
 
 use std::cell::Cell;
-
-pub struct WaterDrainOverTimeSideEffectStateContract {
-    pub drain_amount: f32
-}
 
 impl WaterDrainOverTimeSideEffect {
     /// Creates new `WaterDrainOverTimeSideEffect` instance.
