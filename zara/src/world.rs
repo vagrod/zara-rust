@@ -27,9 +27,9 @@ impl EnvironmentData {
     /// Basic usage:
     ///
     /// ```
-    /// use zara::env;
+    /// use zara::world::EnvironmentData;
     ///
-    /// let env = env::EnvironmentData::new();
+    /// let env = EnvironmentData::new();
     /// ```
     pub fn new() -> Self {
         EnvironmentData {
@@ -52,9 +52,9 @@ impl EnvironmentData {
     /// Basic usage:
     ///
     /// ```
-    /// use zara::env;
+    /// use zara::world::EnvironmentData;
     ///
-    /// let env = env::EnvironmentData::from_description(env_desc);
+    /// let env = EnvironmentData::from_description(env_desc);
     /// ```
     pub fn from_description(ed: EnvironmentC) -> EnvironmentData {
         let e = EnvironmentData::new();

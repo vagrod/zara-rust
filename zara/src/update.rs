@@ -32,7 +32,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Basic usage:
     ///
     /// ```
-    /// zara_controller.update(time_delta);
+    /// person.update(time_delta);
     /// ```
     pub fn update(&self, frame_time: f32) -> Result<(), ZaraUpdateErr>{
         if !self.health.is_alive() { return Err(ZaraUpdateErr::CharacterIsDead); }
@@ -256,5 +256,4 @@ impl<E: Listener + 'static> ZaraController<E> {
             key += 1;
         }
     }
-
 }

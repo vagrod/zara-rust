@@ -6,6 +6,13 @@ use crate::inventory::state::InventoryStateContract;
 
 use std::time::Duration;
 
+/// Zara state contract. It **does not** include state of diseases, injuries, side effects monitors,
+/// disease monitors, inventory monitors or inventory items. For those objects you may need to
+/// implement custom methods for saving and restoring their states.
+///
+/// It contains game time, state of all medical agents, environment snapshot, saved payer status,
+/// health vitals and levels, clothes and body appliances, cached inventory weight and related
+/// internal fields.
 pub struct ZaraControllerStateContract {
     pub environment: EnvironmentStateContract,
     pub player_status: PlayerStatusContract,
@@ -65,10 +72,15 @@ pub struct PlayerStatusContract {
 }
 
 impl<E: Listener + 'static> ZaraController<E> {
-    /// Gets Zara state snapshot, **not** including active diseases, active injuries and inventory items.
+    /// Gets Zara state snapshot, **not** including active diseases, active injuries,
+    /// disease/inventory/side effects monitors and inventory items.
     ///
     /// For diseases and injuries, you need to call `get_state` for every active disease or
     /// injury, and when needed call `restore_disease` and `restore_injury` on `health` node.
+    ///
+    /// It will capture current game time, state of all medical agents, environment snapshot, saved
+    /// payer status, health vitals and levels, clothes and body appliances, cached inventory weight
+    /// and related internal fields.
     pub fn get_state(&self) -> ZaraControllerStateContract {
         ZaraControllerStateContract {
             environment: EnvironmentStateContract {
@@ -94,11 +106,14 @@ impl<E: Listener + 'static> ZaraController<E> {
             is_paused: self.is_paused.get()
         }
     }
-    /// Restores previously captured state.
+    /// Restores previously captured state. This will **not** restore active diseases, injuries,
+    /// disease/inventory/side effects monitors or inventory items.
+    ///
+    /// It will restore current game time, state of all medical agents, environment snapshot, saved
+    /// payer status, health vitals and levels, clothes and body appliances, cached inventory weight
+    /// and related internal fields.
     ///
     /// To restore a disease or injury, call `restore_disease` or `restore_injury` on a `health` node.
-    ///
-    /// This method will not restore inventory items.
     pub fn restore_state(&self, state: &ZaraControllerStateContract) {
         self.update_counter.set(state.update_counter);
         self.queue_counter.set(state.queue_counter);
