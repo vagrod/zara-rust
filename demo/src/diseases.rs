@@ -75,11 +75,11 @@ zara::disease!(Flu, "Flu", Some(Box::new(Flu)),
     ]
 );
 impl DiseaseTreatment for Flu {
-    fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+    fn on_consumed(&self, _game_time: &GameTimeC, _item: &ConsumableC, _active_stage: &ActiveStage, _disease: &ActiveDisease, _inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         //println!("from treatment");
     }
 
-    fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart, active_stage: &ActiveStage, disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
+    fn on_appliance_taken(&self, _game_time: &GameTimeC, _item: &ApplianceC, _body_part: BodyPart, _active_stage: &ActiveStage, _disease: &ActiveDisease, _inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         //println!("from treatment");
     }
 }

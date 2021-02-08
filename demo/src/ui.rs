@@ -498,19 +498,3 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
 fn format_gt(t: &GameTimeC) -> String {
     format!("{}day {}hour {}min {:.0}sec", t.day,t.hour,t.minute, t.second)
 }
-
-fn read_char() -> Result<char> {
-    loop {
-        if let Ok(TermEvent::Key(KeyEvent {
-                                     code: KeyCode::Char(c),
-                                     ..
-                                 })) = event::read()
-        {
-            return Ok(c);
-        }
-    }
-}
-
-fn buffer_size() -> Result<(u16, u16)> {
-    terminal::size()
-}
