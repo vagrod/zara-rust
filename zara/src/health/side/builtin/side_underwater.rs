@@ -3,6 +3,7 @@ use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
+use std::any::Any;
 
 impl UnderwaterSideEffect {
     /// Creates new `UnderwaterSideEffect` instance.
@@ -117,4 +118,6 @@ impl SideEffectsMonitor for UnderwaterSideEffect {
             ..Default::default()
         }
     }
+
+    fn as_any(&self) -> &dyn Any { self }
 }

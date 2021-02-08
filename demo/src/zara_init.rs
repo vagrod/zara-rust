@@ -55,7 +55,6 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
         ]
     );
 
-    add_side_effects(&person);
     populate_inventory(&person);
     dress(&person);
 
@@ -110,24 +109,4 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
         ]);
 
     person.inventory.execute_combination(&ids[0]).ok();
-}
-
-fn add_side_effects(person: &zara::ZaraController<ZaraEventsListener>) {
-    let vitals_effects = zara::health::side::builtin::DynamicVitalsSideEffect::new();
-    person.health.register_side_effect_monitor(Box::new(vitals_effects));
-
-    let running_effects = zara::health::side::builtin::RunningSideEffects::new(0.22, 0.009);
-    person.health.register_side_effect_monitor(Box::new(running_effects));
-
-    let fatigue_effects = zara::health::side::builtin::FatigueSideEffects::new(8);
-    person.health.register_side_effect_monitor(Box::new(fatigue_effects));
-
-    let food_drain_effect =  zara::health::side::builtin::FoodDrainOverTimeSideEffect::new(0.01);
-    person.health.register_side_effect_monitor(Box::new(food_drain_effect));
-
-    let water_drain_effect =  zara::health::side::builtin::WaterDrainOverTimeSideEffect::new(0.03);
-    person.health.register_side_effect_monitor(Box::new(water_drain_effect));
-
-    let underwater_effect =  zara::health::side::builtin::UnderwaterSideEffect::new(0.15, 0.28);
-    person.health.register_side_effect_monitor(Box::new(underwater_effect));
 }

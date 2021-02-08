@@ -4,6 +4,7 @@ use crate::utils::FrameSummaryC;
 
 use std::time::Duration;
 use std::cell::Cell;
+use std::any::Any;
 
 impl FatigueSideEffects {
     pub fn new(hours_until_exhausted: usize) -> Self {
@@ -47,4 +48,6 @@ impl SideEffectsMonitor for FatigueSideEffects {
             ..Default::default()
         }
     }
+
+    fn as_any(&self) -> &dyn Any { self }
 }

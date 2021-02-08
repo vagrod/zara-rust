@@ -39,6 +39,12 @@ pub struct Health {
     pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
     /// Registered medical agents
     pub medical_agents: Arc<MedicalAgentsMonitor>,
+    /// Stores all registered disease monitors. Do not alter this collection manually, use
+    /// `register_disease_monitor` and `unregister_disease_monitor` methods
+    pub disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
+    /// Stores all registered side effects monitors. Do not alter this collection manually, use
+    /// `register_side_effect_monitor` and `unregister_side_effect_monitor` methods
+    pub side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
 
     // Health state fields
     /// Body temperature (degrees C)
@@ -61,10 +67,6 @@ pub struct Health {
     fatigue_level: Cell<f32>,
     /// Oxygen level (0..100)
     oxygen_level: Cell<f32>,
-    /// Stores all registered disease monitors
-    disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
-    /// Stores all registered side effects monitors
-    side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
     /// Is character alive
     is_alive: Cell<bool>,
     /// Has any injury active blood loss

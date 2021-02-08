@@ -9,6 +9,7 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
+use std::any::Any;
 
 pub(crate) mod state;
 
@@ -347,6 +348,9 @@ pub trait DiseaseMonitor {
     ///     moment of this call
     fn on_appliance_taken(&self, health: &Health, game_time: &GameTimeC, item: &ApplianceC,
                           body_part: BodyPart, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
+
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Trait that must be implemented by all diseases

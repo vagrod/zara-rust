@@ -6,15 +6,14 @@ use std::thread::sleep;
 use crate::events::ZaraEventsListener;
 use crate::ui::ui_frame;
 use crate::zara_init::init_zara_instance;
-use crate::diseases::Flu;
-use crate::injuries::Cut;
+use crate::state::StateObject;
 
 use zara::body::BodyPart;
-use zara::health::InjuryKey;
 use crossterm::terminal;
 use crossterm::execute;
 
 mod zara_init;
+mod state;
 mod diseases;
 mod injuries;
 mod inventory;
@@ -34,10 +33,7 @@ fn main() {
         let mut is_item_consumed = false;
         let mut is_jacket_off = false;
 
-        let mut state = None;
-        let mut disease_state = None;
-        let mut injury1_state = None;
-        let mut injury2_state = None;
+        let mut state = StateObject::new();
 
         let two_millis= Duration::new(0, 2_000_000); // 2ms
         let mut frame_time= 0_f32;
@@ -45,6 +41,20 @@ fn main() {
         let mut console_update_counter = 0.;
 
         let person = init_zara_instance();
+
+        let vitals_effects = Box::new(zara::health::side::builtin::DynamicVitalsSideEffect::new());
+        let running_effects = Box::new(zara::health::side::builtin::RunningSideEffects::new(0.22, 0.009));
+        let fatigue_effects = Box::new(zara::health::side::builtin::FatigueSideEffects::new(8));
+        let food_drain_effect = Box::new(zara::health::side::builtin::FoodDrainOverTimeSideEffect::new(0.01));
+        let water_drain_effect = Box::new(zara::health::side::builtin::WaterDrainOverTimeSideEffect::new(0.03));
+        let underwater_effect = Box::new(zara::health::side::builtin::UnderwaterSideEffect::new(0.15, 0.28));
+
+        state.monitor_vitals = Some(person.health.register_side_effect_monitor(vitals_effects));
+        state.monitor_running = Some(person.health.register_side_effect_monitor(running_effects));
+        state.monitor_fatigue = Some(person.health.register_side_effect_monitor(fatigue_effects));
+        state.monitor_food = Some(person.health.register_side_effect_monitor(food_drain_effect));
+        state.monitor_water = Some(person.health.register_side_effect_monitor(water_drain_effect));
+        state.monitor_underwater = Some(person.health.register_side_effect_monitor(underwater_effect));
 
         spawn_diseases(&person);
         spawn_injuries(&person);
@@ -71,19 +81,7 @@ fn main() {
             }
 
             if person.environment.game_time.minute.get() == 5 {
-                match &state {
-                    None => {
-                        let b = person.health.injuries.borrow();
-                        let i1 = b.get(&InjuryKey { injury: format!("Cut"), body_part: BodyPart::LeftShoulder }).unwrap();
-                        let i2 = b.get(&InjuryKey { injury: format!("Cut"), body_part: BodyPart::Forehead }).unwrap();
-
-                        state = Some(person.get_state());
-                        disease_state = Some(person.health.diseases.borrow().get("Flu").unwrap().get_state());
-                        injury1_state = Some(i1.get_state());
-                        injury2_state = Some(i2.get_state());
-                    },
-                    Some(_) => {}
-                }
+                state.capture(&person);
             }
 
             if person.environment.game_time.minute.get() == 6 && !is_jacket_off {
@@ -92,42 +90,10 @@ fn main() {
                 is_jacket_off = true;
             }
 
-            /* State restore test -- roll back to 5 min mark
+            // State restore test -- roll back to 5 min mark
             if person.environment.game_time.minute.get() == 10 {
-                match &state {
-                    Some(st) => {
-                        person.restore_state(st);
-
-                        person.health.diseases.borrow_mut().clear();
-                        person.health.injuries.borrow_mut().clear();
-
-                        match &disease_state {
-                            Some(st) => {
-                                person.health.restore_disease(st, Box::new(Flu));
-                            },
-                            None => { }
-                        }
-                        match &injury1_state {
-                            Some(st) => {
-                                person.health.restore_injury(st, Box::new(Cut));
-                            },
-                            None => { }
-                        }
-                        match &injury2_state {
-                            Some(st) => {
-                                person.health.restore_injury(st, Box::new(Cut));
-                            },
-                            None => { }
-                        }
-
-                        state = None;
-                        disease_state = None;
-                        injury1_state = None;
-                        injury2_state = None;
-                    },
-                    None => { }
-                }
-            }*/
+                state.restore(&person);
+            }
 
             // Disease "invert" test
             if person.environment.game_time.minute.get() == 20 || person.environment.game_time.minute.get() == 42 {

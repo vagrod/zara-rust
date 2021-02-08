@@ -3,6 +3,7 @@ use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC, clamp_bottom};
 
 use std::cell::Cell;
+use std::any::Any;
 
 impl RunningSideEffects {
     pub fn new(stamina_drain: f32, water_drain: f32) -> Self {
@@ -115,4 +116,6 @@ impl SideEffectsMonitor for RunningSideEffects {
             ..Default::default()
         }
     }
+
+    fn as_any(&self) -> &dyn Any { self }
 }

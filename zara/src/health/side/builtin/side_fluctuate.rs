@@ -3,6 +3,7 @@ use crate::health::side::{SideEffectsMonitor, SideEffectDeltasC};
 use crate::utils::{FrameSummaryC};
 
 use std::cell::Cell;
+use std::any::Any;
 
 impl DynamicVitalsSideEffect {
     pub fn new() -> Self {
@@ -87,6 +88,8 @@ impl SideEffectsMonitor for DynamicVitalsSideEffect {
 
         return result;
     }
+
+    fn as_any(&self) -> &dyn Any { self }
 }
 
 impl DynamicVitalsSideEffect {

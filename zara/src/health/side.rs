@@ -1,5 +1,7 @@
 use crate::utils::FrameSummaryC;
 
+use std::any::Any;
+
 pub mod builtin;
 
 /// Trait that must be implemented by all side effects monitors
@@ -13,6 +15,9 @@ pub trait SideEffectsMonitor {
     /// [`SideEffectDeltasC`](crate::zara::health::side::SideEffectDeltasC) structure containing deltas
     /// that will be added to the `healthy player state`, and NOT THE CURRENT health state
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC;
+
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Structure that contains result of a side effects monitor check for one frame.

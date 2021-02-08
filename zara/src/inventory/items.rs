@@ -1,5 +1,7 @@
 use crate::utils::GameTimeC;
 
+use std::any::Any;
+
 /// Macro for declaring a simple inventory item with particular weight
 ///
 /// # Examples
@@ -23,6 +25,7 @@ macro_rules! inv_item(
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableDescription> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceDescription> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -50,6 +53,7 @@ macro_rules! inv_infinite(
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableDescription> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceDescription> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -78,6 +82,7 @@ macro_rules! inv_item_cons(
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableDescription> { $cons }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceDescription> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -106,6 +111,7 @@ macro_rules! inv_item_appl (
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableDescription> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceDescription> { $appl }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { None }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -134,6 +140,7 @@ macro_rules! inv_item_clothes (
             fn consumable(&self) -> Option<&dyn zara::inventory::items::ConsumableDescription> { None }
             fn appliance(&self) ->  Option<&dyn zara::inventory::items::ApplianceDescription> { None }
             fn clothes(&self) -> Option<&dyn zara::inventory::items::ClothesDescription> { $cl }
+            fn as_any(&self) -> &dyn std::any::Any { self }
         }
     );
 );
@@ -377,6 +384,8 @@ pub trait InventoryItem {
     fn appliance(&self) -> Option<&dyn ApplianceDescription>;
     /// Node that describes clothes options for this item
     fn clothes(&self) -> Option<&dyn ClothesDescription>;
+    /// For downcasting
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Trait to describe appliance behavior of the inventory item
