@@ -103,9 +103,9 @@ fn populate_inventory(person: &zara::ZaraController<ZaraEventsListener>) {
     // Crafting test
     let ids = person.inventory.get_suitable_combinations_for(
         vec![
-            format!("Stick"),
-            format!("Rope"),
-            format!("SharpStone")
+            "Stick",
+            "Rope",
+            "SharpStone"
         ]);
 
     person.inventory.execute_combination(&ids[0]).ok();

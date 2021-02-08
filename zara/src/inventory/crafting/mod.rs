@@ -53,7 +53,18 @@ impl Inventory {
 
     /// Returns a list of `combination unique keys` for the combinations that can be done
     /// using a set of passed items (**without checking for resources availability**)
-    pub fn get_suitable_combinations_for(&self, items: Vec<String>) -> Vec<String> {
+    ///
+    /// # Examples
+    /// ```
+    /// let ids = person.inventory.get_suitable_combinations_for(
+    ///     vec![
+    ///         "Stick",
+    ///         "Rope",
+    ///         "Stone"
+    ///     ]
+    /// );
+    /// ```
+    pub fn get_suitable_combinations_for(&self, items: Vec<&str>) -> Vec<String> {
         let key_to_check_against = get_match_key(items);
         let mut result = Vec::new();
 
@@ -190,7 +201,7 @@ impl CraftingCombination {
         let mut mapped = HashMap::new();
         let mut copy = Vec::from(items);
         let key = &mut String::from(&result_item);
-        let mut item_names: Vec<String> = Vec::new();
+        let mut item_names: Vec<&str> = Vec::new();
         let mut b = [0; 2];
         let sep = '\u{0003}'.encode_utf8(&mut b);
 
@@ -198,7 +209,7 @@ impl CraftingCombination {
         copy.sort_by(|a, b| a.item_name.cmp(&b.item_name));
 
         for item in copy.iter() {
-            item_names.push(String::from(&item.item_name));
+            item_names.push(&item.item_name);
 
             mapped.insert(String::from(&item.item_name), item.copy());
             key.push_str(&item.item_name);
@@ -246,7 +257,7 @@ impl Builder {
     }
 }
 
-fn get_match_key(items: Vec<String>) -> String {
+fn get_match_key(items: Vec<&str>) -> String {
     let mut match_key: String = String::new();
     let mut copy = Vec::from(items);
     let mut b = [0; 2];
