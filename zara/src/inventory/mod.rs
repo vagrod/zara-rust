@@ -46,13 +46,35 @@ pub struct Inventory {
 
 impl Inventory {
     pub(crate) fn new() -> Self {
-        Inventory{
+        Inventory {
             items: Arc::new(RefCell::new(HashMap::new())),
             crafting_combinations: Rc::new(RefCell::new(HashMap::new())),
             inventory_monitors: Rc::new(RefCell::new(HashMap::new())),
             weight: Cell::new(0.),
             message_queue: RefCell::new(BTreeMap::new()),
             clothes_cache: RefCell::new(Vec::new())
+        }
+    }
+
+    /// Returns count of a certain item kind. None if not found.
+    ///
+    /// # Parameters
+    /// - `name`: unique item kind name
+    pub fn get_count_of(&self, name: &String) -> Option<usize> {
+        match self.items.borrow().get(name) {
+            Some(item) => Some(item.get_count()),
+            None => None
+        }
+    }
+
+    /// Returns total weight of a certain item. None if not found.
+    ///
+    /// # Parameters
+    /// - `name`: unique item kind name
+    pub fn get_weight_of(&self, name: &String) -> Option<f32> {
+        match self.items.borrow().get(name) {
+            Some(item) => Some(item.get_total_weight()),
+            None => None
         }
     }
 

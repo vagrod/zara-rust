@@ -149,18 +149,10 @@ impl StateObject {
         };
 
         // Clear diseases
-        {
-            let mut b = controller.health.diseases.borrow_mut();
-
-            b.clear();
-        }
+        controller.health.clear_diseases();
 
         // Clear injuries
-        {
-            let mut b = controller.health.injuries.borrow_mut();
-
-            b.clear();
-        }
+        controller.health.clear_injuries();
 
         // Restore diseases
         for (_, state) in &self.diseases {

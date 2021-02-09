@@ -206,6 +206,22 @@ impl Health {
 
     /// Sets controller alive state to `false`
     pub(crate) fn declare_dead(&self) { self.is_alive.set(false); }
+
+    /// Removes all diseases.
+    ///
+    /// ## Note
+    /// Borrows `diseases` collection
+    pub fn clear_diseases(&self) {
+        self.diseases.borrow_mut().clear();
+    }
+
+    /// Removes all injuries.
+    ///
+    /// ## Note
+    /// Borrows `injuries` collection
+    pub fn clear_injuries(&self) {
+        self.injuries.borrow_mut().clear();
+    }
 }
 
 impl MessageQueue for Health {
