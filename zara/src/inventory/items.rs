@@ -324,9 +324,6 @@ pub trait InventoryItem {
     /// Returns count of items of this kind in the inventory
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// let n = item.get_count();
     /// ```
@@ -335,9 +332,6 @@ pub trait InventoryItem {
     /// Sets new count for items of this kind
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// item.set_count(new_value);
     /// ```
@@ -346,9 +340,6 @@ pub trait InventoryItem {
     /// Gets unique name for all items of this kind
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// let s = item.get_name();
     /// ```
@@ -357,9 +348,6 @@ pub trait InventoryItem {
     /// Returns `true` is this item is an infinite resource
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// let f = item.get_is_infinite();
     /// ```
@@ -370,9 +358,6 @@ pub trait InventoryItem {
     /// Most of the time, it is `count` * `weight per item`.
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// let n = item.get_total_weight();
     /// ```

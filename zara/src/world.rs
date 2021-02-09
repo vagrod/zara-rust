@@ -23,9 +23,6 @@ impl EnvironmentData {
     ///
     /// [`from_description`]: #method.from_description
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::world::EnvironmentData;
     ///
@@ -48,9 +45,6 @@ impl EnvironmentData {
     /// - `ed`: environment description with initial values for newly created `EnvironmentData`
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::world::EnvironmentData;
     ///

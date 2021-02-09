@@ -58,9 +58,6 @@ impl GameTime {
     /// Creates new zero game time.
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::utils;
     ///
@@ -82,8 +79,6 @@ impl GameTime {
     /// - `d`: `Duration` object to create new game time from
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::utils;
     ///
@@ -118,8 +113,6 @@ impl GameTime {
     /// - `d`: `Duration` object to add
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// game_time.add_duration(duration);
     /// ```
@@ -135,8 +128,6 @@ impl GameTime {
     /// - `value`: seconds to add
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// game_time.add_seconds(amount);
     /// ```
@@ -152,8 +143,6 @@ impl GameTime {
     /// - `new_values`: `GameTime` object to match
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// game_time.update_from(duration);
     /// ```
@@ -170,8 +159,6 @@ impl GameTime {
     /// - `d`: `Duration` object to apply to this game time
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// game_time.update_from_duration(duration);
     /// ```
@@ -187,8 +174,6 @@ impl GameTime {
     /// - `new_seconds`: amount of seconds
     ///
     /// # Examples
-    /// Basic usage:
-    ///
     /// ```
     /// game_time.update_from_seconds(amount);
     /// ```
@@ -405,9 +390,6 @@ impl EnvironmentC {
     /// - `wind_speed`: m/s
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::utils;
     ///
@@ -429,9 +411,6 @@ impl EnvironmentC {
     /// [`new`]: #method.new
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara::utils;
     ///

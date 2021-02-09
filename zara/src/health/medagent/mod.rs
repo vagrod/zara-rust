@@ -268,6 +268,12 @@ impl MedicalAgent {
 /// Node that controls all the medical agents
 pub struct MedicalAgentsMonitor {
     /// All registered medical agents
+    ///
+    /// # Important
+    /// Do not alter this collection manually. Use
+    /// [`register_medical_agents`] method instead.
+    ///
+    /// [`register_medical_agents`]: #method.register_medical_agents
     pub agents: Arc<RefCell<HashMap<String, MedicalAgent>>>,
 
     active_count: Cell<usize>,

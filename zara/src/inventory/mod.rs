@@ -30,8 +30,14 @@ pub struct Inventory {
     /// [`add_item`]: #method.add_item
     /// [`remove_item`]: #method.remove_item
     pub items: Arc<RefCell<HashMap<String, Box<dyn InventoryItem>>>>,
-    /// Registered inventory monitors. Do not alter this collection manually. Use
-    /// `register_monitor` and `unregister_monitor` methods instead
+    /// Registered inventory monitors.
+    ///
+    /// # Important
+    /// Do not alter this collection manually. Use
+    /// [`register_monitor`] and [`unregister_monitor`] methods instead.
+    ///
+    /// [`register_monitor`]: #method.register_monitor
+    /// [`unregister_monitor`]: #method.unregister_monitor
     pub inventory_monitors: Rc<RefCell<HashMap<usize, Box<dyn InventoryMonitor>>>>,
 
     /// Weight of all inventory items (in grams)

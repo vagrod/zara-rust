@@ -24,7 +24,8 @@ pub trait AgentDuration {
 }
 
 pub trait AgentItems {
-    /// What kinds of inventory items are describing this agent
+    /// What kinds of inventory items are describing this agent. It can be consumable items,
+    /// as well as appliances (like injections or bandages)
     ///
     /// # Examples
     /// ```

@@ -28,9 +28,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// - `frame_time`: time, **in seconds**`, since last `update` call.
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.update(time_delta);
     /// ```

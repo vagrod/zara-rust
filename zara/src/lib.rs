@@ -69,7 +69,6 @@ pub struct ZaraController<E: Listener + 'static> {
 }
 
 impl<E: Listener + 'static> ZaraController<E> {
-
     /// Creates new `ZaraController` without pre-defined environment. You can change environment
     /// parameters later at any time by accessing the `environment` field.
     ///
@@ -82,9 +81,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///     called when Zara event occurs
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara;
     ///
@@ -104,9 +100,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// - `env`: [`EnvironmentC`](crate::zara::utils::EnvironmentC) object that describes initial state of the environment
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// use zara;
     ///
@@ -154,9 +147,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Borrows `inventory.items` collection
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.consume(item_name);
     /// ```
@@ -221,9 +211,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Borrows `inventory.items` collection, can borrow `body.appliances` collection
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.take_appliance(item_name, body_part);
     /// ```
@@ -293,9 +280,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Borrows `body.appliances` collection
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.remove_appliance(item_name, body_part);
     /// ```
@@ -313,9 +297,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Sets controller alive state to `false`
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.declare_dead();
     /// ```
@@ -331,9 +312,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Pause this instance (all `update` calls will be ignored)
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.pause();
     /// ```
@@ -341,9 +319,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Resume this instance (all `update` calls will be working again)
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.resume();
     /// ```
@@ -361,9 +336,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Ok on success
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.put_on_clothes(jacket_name);
     /// ```
@@ -407,9 +379,6 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// Ok on success
     ///
     /// # Examples
-    ///
-    /// Basic usage:
-    ///
     /// ```
     /// person.take_off_clothes(jacket_name);
     /// ```
@@ -439,5 +408,4 @@ impl<E: Listener + 'static> ZaraController<E> {
             }
         }
     }
-
 }

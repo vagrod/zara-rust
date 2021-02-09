@@ -3,10 +3,7 @@ use crate::inventory::items::InventoryItem;
 use crate::error::InventoryItemAccessErr;
 use crate::utils::event::{MessageQueue, Event};
 
-/// Contains code that adds, remove  or update the inventory
-
 impl Inventory {
-
     /// Returns `true` if item of this kind exists in the inventory
     ///
     ///# Parameters
@@ -59,5 +56,4 @@ impl Inventory {
 
         return Err(InventoryItemAccessErr::ItemNotFound)
     }
-
 }

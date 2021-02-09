@@ -11,7 +11,6 @@ use std::collections::HashMap;
 mod fluent;
 
 impl Inventory {
-
     /// Registers crafting combinations (recipes) for this Zara instance
     ///
     /// # Examples

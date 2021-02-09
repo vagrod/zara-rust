@@ -1,7 +1,6 @@
 use crate::health::Health;
 
 impl Health {
-
     /// Is character alive
     pub fn is_alive(&self) -> bool { self.is_alive.get() }
     /// Is player tired (`fatigue_level` more than 70%)
@@ -40,5 +39,4 @@ impl Health {
     pub fn fatigue_level(&self) -> f32 { self.fatigue_level.get() }
     /// Current oxygen level (0..100 percents)
     pub fn oxygen_level(&self) -> f32 { self.oxygen_level.get() }
-
 }

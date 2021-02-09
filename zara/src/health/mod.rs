@@ -39,11 +39,23 @@ pub struct Health {
     pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
     /// Registered medical agents
     pub medical_agents: Arc<MedicalAgentsMonitor>,
-    /// Stores all registered disease monitors. Do not alter this collection manually, use
-    /// `register_disease_monitor` and `unregister_disease_monitor` methods instead
+    /// Stores all registered disease monitors.
+    ///
+    /// # Important
+    /// Do not alter this collection manually. Use
+    /// [`register_disease_monitor`] and [`unregister_disease_monitor`] methods instead.
+    ///
+    /// [`register_disease_monitor`]: #method.register_disease_monitor
+    /// [`unregister_disease_monitor`]: #method.unregister_disease_monitor
     pub disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
-    /// Stores all registered side effects monitors. Do not alter this collection manually, use
-    /// `register_side_effect_monitor` and `unregister_side_effect_monitor` methods instead
+    /// Stores all registered side effects monitors.
+    ///
+    /// # Important
+    /// Do not alter this collection manually. Use
+    /// [`register_side_effect_monitor`] and [`unregister_side_effect_monitor`] methods instead.
+    ///
+    /// [`register_side_effect_monitor`]: #method.register_side_effect_monitor
+    /// [`unregister_side_effect_monitor`]: #method.unregister_side_effect_monitor
     pub side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
 
     // Health state fields

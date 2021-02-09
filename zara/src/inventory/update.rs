@@ -2,10 +2,7 @@ use crate::inventory::Inventory;
 use crate::utils::event::Listener;
 use crate::utils::FrameC;
 
-/// Contains `update` function
-
 impl Inventory {
-
     /// This method is called every `UPDATE_INTERVAL` real seconds
     ///
     /// # Parameters
@@ -16,5 +13,4 @@ impl Inventory {
             monitor.check(&self, &frame.data);
         }
     }
-
 }
