@@ -134,7 +134,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Consumes the item. Item which name is passed must have the
-    /// [`ConsumableBehavior`](crate::zara::inventory::ConsumableBehavior) option present, or
+    /// [`ConsumableDescription`](crate::zara::inventory::ConsumableDescription) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters
@@ -197,7 +197,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Takes an appliance (like bandage or injection). Item which name is passed must have the
-    /// [`ApplianceBehavior`](crate::zara::inventory::ApplianceBehavior) option present, or
+    /// [`ApplianceDescription`](crate::zara::inventory::ApplianceDescription) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters

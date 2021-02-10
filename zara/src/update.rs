@@ -25,7 +25,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// This method should be called every frame.
     ///
     /// # Parameters
-    /// - `frame_time`: time, **in seconds**`, since last `update` call.
+    /// - `frame_time`: time, **in seconds**, since last `update` call.
     ///
     /// # Examples
     /// ```

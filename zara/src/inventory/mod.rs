@@ -137,7 +137,7 @@ impl Inventory {
 
     /// Recalculates the inventory weight. Is called automatically every time inventory
     /// or clothes changes
-    fn recalculate_weight(&self) {
+    pub fn recalculate_weight(&self) {
         let old_weight = self.weight.get();
         let mut new_weight: f32;
 
