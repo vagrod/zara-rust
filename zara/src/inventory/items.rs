@@ -287,7 +287,13 @@ pub struct ConsumableC {
     /// How many percents of water this piece will give
     pub water_gain: f32,
     /// How many percents of food this piece will give
-    pub food_gain: f32
+    pub food_gain: f32,
+    /// Chance of poisoning by eating this fresh (0..100)
+    pub fresh_poisoning_chance: usize,
+    /// Chance of poisoning by eating this spoiled (0..100)
+    pub spoiled_poisoning_chance: usize,
+    /// Time in which this item fully spoils
+    pub spoil_time: Option<GameTimeC>
 }
 impl ConsumableC {
     pub fn new() -> Self {
@@ -297,7 +303,10 @@ impl ConsumableC {
             is_water: false,
             food_gain: 0.,
             water_gain: 0.,
-            consumed_count: 0
+            consumed_count: 0,
+            fresh_poisoning_chance: 0,
+            spoiled_poisoning_chance: 0,
+            spoil_time: None
         }
     }
 }
