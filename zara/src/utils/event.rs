@@ -80,6 +80,7 @@ pub enum Event {
     /// When injury stage death chance is satisfied
     /// # Parameters
     /// - Injury unique name
+    /// - Body part
     DeathFromInjury(String, BodyPart),
 
     /// When disease is spawned or scheduled
@@ -152,7 +153,7 @@ pub enum Event {
     /// # Parameters
     /// - Consumable option description
     ItemConsumed(ConsumableC),
-    /// When appliance is taken (like injection)
+    /// When appliance is taken (like injection or bandage)
     /// # Parameters
     /// - Appliance option description
     /// - Body part
