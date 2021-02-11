@@ -1,6 +1,9 @@
+![Zara Survival Engine](http://imw.su/zaralogo_rust_gh.png)
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vagrod/zara-rust/blob/master/zara/LICENSE)
+
 Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org).
 
-The code is stable.
 
 ![Zara Rust Demo](http://imw.su/zara_rust_008.png)
 
@@ -23,8 +26,5 @@ Zara will be useful for you if you want your game to have weather-aware health c
 - Number of built-in side effects like running effects, underwater effects and such
 
 Saving and restoring engine state is supported: everything except inventory items. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands.
-
-## What's in progress
-- Wiki; preparing for a release
 
 The demo is using `crossterm`.
