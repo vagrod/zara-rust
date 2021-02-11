@@ -170,6 +170,10 @@ impl Health {
     /// Called by zara controller when item is consumed as food or water
     pub(crate) fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC,
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>){
+        // Affect water- and food levels
+        self.food_level.set(crate::utils::clamp(self.food_level.get() + item.food_gain, 0., 100.));
+        self.water_level.set(crate::utils::clamp(self.water_level.get() + item.water_gain, 0., 100.));
+
         // Notify disease monitors
         for (_, monitor) in self.disease_monitors.borrow().iter() {
             monitor.on_consumed(self, game_time, item, inventory_items);

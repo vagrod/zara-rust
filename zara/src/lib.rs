@@ -178,6 +178,8 @@ impl<E: Listener + 'static> ZaraController<E> {
             consumable.name = item.get_name();
             consumable.is_water = c.is_water();
             consumable.is_food = c.is_food();
+            consumable.food_gain = c.food_gain_per_dose();
+            consumable.water_gain = c.water_gain_per_dose();
             consumable.consumed_count = 1; // so far
 
             let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();

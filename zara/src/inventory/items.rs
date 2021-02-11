@@ -283,7 +283,11 @@ pub struct ConsumableC {
     /// Is this consumable a water
     pub is_water: bool,
     /// How many items of this type has been consumed
-    pub consumed_count: usize
+    pub consumed_count: usize,
+    /// How many percents of water this piece will give
+    pub water_gain: f32,
+    /// How many percents of food this piece will give
+    pub food_gain: f32
 }
 impl ConsumableC {
     pub fn new() -> Self {
@@ -291,6 +295,8 @@ impl ConsumableC {
             name: String::new(),
             is_food: false,
             is_water: false,
+            food_gain: 0.,
+            water_gain: 0.,
             consumed_count: 0
         }
     }
