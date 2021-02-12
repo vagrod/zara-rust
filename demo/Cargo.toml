@@ -4,17 +4,15 @@ version = "0.1.0"
 authors = ["Vadim Gromov <zara-survival@imw.su>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-# If you are building Zara lib separately, comment this lib
-[lib]
-crate-type = ["lib"]
-name="zara"
-bench = false
-path="../zara/src/lib.rs"
+# If you want to use Zara from local lib, uncomment this
+# [lib]
+# crate-type = ["lib"]
+# name="zara"
+# bench = false
+# path="../zara/src/lib.rs"
 
 [dependencies]
-# If you want to use sources instead of lib, uncomment this line and comment out "rand" dependency
-# zara = { path = "../zara" }
+# If you want to use local Zara lib, comment this crate
+zara = "1.0.1"
 rand = "0.8.2"
 crossterm = "0.18"
