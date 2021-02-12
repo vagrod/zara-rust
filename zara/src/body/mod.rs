@@ -7,6 +7,8 @@ use std::cell::{Cell, RefCell, RefMut};
 use std::time::Duration;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 mod status_methods;
 mod body_appliance;
@@ -62,12 +64,23 @@ struct ClothesItemC {
 }
 
 /// Body appliance data
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct BodyAppliance {
     /// Unique name of an appliance inventory item
     pub item_name: String,
     /// Body part where this appliance is located
     pub body_part: BodyPart
+}
+impl fmt::Display for BodyAppliance {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({} on {})", self.item_name, self.body_part)
+    }
+}
+impl Hash for BodyAppliance {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.item_name.hash(state);
+        self.body_part.hash(state);
+    }
 }
 
 /// Used to describe a new clothes group. Use `start` method to begin.
@@ -136,6 +149,17 @@ pub enum BodyPart {
     LeftFoot = 23,
     RightFoot = 24,
     Back = 25
+}
+
+impl Default for BodyPart {
+    fn default() -> Self {
+        BodyPart::Unknown
+    }
+}
+impl fmt::Display for BodyPart {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 impl Body {

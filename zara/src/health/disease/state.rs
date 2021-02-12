@@ -7,7 +7,11 @@ use std::time::Duration;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::cell::{RefCell, Cell};
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
+#[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
     pub level: StageLevel,
     pub self_heal_chance: Option<usize>,
@@ -23,7 +27,61 @@ pub struct StageDescriptionStateContract {
     pub target_water_drain: f32,
     pub target_stamina_drain: f32
 }
+impl fmt::Display for StageDescriptionStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Stage description state ({})", self.level)
+    }
+}
+impl Ord for StageDescriptionStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.level.cmp(&other.level)
+    }
+}
+impl PartialOrd for StageDescriptionStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for StageDescriptionStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
 
+        self.level == other.level &&
+        self.self_heal_chance == other.self_heal_chance &&
+        self.chance_of_death == other.chance_of_death &&
+        self.is_endless == other.is_endless &&
+        f32::abs(self.reaches_peak_in_hours - other.reaches_peak_in_hours) < EPS &&
+        f32::abs(self.target_body_temp - other.target_body_temp) < EPS &&
+        f32::abs(self.target_heart_rate - other.target_heart_rate) < EPS &&
+        f32::abs(self.target_pressure_top - other.target_pressure_top) < EPS &&
+        f32::abs(self.target_pressure_bottom - other.target_pressure_bottom) < EPS &&
+        f32::abs(self.target_fatigue_delta - other.target_fatigue_delta) < EPS &&
+        f32::abs(self.target_food_drain - other.target_food_drain) < EPS &&
+        f32::abs(self.target_water_drain - other.target_water_drain) < EPS &&
+        f32::abs(self.target_stamina_drain - other.target_stamina_drain) < EPS
+    }
+}
+impl Eq for StageDescriptionStateContract { }
+impl Hash for StageDescriptionStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_endless.hash(state);
+        self.self_heal_chance.hash(state);
+        self.chance_of_death.hash(state);
+        self.is_endless.hash(state);
+
+        state.write_u32(self.reaches_peak_in_hours as u32);
+        state.write_u32(self.target_body_temp as u32);
+        state.write_u32(self.target_heart_rate as u32);
+        state.write_u32(self.target_pressure_top as u32);
+        state.write_u32(self.target_pressure_bottom as u32);
+        state.write_u32(self.target_fatigue_delta as u32);
+        state.write_u32(self.target_food_drain as u32);
+        state.write_u32(self.target_water_drain as u32);
+        state.write_u32(self.target_stamina_drain as u32);
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveStageStateContract {
     pub key: StageLevel,
     pub info: StageDescriptionStateContract,
@@ -32,6 +90,7 @@ pub struct ActiveStageStateContract {
     pub duration: Duration
 }
 
+#[derive(Clone, Debug, Default)]
 pub struct LerpDataNodeStateContract {
     pub start_time: f32,
     pub end_time: f32,
@@ -46,7 +105,66 @@ pub struct LerpDataNodeStateContract {
     pub is_endless: bool,
     pub is_for_inverted: bool
 }
+impl fmt::Display for LerpDataNodeStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Lerp data node state")
+    }
+}
+impl Ord for LerpDataNodeStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.start_time < other.start_time {
+            return Ordering::Less;
+        }
+        if self.start_time > other.start_time {
+            return Ordering::Greater;
+        }
 
+        Ordering::Equal
+    }
+}
+impl PartialOrd for LerpDataNodeStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for LerpDataNodeStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.is_endless == other.is_endless &&
+        self.is_for_inverted == other.is_for_inverted &&
+        self.body_temp_data == other.body_temp_data &&
+        self.heart_rate_data == other.heart_rate_data &&
+        self.pressure_top_data == other.pressure_top_data &&
+        self.pressure_bottom_data == other.pressure_bottom_data &&
+        self.fatigue_data == other.fatigue_data &&
+        self.stamina_data == other.stamina_data &&
+        self.food_data == other.food_data &&
+        self.water_data == other.water_data &&
+        f32::abs(self.start_time - other.start_time) < EPS &&
+        f32::abs(self.end_time - other.end_time) < EPS
+    }
+}
+impl Eq for LerpDataNodeStateContract { }
+impl Hash for LerpDataNodeStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_endless.hash(state);
+        self.is_for_inverted.hash(state);
+        self.body_temp_data.hash(state);
+        self.heart_rate_data.hash(state);
+        self.pressure_top_data.hash(state);
+        self.pressure_bottom_data.hash(state);
+        self.fatigue_data.hash(state);
+        self.stamina_data.hash(state);
+        self.food_data.hash(state);
+        self.water_data.hash(state);
+
+        state.write_u32(self.start_time as u32);
+        state.write_u32(self.end_time as u32);
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct LerpDataStateContract {
     pub start_time: f32,
     pub end_time: f32,
@@ -55,7 +173,54 @@ pub struct LerpDataStateContract {
     pub duration: f32,
     pub is_endless: bool
 }
+impl fmt::Display for LerpDataStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Lerp data state")
+    }
+}
+impl Ord for LerpDataStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.start_time < other.start_time {
+            return Ordering::Less;
+        }
+        if self.start_time > other.start_time {
+            return Ordering::Greater;
+        }
 
+        Ordering::Equal
+    }
+}
+impl PartialOrd for LerpDataStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for LerpDataStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.is_endless == other.is_endless &&
+        f32::abs(self.start_time - other.start_time) < EPS &&
+        f32::abs(self.end_time - other.end_time) < EPS &&
+        f32::abs(self.start_value - other.start_value) < EPS &&
+        f32::abs(self.end_value - other.end_value) < EPS &&
+        f32::abs(self.duration - other.duration) < EPS
+    }
+}
+impl Eq for LerpDataStateContract { }
+impl Hash for LerpDataStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_endless.hash(state);
+
+        state.write_u32(self.start_time as u32);
+        state.write_u32(self.end_time as u32);
+        state.write_u32(self.start_value as u32);
+        state.write_u32(self.end_value as u32);
+        state.write_u32(self.duration as u32);
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct DiseaseDeltasStateContract {
     pub body_temperature_delta: f32,
     pub heart_rate_delta: f32,
@@ -66,6 +231,40 @@ pub struct DiseaseDeltasStateContract {
     pub oxygen_drain: f32,
     pub food_drain: f32,
     pub water_drain: f32
+}
+impl fmt::Display for DiseaseDeltasStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Disease deltas state")
+    }
+}
+impl Eq for DiseaseDeltasStateContract { }
+impl PartialEq for DiseaseDeltasStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        f32::abs(self.body_temperature_delta - other.body_temperature_delta) < EPS &&
+        f32::abs(self.heart_rate_delta - other.heart_rate_delta) < EPS &&
+        f32::abs(self.pressure_top_delta - other.pressure_top_delta) < EPS &&
+        f32::abs(self.pressure_bottom_delta - other.pressure_bottom_delta) < EPS &&
+        f32::abs(self.fatigue_delta - other.fatigue_delta) < EPS &&
+        f32::abs(self.stamina_drain - other.stamina_drain) < EPS &&
+        f32::abs(self.oxygen_drain - other.oxygen_drain) < EPS &&
+        f32::abs(self.food_drain - other.food_drain) < EPS &&
+        f32::abs(self.water_drain - other.water_drain) < EPS
+    }
+}
+impl Hash for DiseaseDeltasStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u32(self.body_temperature_delta as u32);
+        state.write_u32(self.heart_rate_delta as u32);
+        state.write_u32(self.pressure_top_delta as u32);
+        state.write_u32(self.pressure_bottom_delta as u32);
+        state.write_u32(self.fatigue_delta as u32);
+        state.write_u32(self.stamina_drain as u32);
+        state.write_u32(self.oxygen_drain as u32);
+        state.write_u32(self.food_drain as u32);
+        state.write_u32(self.water_drain as u32);
+    }
 }
 
 impl StageDescription {

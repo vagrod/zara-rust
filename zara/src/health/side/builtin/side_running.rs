@@ -5,7 +5,13 @@ use crate::utils::{FrameSummaryC, clamp_bottom};
 use std::cell::Cell;
 use std::any::Any;
 
-impl RunningSideEffects {
+impl RunningSideEffects
+{
+    /// Creates new `RunningSideEffects` instance.
+    ///
+    /// # Parameters
+    /// - `stamina_drain`: stamina drain when running, 0..100 percents per game second
+    /// - `water_drain`: water level drain speed when running, 0..100 percents per game second
     pub fn new(stamina_drain: f32, water_drain: f32) -> Self {
         RunningSideEffects {
             running_state: Cell::new(false),

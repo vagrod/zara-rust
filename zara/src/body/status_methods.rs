@@ -15,7 +15,7 @@ impl Body {
     pub fn last_sleep_time(&self) -> Option<GameTimeC> {
         match self.last_sleep_time.borrow().as_ref()
         {
-            Some(t) => Some(t.copy()),
+            Some(t) => Some(t.clone()),
             _ => None
         }
     }
@@ -26,7 +26,7 @@ impl Body {
     /// Returns copy of matched clothes group description.
     pub fn clothes_group(&self) -> Option<ClothesGroupC> {
         match self.clothes_group.borrow().as_ref() {
-            Some(g) => Some(g.copy()),
+            Some(g) => Some(g.clone()),
             _ => None
         }
     }

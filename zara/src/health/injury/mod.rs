@@ -10,6 +10,9 @@ use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 use std::any::Any;
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hasher, Hash};
 
 pub(crate) mod state;
 
@@ -190,7 +193,23 @@ pub struct StageDescription {
     /// Target stamina drain for this stage (0..100 percents per game second)
     pub target_stamina_drain: f32
 }
+impl fmt::Display for StageDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.level)
+    }
+}
+impl Hash for StageDescription {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.level.hash(state);
+        self.self_heal_chance.hash(state);
+        self.chance_of_death.hash(state);
+        self.is_endless.hash(state);
 
+        state.write_u32(self.reaches_peak_in_hours as u32);
+        state.write_u32(self.target_blood_drain as u32);
+        state.write_u32(self.target_stamina_drain as u32);
+    }
+}
 impl StageDescription {
     pub fn copy(&self) -> StageDescription {
         StageDescription {
@@ -280,8 +299,8 @@ impl ActiveStage {
     pub fn copy(&self) -> ActiveStage {
         ActiveStage {
             info: self.info.copy(),
-            peak_time: self.peak_time.copy(),
-            start_time: self.start_time.copy(),
+            peak_time: self.peak_time.clone(),
+            start_time: self.start_time.clone(),
             duration: self.duration.clone()
         }
     }
@@ -360,6 +379,39 @@ pub struct ActiveInjury {
 
     // Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+impl fmt::Display for ActiveInjury {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} on {} @{}", self.injury.get_name(), self.body_part, self.activation_time.borrow())
+    }
+}
+impl Ord for ActiveInjury {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.activation_time.borrow().to_duration().cmp(&other.activation_time.borrow().to_duration())
+    }
+}
+impl Eq for ActiveInjury { }
+impl PartialOrd for ActiveInjury {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for ActiveInjury {
+    fn eq(&self, other: &Self) -> bool {
+        self.injury.get_name() == other.injury.get_name() &&
+        self.activation_time == other.activation_time &&
+        self.total_duration == other.total_duration &&
+        self.will_self_heal_on == other.will_self_heal_on
+    }
+}
+impl Hash for ActiveInjury {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.injury.get_name().hash(state);
+        self.injury.get_stages().hash(state);
+        self.activation_time.borrow().hash(state);
+        self.total_duration.hash(state);
+        self.will_self_heal_on.hash(state);
+    }
 }
 impl ActiveInjury {
     /// Creates new active disease object

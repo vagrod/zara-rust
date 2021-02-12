@@ -7,6 +7,11 @@ use std::cell::Cell;
 use std::any::Any;
 
 impl FatigueSideEffects {
+    /// Creates new `FatigueSideEffects` side effects monitor.
+    ///
+    /// # Parameters
+    /// - `hours_until_exhausted`: game hours for player from being fully rested to become
+    ///     extremely exhausted
     pub fn new(hours_until_exhausted: usize) -> Self {
         FatigueSideEffects {
             hours_until_exhausted: Cell::new(hours_until_exhausted)

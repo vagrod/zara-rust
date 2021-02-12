@@ -1,6 +1,8 @@
 use crate::utils::FrameSummaryC;
 
 use std::any::Any;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 pub mod builtin;
 
@@ -32,7 +34,7 @@ pub trait SideEffectsMonitor {
 ///
 /// let result = side::SideEffectDeltasC { body_temp_bonus: 0.05, ..Default::default() };
 /// ```
-#[derive(Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct SideEffectDeltasC {
     /// Delta that will be added to the healthy value (absolute delta)
     pub body_temp_bonus: f32,
@@ -52,4 +54,38 @@ pub struct SideEffectDeltasC {
     pub oxygen_level_bonus: f32,
     /// Delta that will be added to the healthy fatigue value (absolute delta)
     pub fatigue_bonus: f32
+}
+impl fmt::Display for SideEffectDeltasC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Side Effect deltas")
+    }
+}
+impl Eq for SideEffectDeltasC { }
+impl PartialEq for SideEffectDeltasC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        f32::abs(self.body_temp_bonus - other.body_temp_bonus) < EPS &&
+        f32::abs(self.heart_rate_bonus - other.heart_rate_bonus) < EPS &&
+        f32::abs(self.top_pressure_bonus - other.top_pressure_bonus) < EPS &&
+        f32::abs(self.bottom_pressure_bonus - other.bottom_pressure_bonus) < EPS &&
+        f32::abs(self.food_level_bonus - other.food_level_bonus) < EPS &&
+        f32::abs(self.water_level_bonus - other.water_level_bonus) < EPS &&
+        f32::abs(self.stamina_bonus - other.stamina_bonus) < EPS &&
+        f32::abs(self.oxygen_level_bonus - other.oxygen_level_bonus) < EPS &&
+        f32::abs(self.fatigue_bonus - other.fatigue_bonus) < EPS
+    }
+}
+impl Hash for SideEffectDeltasC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u32(self.body_temp_bonus as u32);
+        state.write_u32(self.heart_rate_bonus as u32);
+        state.write_u32(self.top_pressure_bonus as u32);
+        state.write_u32(self.bottom_pressure_bonus as u32);
+        state.write_u32(self.food_level_bonus as u32);
+        state.write_u32(self.water_level_bonus as u32);
+        state.write_u32(self.stamina_bonus as u32);
+        state.write_u32(self.oxygen_level_bonus as u32);
+        state.write_u32(self.fatigue_bonus as u32);
+    }
 }

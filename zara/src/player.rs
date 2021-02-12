@@ -1,6 +1,9 @@
 use std::cell::Cell;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 /// Runtime player game state
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Default)]
 pub struct PlayerStatus {
     /// Is player walking now
     pub is_walking: Cell<bool>,
@@ -11,7 +14,19 @@ pub struct PlayerStatus {
     /// Is player under the water now
     pub is_underwater: Cell<bool>
 }
-
+impl fmt::Display for PlayerStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Player status")
+    }
+}
+impl Hash for PlayerStatus {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_walking.get().hash(state);
+        self.is_running.get().hash(state);
+        self.is_swimming.get().hash(state);
+        self.is_underwater.get().hash(state);
+    }
+}
 impl PlayerStatus {
     /// Creates an empty default player state
     pub fn empty() -> Self {

@@ -5,6 +5,8 @@ use crate::utils::ClothesGroupC;
 use crate::utils::event::{MessageQueue, Event};
 
 use std::collections::HashMap;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 mod warmth;
 mod wetness;
@@ -112,12 +114,18 @@ impl Body {
 }
 
 /// Holds the information about clothes item
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesItem {
     pub name: String,
     pub water_resistance: usize,
     pub cold_resistance: usize
 }
+impl fmt::Display for ClothesItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.name)
+    }
+}
+
 impl ClothesItem {
     pub fn new(name: String, water_resistance: usize, cold_resistance: usize) -> Self {
         ClothesItem {
@@ -129,12 +137,27 @@ impl ClothesItem {
 }
 
 /// Holds the information about clothes group set
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ClothesGroup {
     pub name: String,
     pub items: HashMap<String, ClothesItem>,
     pub bonus_cold_resistance: usize,
     pub bonus_water_resistance: usize
 }
+impl fmt::Display for ClothesGroup {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}: {} items)", self.name, self.items.len())
+    }
+}
+impl Hash for ClothesGroup {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.items.iter().for_each(|(key, _)| key.hash(state));
+        self.bonus_cold_resistance.hash(state);
+        self.bonus_water_resistance.hash(state);
+    }
+}
+
 impl ClothesGroup {
     /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::zara::body::ClothesGroupBuilder) to construct new group.
     pub fn new(name: String, items: Vec<ClothesItem>, bonus_cold_resistance: usize, bonus_water_resistance: usize) -> Self {

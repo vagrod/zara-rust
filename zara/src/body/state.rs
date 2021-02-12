@@ -2,7 +2,10 @@ use crate::body::{Body, BodyPart, BodyAppliance, ClothesItemC};
 use crate::utils::{ClothesGroupC, GameTimeC};
 
 use std::time::Duration;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
+#[derive(Clone, Debug, Default)]
 pub struct BodyStateContract {
     pub clothes: Vec<String>,
     pub appliances: Vec<BodyApplianceStateContract>,
@@ -19,18 +22,67 @@ pub struct BodyStateContract {
     pub cached_player_in_water: bool,
     pub cached_rain_intensity: f32,
 }
+impl fmt::Display for BodyStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Body state")
+    }
+}
+impl Eq for BodyStateContract { }
+impl PartialEq for BodyStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS_32: f32 = 0.0001;
+        const EPS_64: f64 = 0.0001;
 
+        self.clothes == other.clothes &&
+        self.appliances == other.appliances &&
+        self.last_sleep_time == other.last_sleep_time &&
+        self.is_sleeping == other.is_sleeping &&
+        self.clothes_group == other.clothes_group &&
+        self.clothes_data == other.clothes_data &&
+        self.cached_player_in_water == other.cached_player_in_water &&
+        f32::abs(self.last_sleep_duration - other.last_sleep_duration) < EPS_32 &&
+        f32::abs(self.warmth_level - other.warmth_level) < EPS_32 &&
+        f32::abs(self.wetness_level - other.wetness_level) < EPS_32 &&
+        f32::abs(self.cached_world_temp - other.cached_world_temp) < EPS_32 &&
+        f32::abs(self.cached_wind_speed - other.cached_wind_speed) < EPS_32 &&
+        f32::abs(self.cached_rain_intensity - other.cached_rain_intensity) < EPS_32 &&
+        f64::abs(self.sleeping_counter - other.sleeping_counter) < EPS_64
+    }
+}
+impl Hash for BodyStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.clothes.hash(state);
+        self.appliances.hash(state);
+        self.last_sleep_time.hash(state);
+        self.is_sleeping.hash(state);
+        self.clothes_group.hash(state);
+        self.clothes_data.hash(state);
+        self.cached_player_in_water.hash(state);
+
+        state.write_u32(self.last_sleep_duration as u32);
+        state.write_u32(self.warmth_level as u32);
+        state.write_u32(self.wetness_level as u32);
+        state.write_u32(self.cached_world_temp as u32);
+        state.write_u32(self.cached_wind_speed as u32);
+        state.write_u32(self.cached_rain_intensity as u32);
+        state.write_u64(self.sleeping_counter as u64);
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct BodyApplianceStateContract {
     pub item_name: String,
     pub body_part: BodyPart
 }
 
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesGroupStateContract {
     pub name: String,
     pub bonus_cold_resistance: usize,
     pub bonus_water_resistance: usize
 }
 
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesItemStateContract {
     pub key: String,
     pub cold_resistance: usize,

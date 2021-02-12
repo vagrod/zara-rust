@@ -169,7 +169,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Determine last sleep time
         let last_slept =
             match self.body.last_sleep_time().as_ref() {
-                Some(t) => Some(t.copy()),
+                Some(t) => Some(t.clone()),
                 None => { None }
             };
 

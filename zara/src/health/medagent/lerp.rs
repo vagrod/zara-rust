@@ -1,6 +1,7 @@
 use std::cmp::Ordering::Equal;
 use std::cell::RefCell;
 
+#[derive(Default, Debug, Clone)]
 pub struct MultiKeyedLerp {
     segments: Vec<(KeyFrame, KeyFrame)>,
     last_segment: RefCell<Option<(KeyFrame, KeyFrame)>>,
@@ -74,7 +75,7 @@ impl MultiKeyedLerp {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct KeyFrame {
     pub time: f32,
     pub value: f32

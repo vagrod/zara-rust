@@ -2,8 +2,11 @@ use crate::utils::{GameTime, EnvironmentC};
 
 use std::cell::Cell;
 use std::rc::Rc;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 /// Contains runtime environment data and game time
+#[derive(Clone, Default)]
 pub struct EnvironmentData {
     /// Game time for this Zara instance
     pub game_time: Rc<GameTime>,
@@ -15,7 +18,32 @@ pub struct EnvironmentData {
     /// Rain intensity, 0..1
     pub rain_intensity: Cell<f32>
 }
+impl fmt::Display for EnvironmentData {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}, temp {:.1}C, wind {:.1} m/s, rain {:.1}", self.game_time,
+               self.temperature.get(), self.wind_speed.get(), self.rain_intensity.get())
+    }
+}
+impl Eq for EnvironmentData { }
+impl PartialEq for EnvironmentData {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
 
+        self.game_time.to_contract() == other.game_time.to_contract() &&
+        f32::abs(self.temperature.get() - other.temperature.get()) < EPS &&
+        f32::abs(self.wind_speed.get() - other.wind_speed.get()) < EPS &&
+        f32::abs(self.rain_intensity.get() - other.rain_intensity.get()) < EPS
+    }
+}
+impl Hash for EnvironmentData {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.game_time.to_contract().hash(state);
+
+        state.write_u32(self.temperature.get() as u32);
+        state.write_u32(self.wind_speed.get() as u32);
+        state.write_u32(self.rain_intensity.get() as u32);
+    }
+}
 impl EnvironmentData {
     /// Creates new `EnvironmentData`.
     ///

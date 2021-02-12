@@ -14,7 +14,7 @@ impl ActiveDisease {
         let b = self.end_time.borrow();
 
         match b.as_ref() {
-            Some(o) => Some(o.copy()),
+            Some(o) => Some(o.clone()),
             None => None
         }
     }
@@ -22,7 +22,7 @@ impl ActiveDisease {
     /// Gets a copy of active disease stage data for a given time
     pub fn get_active_stage(&self, game_time: &GameTimeC) -> Option<ActiveStage> {
         for (_, stage) in self.stages.borrow().iter() {
-            if stage.is_active(game_time) { return Some(stage.copy()) }
+            if stage.is_active(game_time) { return Some(stage.clone()) }
         }
 
         return None;
@@ -34,12 +34,12 @@ impl ActiveDisease {
     }
 
     /// Returns a copy of a game time structure containing data of when this disease was activated
-    pub fn activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
+    pub fn activation_time(&self) -> GameTimeC { self.activation_time.borrow().clone() }
 
     /// Returns a copy of stage data by its level
     pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
         for (l, stage) in self.stages.borrow().iter() {
-            if level as i32 == *l as i32 { return Some(stage.copy()) }
+            if level as i32 == *l as i32 { return Some(stage.clone()) }
         }
 
         return None;

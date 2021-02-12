@@ -9,8 +9,8 @@ impl UnderwaterSideEffect {
     /// Creates new `UnderwaterSideEffect` instance.
     ///
     /// # Parameters
-    /// - `oxygen_drain`: oxygen drain speed is under water, 0..100 percents per game second
-    /// - `stamina_drain`: stamina drain speed is under water, 0..100 percents per game second
+    /// - `oxygen_drain`: oxygen drain speed when is under water, 0..100 percents per game second
+    /// - `stamina_drain`: stamina drain speed when is under water, 0..100 percents per game second
     pub fn new(oxygen_drain: f32, stamina_drain: f32) -> Self {
         UnderwaterSideEffect {
             oxygen_drain_amount: Cell::new(oxygen_drain),

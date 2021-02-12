@@ -7,6 +7,7 @@ use crate::body::BodyPart;
 use std::sync::{Arc, Weak};
 use std::cell::{RefCell, RefMut};
 use std::collections::BTreeMap;
+use std::fmt;
 
 pub trait MessageQueue {
     fn has_messages(&self) -> bool;
@@ -201,6 +202,11 @@ pub enum Event {
     LowBodyTemperatureDanger,
     /// When character forcibly declared dead
     DeclaredDead
+}
+impl fmt::Display for Event {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 pub trait Listener {

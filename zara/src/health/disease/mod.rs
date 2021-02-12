@@ -10,6 +10,9 @@ use std::cell::{Cell, RefCell, RefMut};
 use std::collections::{BTreeMap, HashMap};
 use std::time::Duration;
 use std::any::Any;
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 pub(crate) mod state;
 
@@ -152,7 +155,7 @@ pub trait DiseaseTreatment {
 }
 
 /// Describes disease stage
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Default)]
 pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
@@ -181,7 +184,29 @@ pub struct StageDescription {
     /// Target stamina drain for this stage (0..100 percents per game second)
     pub target_stamina_drain: f32
 }
+impl fmt::Display for StageDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.level)
+    }
+}
+impl Hash for StageDescription {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.level.hash(state);
+        self.self_heal_chance.hash(state);
+        self.chance_of_death.hash(state);
+        self.is_endless.hash(state);
 
+        state.write_u32(self.reaches_peak_in_hours as u32);
+        state.write_u32(self.target_body_temp as u32);
+        state.write_u32(self.target_heart_rate as u32);
+        state.write_u32(self.target_pressure_top as u32);
+        state.write_u32(self.target_pressure_bottom as u32);
+        state.write_u32(self.target_fatigue_delta as u32);
+        state.write_u32(self.target_stamina_drain as u32);
+        state.write_u32(self.target_food_drain as u32);
+        state.write_u32(self.target_water_drain as u32);
+    }
+}
 impl StageDescription {
     pub fn copy(&self) -> StageDescription {
         StageDescription {
@@ -202,19 +227,8 @@ impl StageDescription {
     }
 }
 
-/// Describes active stages
-pub struct ActiveStage {
-    /// Stage data
-    pub info: StageDescription,
-    /// When this stage should start
-    pub start_time: GameTimeC,
-    /// When this stage reaches its peak
-    pub peak_time: GameTimeC,
-    /// Duration of the stage
-    pub duration: Duration
-}
-
 /// Describes deltas calculated by the active diseases
+#[derive(Copy, Clone, Debug, Default)]
 pub struct DiseaseDeltasC {
     pub body_temperature_delta: f32,
     pub heart_rate_delta: f32,
@@ -226,7 +240,40 @@ pub struct DiseaseDeltasC {
     pub food_drain: f32,
     pub water_drain: f32
 }
+impl fmt::Display for DiseaseDeltasC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Disease deltas")
+    }
+}
+impl Eq for DiseaseDeltasC { }
+impl PartialEq for DiseaseDeltasC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
 
+        f32::abs(self.body_temperature_delta - other.body_temperature_delta) < EPS &&
+        f32::abs(self.heart_rate_delta - other.heart_rate_delta) < EPS &&
+        f32::abs(self.pressure_top_delta - other.pressure_top_delta) < EPS &&
+        f32::abs(self.pressure_bottom_delta - other.pressure_bottom_delta) < EPS &&
+        f32::abs(self.fatigue_delta - other.fatigue_delta) < EPS &&
+        f32::abs(self.stamina_drain - other.stamina_drain) < EPS &&
+        f32::abs(self.oxygen_drain - other.oxygen_drain) < EPS &&
+        f32::abs(self.food_drain - other.food_drain) < EPS &&
+        f32::abs(self.water_drain - other.water_drain) < EPS
+    }
+}
+impl Hash for DiseaseDeltasC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u32(self.body_temperature_delta as u32);
+        state.write_u32(self.heart_rate_delta as u32);
+        state.write_u32(self.pressure_top_delta as u32);
+        state.write_u32(self.pressure_bottom_delta as u32);
+        state.write_u32(self.fatigue_delta as u32);
+        state.write_u32(self.stamina_drain as u32);
+        state.write_u32(self.oxygen_drain as u32);
+        state.write_u32(self.food_drain as u32);
+        state.write_u32(self.water_drain as u32);
+    }
+}
 impl DiseaseDeltasC {
     pub fn empty() -> Self {
         DiseaseDeltasC {
@@ -260,21 +307,52 @@ impl DiseaseDeltasC {
         if self.pressure_top_delta < -900. { self.pressure_top_delta = 0.; }
         if self.pressure_bottom_delta < -900. { self.pressure_bottom_delta = 0.; }
     }
-    pub fn copy(&self) -> DiseaseDeltasC {
-        DiseaseDeltasC {
-            body_temperature_delta: self.body_temperature_delta,
-            heart_rate_delta: self.heart_rate_delta,
-            pressure_top_delta: self.pressure_top_delta,
-            pressure_bottom_delta: self.pressure_bottom_delta,
-            fatigue_delta: self.fatigue_delta,
-            stamina_drain: self.stamina_drain,
-            food_drain: self.food_drain,
-            water_drain: self.water_drain,
-            oxygen_drain: self.oxygen_drain
-        }
-    }
 }
 
+/// Describes active stages
+#[derive(Copy, Clone, Debug, Default)]
+pub struct ActiveStage {
+    /// Stage data
+    pub info: StageDescription,
+    /// When this stage should start
+    pub start_time: GameTimeC,
+    /// When this stage reaches its peak
+    pub peak_time: GameTimeC,
+    /// Duration of the stage
+    pub duration: Duration
+}
+impl fmt::Display for ActiveStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} starts at {}", self.info, self.start_time)
+    }
+}
+impl Ord for ActiveStage {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.start_time.to_duration().cmp(&other.start_time.to_duration())
+    }
+}
+impl Eq for ActiveStage { }
+impl PartialOrd for ActiveStage {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for ActiveStage {
+    fn eq(&self, other: &Self) -> bool {
+        self.info == other.info &&
+        self.start_time == other.start_time &&
+        self.peak_time == other.peak_time &&
+        self.duration == other.duration
+    }
+}
+impl Hash for ActiveStage {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.info.hash(state);
+        self.start_time.hash(state);
+        self.peak_time.hash(state);
+        self.duration.hash(state);
+    }
+}
 impl ActiveStage {
     /// Checks if stage is active for a given time
     pub fn is_active(&self, game_time: &GameTimeC) -> bool {
@@ -306,15 +384,6 @@ impl ActiveStage {
         let gt_d = gt - start;
 
         return ((gt_d/d) * 100.) as usize;
-    }
-
-    pub fn copy(&self) -> ActiveStage {
-        ActiveStage {
-            info: self.info.copy(),
-            peak_time: self.peak_time.copy(),
-            start_time: self.start_time.copy(),
-            duration: self.duration.clone()
-        }
     }
 }
 
@@ -425,6 +494,39 @@ pub struct ActiveDisease {
 
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+impl fmt::Display for ActiveDisease {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} @{}", self.disease.get_name(), self.activation_time.borrow())
+    }
+}
+impl Ord for ActiveDisease {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.activation_time.borrow().to_duration().cmp(&other.activation_time.borrow().to_duration())
+    }
+}
+impl Eq for ActiveDisease { }
+impl PartialOrd for ActiveDisease {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for ActiveDisease {
+    fn eq(&self, other: &Self) -> bool {
+        self.disease.get_name() == other.disease.get_name() &&
+        self.activation_time == other.activation_time &&
+        self.total_duration == other.total_duration &&
+        self.will_self_heal_on == other.will_self_heal_on
+    }
+}
+impl Hash for ActiveDisease {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.disease.get_name().hash(state);
+        self.disease.get_stages().hash(state);
+        self.activation_time.borrow().hash(state);
+        self.total_duration.hash(state);
+        self.will_self_heal_on.hash(state);
+    }
 }
 impl ActiveDisease {
     /// Creates new active disease object

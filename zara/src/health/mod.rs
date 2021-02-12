@@ -13,6 +13,8 @@ use std::cell::{RefCell, Cell, RefMut};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::convert::TryFrom;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 mod update;
 mod status_methods;
@@ -94,15 +96,33 @@ pub struct InjuryKey {
     pub injury: String,
     pub body_part: BodyPart
 }
+impl fmt::Display for InjuryKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} on {}", self.injury, self.body_part)
+    }
+}
 
 /// Disease or injury stage level of seriousness
-#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum StageLevel {
     Undefined = -1,
     InitialStage = 1,
     Progressing = 2,
     Worrying = 3,
     Critical = 4
+}
+impl Default for StageLevel {
+    fn default() -> Self { StageLevel::Undefined }
+}
+impl Hash for StageLevel {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_usize(*self as usize);
+    }
+}
+impl fmt::Display for StageLevel {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 impl TryFrom<i32> for StageLevel {
     type Error = ();

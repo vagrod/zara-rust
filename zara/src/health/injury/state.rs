@@ -7,7 +7,11 @@ use std::time::Duration;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 use std::cell::{RefCell, Cell};
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
+#[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
     pub level: StageLevel,
     pub self_heal_chance: Option<usize>,
@@ -17,7 +21,49 @@ pub struct StageDescriptionStateContract {
     pub target_blood_drain: f32,
     pub target_stamina_drain: f32
 }
+impl fmt::Display for StageDescriptionStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.level)
+    }
+}
+impl Ord for StageDescriptionStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.level.cmp(&other.level)
+    }
+}
+impl Eq for StageDescriptionStateContract { }
+impl PartialOrd for StageDescriptionStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for StageDescriptionStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
 
+        self.level == other.level &&
+        self.self_heal_chance == other.self_heal_chance &&
+        self.chance_of_death == other.chance_of_death &&
+        self.is_endless == other.is_endless &&
+        f32::abs(self.reaches_peak_in_hours - other.reaches_peak_in_hours) < EPS &&
+        f32::abs(self.target_blood_drain - other.target_blood_drain) < EPS &&
+        f32::abs(self.target_stamina_drain - other.target_stamina_drain) < EPS
+    }
+}
+impl Hash for StageDescriptionStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.level.hash(state);
+        self.self_heal_chance.hash(state);
+        self.chance_of_death.hash(state);
+        self.is_endless.hash(state);
+
+        state.write_u32(self.reaches_peak_in_hours as u32);
+        state.write_u32(self.target_blood_drain as u32);
+        state.write_u32(self.target_stamina_drain as u32);
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveStageStateContract {
     pub key: StageLevel,
     pub info: StageDescriptionStateContract,
@@ -26,6 +72,7 @@ pub struct ActiveStageStateContract {
     pub duration: Duration
 }
 
+#[derive(Clone, Debug, Default)]
 pub struct LerpDataNodeStateContract {
     pub start_time: f32,
     pub end_time: f32,
@@ -34,7 +81,54 @@ pub struct LerpDataNodeStateContract {
     pub is_endless: bool,
     pub is_for_inverted: bool
 }
+impl fmt::Display for LerpDataNodeStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} - {}", self.start_time, self.end_time)
+    }
+}
+impl Ord for LerpDataNodeStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.start_time < other.start_time {
+            return Ordering::Less;
+        }
+        if self.start_time > other.start_time {
+            return Ordering::Greater;
+        }
 
+        Ordering::Equal
+    }
+}
+impl Eq for LerpDataNodeStateContract { }
+impl PartialOrd for LerpDataNodeStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for LerpDataNodeStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.stamina_data == other.stamina_data &&
+        self.blood_data == other.blood_data &&
+        self.is_for_inverted == other.is_for_inverted &&
+        self.is_endless == other.is_endless &&
+        f32::abs(self.start_time - other.start_time) < EPS &&
+        f32::abs(self.end_time - other.end_time) < EPS
+    }
+}
+impl Hash for LerpDataNodeStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.stamina_data.hash(state);
+        self.blood_data.hash(state);
+        self.is_for_inverted.hash(state);
+        self.is_endless.hash(state);
+
+        state.write_u32(self.start_time as u32);
+        state.write_u32(self.end_time as u32);
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct LerpDataStateContract {
     pub start_time: f32,
     pub end_time: f32,
@@ -43,10 +137,77 @@ pub struct LerpDataStateContract {
     pub duration: f32,
     pub is_endless: bool
 }
+impl fmt::Display for LerpDataStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{} - {}:{}", self.start_time, self.start_value, self.end_time, self.end_value)
+    }
+}
+impl Ord for LerpDataStateContract {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.start_time < other.start_time {
+            return Ordering::Less;
+        }
+        if self.start_time > other.start_time {
+            return Ordering::Greater;
+        }
 
+        Ordering::Equal
+    }
+}
+impl Eq for LerpDataStateContract { }
+impl PartialOrd for LerpDataStateContract {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for LerpDataStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.is_endless == other.is_endless &&
+        f32::abs(self.start_time - other.start_time) < EPS &&
+        f32::abs(self.end_time - other.end_time) < EPS &&
+        f32::abs(self.start_value - other.start_value) < EPS &&
+        f32::abs(self.end_value - other.end_value) < EPS &&
+        f32::abs(self.duration - other.duration) < EPS
+    }
+}
+impl Hash for LerpDataStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_endless.hash(state);
+
+        state.write_u32(self.start_time as u32);
+        state.write_u32(self.end_time as u32);
+        state.write_u32(self.start_value as u32);
+        state.write_u32(self.end_value as u32);
+        state.write_u32(self.duration as u32);
+    }
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct InjuryDeltasStateContract {
     pub stamina_drain: f32,
     pub blood_drain: f32
+}
+impl fmt::Display for InjuryDeltasStateContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "stamina drain {:.4}, blood drain {:.4}", self.stamina_drain, self.blood_drain)
+    }
+}
+impl Eq for InjuryDeltasStateContract { }
+impl PartialEq for InjuryDeltasStateContract {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        f32::abs(self.stamina_drain - other.stamina_drain) < EPS &&
+        f32::abs(self.blood_drain - other.blood_drain) < EPS
+    }
+}
+impl Hash for InjuryDeltasStateContract {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u32(self.stamina_drain as u32);
+        state.write_u32(self.blood_drain as u32);
+    }
 }
 
 impl StageDescription {

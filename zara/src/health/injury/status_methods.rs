@@ -14,7 +14,7 @@ impl ActiveInjury {
         let b = self.end_time.borrow();
 
         match b.as_ref() {
-            Some(o) => Some(o.copy()),
+            Some(o) => Some(o.clone()),
             None => None
         }
     }
@@ -34,7 +34,7 @@ impl ActiveInjury {
     }
 
     /// Returns a copy of a game time structure containing data of when this injury was activated
-    pub fn activation_time(&self) -> GameTimeC { self.activation_time.borrow().copy() }
+    pub fn activation_time(&self) -> GameTimeC { self.activation_time.borrow().clone() }
 
     /// Returns a copy of stage data by its level
     pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {

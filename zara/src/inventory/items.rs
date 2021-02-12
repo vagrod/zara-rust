@@ -1,6 +1,9 @@
 use crate::utils::GameTimeC;
 
 use std::any::Any;
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 /// Macro for declaring a simple inventory item with particular weight
 ///
@@ -295,6 +298,51 @@ pub struct ConsumableC {
     /// Time in which this item fully spoils
     pub spoil_time: Option<GameTimeC>
 }
+impl fmt::Display for ConsumableC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+impl Ord for ConsumableC {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.consumed_count.cmp(&other.consumed_count)
+    }
+}
+impl Eq for ConsumableC { }
+impl PartialOrd for ConsumableC {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for ConsumableC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.name == other.name &&
+        self.is_food == other.is_food &&
+        self.is_water == other.is_water &&
+        self.consumed_count == other.consumed_count &&
+        self.fresh_poisoning_chance == other.fresh_poisoning_chance &&
+        self.spoiled_poisoning_chance == other.spoiled_poisoning_chance &&
+        self.spoil_time == other.spoil_time &&
+        f32::abs(self.water_gain - other.water_gain) < EPS &&
+        f32::abs(self.food_gain - other.food_gain) < EPS
+    }
+}
+impl Hash for ConsumableC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.is_food.hash(state);
+        self.is_water.hash(state);
+        self.consumed_count.hash(state);
+        self.fresh_poisoning_chance.hash(state);
+        self.spoiled_poisoning_chance.hash(state);
+        self.spoil_time.hash(state);
+
+        state.write_u32(self.food_gain as u32);
+        state.write_u32(self.water_gain as u32);
+    }
+}
 impl ConsumableC {
     pub fn new() -> Self {
         ConsumableC {
@@ -322,6 +370,38 @@ pub struct ApplianceC {
     pub is_injection: bool,
     /// How many of these items has been applied
     pub taken_count: usize
+}
+impl fmt::Display for ApplianceC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+impl Ord for ApplianceC {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.taken_count.cmp(&other.taken_count)
+    }
+}
+impl Eq for ApplianceC { }
+impl PartialOrd for ApplianceC {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for ApplianceC {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name &&
+        self.is_body_appliance == other.is_body_appliance &&
+        self.is_injection == other.is_injection &&
+        self.taken_count == other.taken_count
+    }
+}
+impl Hash for ApplianceC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.is_body_appliance.hash(state);
+        self.is_injection.hash(state);
+        self.taken_count.hash(state);
+    }
 }
 impl ApplianceC {
     pub fn new() -> Self {

@@ -7,6 +7,8 @@ use crate::utils::event::{MessageQueue, Event};
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt;
+use std::fmt::Debug;
 
 mod fluent;
 
@@ -151,13 +153,18 @@ impl Inventory {
 }
 
 /// Describes item in combination
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ItemInCombination {
     /// Unique name of the item kind
     pub item_name: String,
     /// Count of items needed
     pub count: usize
 }
-
+impl fmt::Display for ItemInCombination {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} of {}", self.count, self.item_name)
+    }
+}
 impl ItemInCombination {
     /// Creates new `ItemInCombination`.
     ///
@@ -193,7 +200,21 @@ pub struct CraftingCombination {
     /// Function to instantiate the resulted item (hello reflection :)
     create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>
 }
-
+impl Debug for CraftingCombination {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("CraftingCombination")
+            .field("unique_key", &self.unique_key)
+            .field("match_key", &self.match_key)
+            .field("result_item", &self.result_item)
+            .field("items", &self.items)
+            .finish()
+    }
+}
+impl fmt::Display for CraftingCombination {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Combination for {} ({} items). id={}", self.result_item, self.items.borrow().len(), self.unique_key)
+    }
+}
 impl CraftingCombination {
     pub fn new(result_item: String, items: Vec<ItemInCombination>,
                create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {

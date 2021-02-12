@@ -7,6 +7,9 @@ use rand::Rng;
 
 use event::{Dispatcher, Listener};
 use core::ops;
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 pub mod event;
 
@@ -41,6 +44,7 @@ pub struct FrameSummaryC {
 /// - `minute`: day of game time (whole number)
 /// - `second`: day of game time (with floating point)
 /// - `duration`: `Duration` that corresponds to the above values
+#[derive(Default)]
 pub struct GameTime {
     /// Day of the game time (whole number)
     pub day : Cell<u64>,
@@ -53,7 +57,11 @@ pub struct GameTime {
     /// `Duration` that corresponds to the values contained in other fields
     pub duration: Cell<Duration>
 }
-
+impl fmt::Display for GameTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}d {}h {}m {:.1}s", self.day.get(), self.hour.get(), self.minute.get(), self.second.get())
+    }
+}
 impl GameTime {
     /// Creates new zero game time.
     ///
@@ -196,14 +204,48 @@ impl GameTime {
 }
 
 /// Structure for storing simple game time slice
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct GameTimeC {
     pub day: u64,
     pub hour: u64,
     pub minute: u64,
     pub second: f64
 }
+impl Ord for GameTimeC {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.to_duration().cmp(&other.to_duration())
+    }
+}
+impl Eq for GameTimeC { }
+impl PartialOrd for GameTimeC {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for GameTimeC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f64 = 0.0001;
 
+        self.day == other.day &&
+        self.hour == other.hour &&
+        self.minute == other.minute &&
+        f64::abs(self.second - other.second) < EPS
+    }
+}
+impl fmt::Display for GameTimeC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}d {}h {}m {:.1}s)", self.day, self.hour, self.minute, self.second)
+    }
+}
+impl Hash for GameTimeC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.day.hash(state);
+        self.hour.hash(state);
+        self.minute.hash(state);
+
+        state.write_u32(self.second as u32);
+    }
+}
 impl GameTimeC {
     pub fn empty() -> Self {
         GameTimeC {
@@ -247,16 +289,6 @@ impl GameTimeC {
     pub fn from_duration(d: Duration) -> Self {
         GameTime::from_duration(d).to_contract()
     }
-
-    /// Creates a copy of `GameTimeC`
-    pub fn copy(&self) -> GameTimeC {
-        GameTimeC {
-            day: self.day,
-            hour: self.hour,
-            minute: self.minute,
-            second: self.second
-        }
-    }
 }
 
 impl ops::Add<GameTimeC> for GameTimeC {
@@ -279,18 +311,15 @@ impl ops::Sub<GameTimeC> for GameTimeC {
     }
 }
 
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesGroupC {
     pub name: String,
     pub bonus_cold_resistance: usize,
     pub bonus_water_resistance: usize
 }
-impl ClothesGroupC {
-    pub fn copy(&self) -> ClothesGroupC {
-        ClothesGroupC {
-            name: self.name.to_string(),
-            bonus_water_resistance: self.bonus_water_resistance,
-            bonus_cold_resistance: self.bonus_cold_resistance
-        }
+impl fmt::Display for ClothesGroupC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.name)
     }
 }
 
@@ -341,6 +370,7 @@ impl HealthC {
 }
 
 /// Structure for storing active disease snapshot
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveDiseaseC {
     pub name: String,
     pub scheduled_time: GameTimeC,
@@ -351,8 +381,14 @@ pub struct ActiveDiseaseC {
     pub is_healing: bool,
     pub needs_treatment: bool
 }
+impl fmt::Display for ActiveDiseaseC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} @{}", self.name, self.scheduled_time)
+    }
+}
 
 /// Structure for storing active injury snapshot
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveInjuryC {
     pub name: String,
     pub scheduled_time: GameTimeC,
@@ -366,8 +402,14 @@ pub struct ActiveInjuryC {
     pub body_part: BodyPart,
     pub is_fracture: bool
 }
+impl fmt::Display for ActiveInjuryC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} on {} @{}", self.name, self.body_part, self.scheduled_time)
+    }
+}
 
 /// Describes initial environment information
+#[derive(Clone, Debug, Default)]
 pub struct EnvironmentC {
     /// Wind speed value (m/s)
     pub wind_speed: f32,
@@ -376,7 +418,28 @@ pub struct EnvironmentC {
     /// Rain intensity, 0..1
     pub rain_intensity : f32
 }
+impl fmt::Display for EnvironmentC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "temp {:.1}C, wind {:.1}, rain {:.1}m/s", self.temperature, self.wind_speed, self.rain_intensity)
+    }
+}
+impl Eq for EnvironmentC { }
+impl PartialEq for EnvironmentC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
 
+        f32::abs(self.wind_speed - other.wind_speed) < EPS &&
+        f32::abs(self.temperature - other.temperature) < EPS &&
+        f32::abs(self.rain_intensity - other.rain_intensity) < EPS
+    }
+}
+impl Hash for EnvironmentC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u32(self.temperature as u32);
+        state.write_u32(self.wind_speed as u32);
+        state.write_u32(self.rain_intensity as u32);
+    }
+}
 impl EnvironmentC {
     /// Creates new environment description object.
     ///
@@ -421,6 +484,7 @@ impl EnvironmentC {
 }
 
 /// Describes a snapshot of the player state for a single frame
+#[derive(Clone, Debug, Default)]
 pub struct PlayerStatusC {
     pub is_walking: bool,
     pub is_running: bool,
@@ -437,6 +501,53 @@ pub struct PlayerStatusC {
     pub total_water_resistance: usize,
     pub total_cold_resistance: usize,
     pub inventory_weight: f32
+}
+impl fmt::Display for PlayerStatusC {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Player status")
+    }
+}
+impl Eq for PlayerStatusC { }
+impl PartialEq for PlayerStatusC {
+    fn eq(&self, other: &Self) -> bool {
+        const EPS: f32 = 0.0001;
+
+        self.is_walking == other.is_walking &&
+        self.is_running == other.is_running &&
+        self.is_swimming == other.is_swimming &&
+        self.is_underwater == other.is_underwater &&
+        self.is_sleeping == other.is_sleeping &&
+        self.last_slept == other.last_slept &&
+        self.clothes == other.clothes &&
+        self.appliances == other.appliances &&
+        self.clothes_group == other.clothes_group &&
+        self.total_water_resistance == other.total_water_resistance &&
+        self.total_cold_resistance == other.total_cold_resistance &&
+        f32::abs(self.last_slept_duration - other.last_slept_duration) < EPS &&
+        f32::abs(self.warmth_level - other.warmth_level) < EPS &&
+        f32::abs(self.wetness_level - other.wetness_level) < EPS &&
+        f32::abs(self.inventory_weight - other.inventory_weight) < EPS
+    }
+}
+impl Hash for PlayerStatusC {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.is_walking.hash(state);
+        self.is_running.hash(state);
+        self.is_swimming.hash(state);
+        self.is_underwater.hash(state);
+        self.is_sleeping.hash(state);
+        self.last_slept.hash(state);
+        self.clothes.hash(state);
+        self.appliances.hash(state);
+        self.clothes_group.hash(state);
+        self.total_water_resistance.hash(state);
+        self.total_cold_resistance.hash(state);
+
+        state.write_u32(self.last_slept_duration as u32);
+        state.write_u32(self.warmth_level as u32);
+        state.write_u32(self.wetness_level as u32);
+        state.write_u32(self.inventory_weight as u32);
+    }
 }
 
 /// Classic linear lerp
@@ -466,7 +577,7 @@ pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
     return value;
 }
 
-/// Clamps ceiling
+/// Clamps floor
 pub fn clamp_bottom(value: f32, floor: f32) -> f32 {
     if value < floor {
         return floor;

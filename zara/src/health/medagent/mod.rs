@@ -8,6 +8,9 @@ use std::collections::{HashMap, BTreeMap};
 use std::cell::{Cell, RefCell, RefMut};
 use std::sync::Arc;
 use std::time::Duration;
+use std::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hasher, Hash};
 
 mod lerp;
 
@@ -23,6 +26,16 @@ pub enum CurveType {
     MostActiveInSecondHalf,
     /// Will be activating linearly
     Linearly
+}
+impl fmt::Display for CurveType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+impl Default for CurveType {
+    fn default() -> Self {
+        CurveType::Linearly
+    }
 }
 
 impl Health {
@@ -57,10 +70,15 @@ impl Health {
     }
 }
 
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct MedicalAgentGroup {
     items: Vec<String>
 }
-
+impl fmt::Display for MedicalAgentGroup {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} items", self.items.len())
+    }
+}
 impl MedicalAgentGroup {
     pub fn new(items: Vec<String>) -> Self {
         MedicalAgentGroup {
@@ -76,6 +94,7 @@ struct AgentDoseKey {
     pub timestamp: i32
 }
 
+#[derive(Default, Debug, Clone)]
 struct AgentDose {
     pub lerp: MultiKeyedLerp,
     pub start_time: f32,
@@ -95,10 +114,16 @@ impl AgentUpdateResult {
     }
 }
 
+/// Describes medical agent
+#[derive(Clone, Debug, Default)]
 pub struct MedicalAgent {
+    /// Unique name of a medical agent
     pub name: String,
+    /// Group of items associated with this agent
     pub group: MedicalAgentGroup,
+    /// Type of activation curve
     pub activation_curve: CurveType,
+    /// Duration of a single dose, in game minutes
     pub duration_minutes: f32,
 
     // Private fields
@@ -111,7 +136,46 @@ pub struct MedicalAgent {
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
 }
+impl fmt::Display for MedicalAgent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({})", self.name, self.group)
+    }
+}
+impl Ord for MedicalAgent {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.duration_minutes < other.duration_minutes{
+            return Ordering::Less;
+        }
+        if self.duration_minutes > other.duration_minutes{
+            return Ordering::Greater;
+        }
 
+        Ordering::Equal
+    }
+}
+impl Eq for MedicalAgent { }
+impl PartialOrd for MedicalAgent {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl PartialEq for MedicalAgent {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name &&
+        self.activation_curve == other.activation_curve &&
+        self.duration_minutes == other.duration_minutes &&
+        self.group == other.group
+    }
+}
+impl Hash for MedicalAgent {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.activation_curve.hash(state);
+        self.group.hash(state);
+
+        state.write_u32(self.duration_minutes as u32);
+    }
+}
 impl MedicalAgent {
     pub fn new(name: String, activation_curve: CurveType, duration_minutes: f32, group: MedicalAgentGroup) -> Self {
         MedicalAgent {
@@ -229,7 +293,7 @@ impl MedicalAgent {
     /// Returns time when the last dose for this agent was taken
     pub fn last_dose_end_time(&self) -> Option<GameTimeC> {
         match self.last_dose_end_time.borrow().as_ref() {
-            Some(t) => Some(t.copy()),
+            Some(t) => Some(t.clone()),
             _ => None
         }
     }
@@ -280,6 +344,11 @@ pub struct MedicalAgentsMonitor {
 
     /// Messages queued for sending on the next frame
     message_queue: RefCell<BTreeMap<usize, Event>>
+}
+impl fmt::Display for MedicalAgentsMonitor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Agents: {}, active: {}", self.agents.borrow().len(), self.active_count.get())
+    }
 }
 impl MedicalAgentsMonitor {
     pub fn new() -> Self {

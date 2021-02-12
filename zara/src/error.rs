@@ -175,6 +175,7 @@ pub(crate) enum RequestClothesOffErr {
     ItemIsNotOn
 }
 
+/// Is used by `declare_dead` method
 pub enum DeclareDeadErr {
     /// When controller is paused
     InstancePaused
