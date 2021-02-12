@@ -76,7 +76,7 @@ pub struct MedicalAgentGroup {
 }
 impl fmt::Display for MedicalAgentGroup {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} items", self.items.len())
+        write!(f, "Medagent group: {} items", self.items.len())
     }
 }
 impl MedicalAgentGroup {

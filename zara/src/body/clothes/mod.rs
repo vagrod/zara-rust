@@ -122,7 +122,7 @@ pub struct ClothesItem {
 }
 impl fmt::Display for ClothesItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.name)
+        write!(f, "{}", self.name)
     }
 }
 
@@ -146,7 +146,7 @@ pub struct ClothesGroup {
 }
 impl fmt::Display for ClothesGroup {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}: {} items)", self.name, self.items.len())
+        write!(f, "{}: {} items", self.name, self.items.len())
     }
 }
 impl Hash for ClothesGroup {

@@ -73,7 +73,7 @@ pub struct BodyAppliance {
 }
 impl fmt::Display for BodyAppliance {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({} on {})", self.item_name, self.body_part)
+        write!(f, "{} on {}", self.item_name, self.body_part)
     }
 }
 impl Hash for BodyAppliance {

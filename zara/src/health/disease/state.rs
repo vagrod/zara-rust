@@ -29,7 +29,7 @@ pub struct StageDescriptionStateContract {
 }
 impl fmt::Display for StageDescriptionStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Stage description state ({})", self.level)
+        write!(f, "Stage description state ({}, {:.1}h duration)", self.level, self.reaches_peak_in_hours)
     }
 }
 impl Ord for StageDescriptionStateContract {
@@ -107,7 +107,7 @@ pub struct LerpDataNodeStateContract {
 }
 impl fmt::Display for LerpDataNodeStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Lerp data node state")
+        write!(f, "Lerp node from {:.0} to {:.0} game secs", self.start_time, self.end_time)
     }
 }
 impl Ord for LerpDataNodeStateContract {
@@ -175,7 +175,7 @@ pub struct LerpDataStateContract {
 }
 impl fmt::Display for LerpDataStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Lerp data state")
+        write!(f, "Lerp from {:.0} to {:.0} game secs", self.start_time, self.end_time)
     }
 }
 impl Ord for LerpDataStateContract {

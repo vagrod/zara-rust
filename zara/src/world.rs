@@ -20,7 +20,7 @@ pub struct EnvironmentData {
 }
 impl fmt::Display for EnvironmentData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}, temp {:.1}C, wind {:.1} m/s, rain {:.1}", self.game_time,
+        write!(f, "World: {}, temp {:.1}C, wind {:.1} m/s, rain {:.1}", self.game_time,
                self.temperature.get(), self.wind_speed.get(), self.rain_intensity.get())
     }
 }

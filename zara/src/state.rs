@@ -32,7 +32,7 @@ pub struct ZaraControllerStateContract {
 }
 impl fmt::Display for ZaraControllerStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Zara state @{} game secs", self.environment.game_time.as_secs_f32())
+        write!(f, "Zara core state @{} game secs", self.environment.game_time.as_secs_f32())
     }
 }
 impl Ord for ZaraControllerStateContract {

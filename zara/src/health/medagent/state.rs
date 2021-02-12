@@ -72,7 +72,7 @@ pub struct AgentDoseStateContract {
 }
 impl fmt::Display for AgentDoseStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Agent dose state @{}", self.timestamp)
+        write!(f, "{} dose state @{}", self.item, self.timestamp)
     }
 }
 impl Ord for AgentDoseStateContract {

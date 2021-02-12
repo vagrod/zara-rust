@@ -300,7 +300,7 @@ pub struct ConsumableC {
 }
 impl fmt::Display for ConsumableC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.name)
+        write!(f, "{} [{}]", self.name, self.consumed_count)
     }
 }
 impl Ord for ConsumableC {
@@ -373,7 +373,7 @@ pub struct ApplianceC {
 }
 impl fmt::Display for ApplianceC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.name)
+        write!(f, "{} [{}]", self.name, self.taken_count)
     }
 }
 impl Ord for ApplianceC {

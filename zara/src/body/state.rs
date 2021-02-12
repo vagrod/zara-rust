@@ -24,7 +24,7 @@ pub struct BodyStateContract {
 }
 impl fmt::Display for BodyStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Body state")
+        write!(f, "Body state ({} clothes, {} appliances)", self.clothes.len(), self.appliances.len())
     }
 }
 impl Eq for BodyStateContract { }

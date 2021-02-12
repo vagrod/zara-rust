@@ -10,7 +10,7 @@ pub struct InventoryStateContract {
 }
 impl fmt::Display for InventoryStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Inventory weight {:.0}g [IS NOT CONTAINING ITEMS]", self.weight)
+        write!(f, "Inventory weight {:.0}g [DOES NOT CONTAIN ITEMS]", self.weight)
     }
 }
 impl Eq for InventoryStateContract { }

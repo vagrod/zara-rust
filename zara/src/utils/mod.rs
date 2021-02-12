@@ -234,7 +234,7 @@ impl PartialEq for GameTimeC {
 }
 impl fmt::Display for GameTimeC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}d {}h {}m {:.1}s)", self.day, self.hour, self.minute, self.second)
+        write!(f, "{}d {}h {}m {:.1}s", self.day, self.hour, self.minute, self.second)
     }
 }
 impl Hash for GameTimeC {
@@ -319,7 +319,7 @@ pub struct ClothesGroupC {
 }
 impl fmt::Display for ClothesGroupC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.name)
+        write!(f, "Group {} data", self.name)
     }
 }
 
@@ -383,7 +383,7 @@ pub struct ActiveDiseaseC {
 }
 impl fmt::Display for ActiveDiseaseC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} @{}", self.name, self.scheduled_time)
+        write!(f, "{} @{}, active={}", self.name, self.scheduled_time, self.is_active)
     }
 }
 
@@ -404,7 +404,8 @@ pub struct ActiveInjuryC {
 }
 impl fmt::Display for ActiveInjuryC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} on {} @{}", self.name, self.body_part, self.scheduled_time)
+        write!(f, "{} on {} @{}, fracture={}, active={}", self.name, self.body_part, self.scheduled_time,
+               self.is_fracture, self.is_active)
     }
 }
 
@@ -420,7 +421,7 @@ pub struct EnvironmentC {
 }
 impl fmt::Display for EnvironmentC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "temp {:.1}C, wind {:.1}, rain {:.1}m/s", self.temperature, self.wind_speed, self.rain_intensity)
+        write!(f, "World: temp {:.1}C, wind {:.1} m/s, rain {:.1}", self.temperature, self.wind_speed, self.rain_intensity)
     }
 }
 impl Eq for EnvironmentC { }
@@ -504,7 +505,8 @@ pub struct PlayerStatusC {
 }
 impl fmt::Display for PlayerStatusC {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Player status")
+        write!(f, "Player status ({} clothes, {} appliances, inventory {:.0}g)", self.clothes.len(),
+               self.appliances.len(), self.inventory_weight)
     }
 }
 impl Eq for PlayerStatusC { }

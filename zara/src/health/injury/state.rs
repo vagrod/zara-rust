@@ -83,7 +83,7 @@ pub struct LerpDataNodeStateContract {
 }
 impl fmt::Display for LerpDataNodeStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} - {}", self.start_time, self.end_time)
+        write!(f, "Lerp node from {} to {} game secs", self.start_time, self.end_time)
     }
 }
 impl Ord for LerpDataNodeStateContract {
@@ -139,7 +139,7 @@ pub struct LerpDataStateContract {
 }
 impl fmt::Display for LerpDataStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}:{} - {}:{}", self.start_time, self.start_value, self.end_time, self.end_value)
+        write!(f, "Lerp from {}:{} to {}:{}", self.start_time, self.start_value, self.end_time, self.end_value)
     }
 }
 impl Ord for LerpDataStateContract {
@@ -191,7 +191,7 @@ pub struct InjuryDeltasStateContract {
 }
 impl fmt::Display for InjuryDeltasStateContract {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "stamina drain {:.4}, blood drain {:.4}", self.stamina_drain, self.blood_drain)
+        write!(f, "Injury deltas: stamina drain {:.4}, blood drain {:.4}", self.stamina_drain, self.blood_drain)
     }
 }
 impl Eq for InjuryDeltasStateContract { }

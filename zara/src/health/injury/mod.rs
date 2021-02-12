@@ -195,7 +195,7 @@ pub struct StageDescription {
 }
 impl fmt::Display for StageDescription {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.level)
+        write!(f, "{} description", self.level)
     }
 }
 impl Hash for StageDescription {
