@@ -10,7 +10,7 @@ documentation = "https://github.com/vagrod/zara-rust/wiki"
 license-file = "LICENSE"
 keywords = ["gamedev", "survival"]
 categories = ["game-development"]
-exclude = ["target", "Cargo.lock"]
+exclude = ["target", "Cargo.lock", "zara.iml"]
 edition = "2018"
 
 [dependencies]
