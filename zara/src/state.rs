@@ -73,8 +73,8 @@ impl Hash for ZaraControllerStateContract {
         self.last_frame_game_time.hash(state);
         self.is_paused.hash(state);
 
-        state.write_u32(self.update_counter as u32);
-        state.write_u32(self.queue_counter as u32);
+        state.write_u32((self.update_counter*100_f32) as u32);
+        state.write_u32((self.queue_counter*100_f32) as u32);
     }
 }
 
@@ -151,9 +151,9 @@ impl Hash for EnvironmentStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.game_time.hash(state);
 
-        state.write_u32(self.temperature as u32);
-        state.write_u32(self.wind_speed as u32);
-        state.write_u32(self.rain_intensity as u32);
+        state.write_u32((self.temperature*10_000_f32) as u32);
+        state.write_u32((self.wind_speed*10_000_f32) as u32);
+        state.write_u32((self.rain_intensity*10_000_f32) as u32);
     }
 }
 

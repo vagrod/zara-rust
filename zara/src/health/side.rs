@@ -78,14 +78,14 @@ impl PartialEq for SideEffectDeltasC {
 }
 impl Hash for SideEffectDeltasC {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32(self.body_temp_bonus as u32);
-        state.write_u32(self.heart_rate_bonus as u32);
-        state.write_u32(self.top_pressure_bonus as u32);
-        state.write_u32(self.bottom_pressure_bonus as u32);
-        state.write_u32(self.food_level_bonus as u32);
-        state.write_u32(self.water_level_bonus as u32);
-        state.write_u32(self.stamina_bonus as u32);
-        state.write_u32(self.oxygen_level_bonus as u32);
-        state.write_u32(self.fatigue_bonus as u32);
+        state.write_u32((self.body_temp_bonus*10_000_f32) as u32);
+        state.write_u32((self.heart_rate_bonus*10_000_f32) as u32);
+        state.write_u32((self.top_pressure_bonus*10_000_f32) as u32);
+        state.write_u32((self.bottom_pressure_bonus*10_000_f32) as u32);
+        state.write_u32((self.food_level_bonus*10_000_f32) as u32);
+        state.write_u32((self.water_level_bonus*10_000_f32) as u32);
+        state.write_u32((self.stamina_bonus*10_000_f32) as u32);
+        state.write_u32((self.oxygen_level_bonus*10_000_f32) as u32);
+        state.write_u32((self.fatigue_bonus*10_000_f32) as u32);
     }
 }

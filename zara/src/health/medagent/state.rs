@@ -55,9 +55,9 @@ impl Hash for MedicalAgentStateContract {
         self.last_dose_end_time.hash(state);
         self.doses.hash(state);
 
-        state.write_u32(self.duration_minutes as u32);
-        state.write_u32(self.percent_of_activity as u32);
-        state.write_u32(self.percent_of_presence as u32);
+        state.write_u32((self.duration_minutes*10_000_f32) as u32);
+        state.write_u32((self.percent_of_activity*10_000_f32) as u32);
+        state.write_u32((self.percent_of_presence*10_000_f32) as u32);
     }
 }
 
@@ -113,7 +113,7 @@ impl Hash for AgentDoseStateContract {
 
         state.write_u32(self.start_time as u32);
         state.write_u32(self.end_time as u32);
-        state.write_u32(self.duration as u32);
+        state.write_u32((self.duration*10_000_f32) as u32);
     }
 }
 
@@ -161,7 +161,7 @@ impl PartialEq for KeyFrameStateContract {
 impl Hash for KeyFrameStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
         state.write_u32(self.time as u32);
-        state.write_u32(self.value as u32);
+        state.write_u32((self.value*10_000_f32) as u32);
     }
 }
 

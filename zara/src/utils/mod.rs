@@ -243,7 +243,7 @@ impl Hash for GameTimeC {
         self.hour.hash(state);
         self.minute.hash(state);
 
-        state.write_u32(self.second as u32);
+        state.write_u32((self.second*100_f64) as u32);
     }
 }
 impl GameTimeC {
@@ -436,9 +436,9 @@ impl PartialEq for EnvironmentC {
 }
 impl Hash for EnvironmentC {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32(self.temperature as u32);
-        state.write_u32(self.wind_speed as u32);
-        state.write_u32(self.rain_intensity as u32);
+        state.write_u32((self.temperature*10_000_f32) as u32);
+        state.write_u32((self.wind_speed*10_000_f32) as u32);
+        state.write_u32((self.rain_intensity*10_000_f32) as u32);
     }
 }
 impl EnvironmentC {
@@ -545,10 +545,10 @@ impl Hash for PlayerStatusC {
         self.total_water_resistance.hash(state);
         self.total_cold_resistance.hash(state);
 
-        state.write_u32(self.last_slept_duration as u32);
-        state.write_u32(self.warmth_level as u32);
-        state.write_u32(self.wetness_level as u32);
-        state.write_u32(self.inventory_weight as u32);
+        state.write_u32((self.last_slept_duration*10_000_f32) as u32);
+        state.write_u32((self.warmth_level*10_000_f32) as u32);
+        state.write_u32((self.wetness_level*10_000_f32) as u32);
+        state.write_u32((self.inventory_weight*1_000_f32) as u32);
     }
 }
 

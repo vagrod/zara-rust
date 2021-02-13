@@ -39,9 +39,9 @@ impl Hash for EnvironmentData {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.game_time.to_contract().hash(state);
 
-        state.write_u32(self.temperature.get() as u32);
-        state.write_u32(self.wind_speed.get() as u32);
-        state.write_u32(self.rain_intensity.get() as u32);
+        state.write_u32((self.temperature.get()*10_000_f32) as u32);
+        state.write_u32((self.wind_speed.get()*10_000_f32) as u32);
+        state.write_u32((self.rain_intensity.get()*10_000_f32) as u32);
     }
 }
 impl EnvironmentData {

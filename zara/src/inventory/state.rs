@@ -26,7 +26,7 @@ impl Hash for InventoryStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.clothes_cache.hash(state);
 
-        state.write_u32(self.weight as u32);
+        state.write_u32((self.weight*1_000_f32) as u32);
     }
 }
 

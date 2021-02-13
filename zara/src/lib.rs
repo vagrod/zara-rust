@@ -156,6 +156,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         let mut consumable = ConsumableC::new();
         {
+            let consumed_count = 1_usize;
             let items_count: usize;
             let inv_items = self.inventory.items.borrow();
 
@@ -166,7 +167,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             items_count = item.get_count();
 
-            if !item.get_is_infinite() && items_count - 1 <= 0 { // 1 so far
+            if !item.get_is_infinite() && (items_count as i32) - (consumed_count as i32) < 0 {
                 return Err(ItemConsumeErr::InsufficientResources);
             }
 
@@ -181,7 +182,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             consumable.is_food = c.is_food();
             consumable.food_gain = c.food_gain_per_dose();
             consumable.water_gain = c.water_gain_per_dose();
-            consumable.consumed_count = 1; // so far
+            consumable.consumed_count = consumed_count;
             consumable.fresh_poisoning_chance = match spoil {
                 Some(s) => s.fresh_poisoning_chance(),
                 None => 0
@@ -236,6 +237,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         let mut appliance = ApplianceC::new();
         {
+            let taken_count = 1_usize;
             let items_count: usize;
             let inv_items = self.inventory.items.borrow();
 
@@ -246,7 +248,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
             items_count = item.get_count();
 
-            if !item.get_is_infinite() && items_count - 1 <= 0 { // 1 so far
+            if !item.get_is_infinite() && (items_count as i32) - (taken_count as i32) < 0 {
                 return Err(ApplianceTakeErr::InsufficientResources);
             }
 
@@ -258,7 +260,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             appliance.name = item.get_name();
             appliance.is_body_appliance = a.is_body_appliance();
             appliance.is_injection = a.is_injection();
-            appliance.taken_count = 1; // so far
+            appliance.taken_count = taken_count;
 
             if appliance.is_body_appliance && self.body.is_applied(item_name, body_part) {
                 return Err(ApplianceTakeErr::AlreadyApplied);

@@ -69,15 +69,15 @@ impl Hash for StageDescriptionStateContract {
         self.chance_of_death.hash(state);
         self.is_endless.hash(state);
 
-        state.write_u32(self.reaches_peak_in_hours as u32);
-        state.write_u32(self.target_body_temp as u32);
-        state.write_u32(self.target_heart_rate as u32);
-        state.write_u32(self.target_pressure_top as u32);
-        state.write_u32(self.target_pressure_bottom as u32);
-        state.write_u32(self.target_fatigue_delta as u32);
-        state.write_u32(self.target_food_drain as u32);
-        state.write_u32(self.target_water_drain as u32);
-        state.write_u32(self.target_stamina_drain as u32);
+        state.write_u32((self.reaches_peak_in_hours*10_000_f32) as u32);
+        state.write_u32((self.target_body_temp*10_000_f32) as u32);
+        state.write_u32((self.target_heart_rate*10_000_f32) as u32);
+        state.write_u32((self.target_pressure_top*10_000_f32) as u32);
+        state.write_u32((self.target_pressure_bottom*10_000_f32) as u32);
+        state.write_u32((self.target_fatigue_delta*10_000_f32) as u32);
+        state.write_u32((self.target_food_drain*10_000_f32) as u32);
+        state.write_u32((self.target_water_drain*10_000_f32) as u32);
+        state.write_u32((self.target_stamina_drain*10_000_f32) as u32);
     }
 }
 
@@ -214,9 +214,9 @@ impl Hash for LerpDataStateContract {
 
         state.write_u32(self.start_time as u32);
         state.write_u32(self.end_time as u32);
-        state.write_u32(self.start_value as u32);
-        state.write_u32(self.end_value as u32);
-        state.write_u32(self.duration as u32);
+        state.write_u32((self.start_value*10_000_f32) as u32);
+        state.write_u32((self.end_value*10_000_f32) as u32);
+        state.write_u32((self.duration*10_000_f32) as u32);
     }
 }
 
@@ -255,15 +255,15 @@ impl PartialEq for DiseaseDeltasStateContract {
 }
 impl Hash for DiseaseDeltasStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32(self.body_temperature_delta as u32);
-        state.write_u32(self.heart_rate_delta as u32);
-        state.write_u32(self.pressure_top_delta as u32);
-        state.write_u32(self.pressure_bottom_delta as u32);
-        state.write_u32(self.fatigue_delta as u32);
-        state.write_u32(self.stamina_drain as u32);
-        state.write_u32(self.oxygen_drain as u32);
-        state.write_u32(self.food_drain as u32);
-        state.write_u32(self.water_drain as u32);
+        state.write_u32((self.body_temperature_delta*10_000_f32) as u32);
+        state.write_u32((self.heart_rate_delta*10_000_f32) as u32);
+        state.write_u32((self.pressure_top_delta*10_000_f32) as u32);
+        state.write_u32((self.pressure_bottom_delta*10_000_f32) as u32);
+        state.write_u32((self.fatigue_delta*10_000_f32) as u32);
+        state.write_u32((self.stamina_drain*10_000_f32) as u32);
+        state.write_u32((self.oxygen_drain*10_000_f32) as u32);
+        state.write_u32((self.food_drain*10_000_f32) as u32);
+        state.write_u32((self.water_drain*10_000_f32) as u32);
     }
 }
 

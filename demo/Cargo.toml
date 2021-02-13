@@ -4,14 +4,15 @@ version = "0.1.0"
 authors = ["Vadim Gromov <zara-survival@imw.su>"]
 edition = "2018"
 
-# If you want to use Zara from local lib, uncomment this
-# [lib]
-# crate-type = ["lib"]
-# name="zara"
-# bench = false
-# path="../zara/src/lib.rs"
+# If you want to use Zara from local lib, uncomment this lib
+[lib]
+crate-type = ["lib"]
+name="zara"
+bench = false
+path="../zara/src/lib.rs"
 
 [dependencies]
-# If you want to use local Zara lib, comment this crate
-zara = "1.0.1"
+# If you want to use local Zara lib, comment zara crate and uncomment rand
+#zara = "1.0.1"
+rand = "0.8.2"
 crossterm = "0.18"

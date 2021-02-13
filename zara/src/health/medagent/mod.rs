@@ -173,7 +173,7 @@ impl Hash for MedicalAgent {
         self.activation_curve.hash(state);
         self.group.hash(state);
 
-        state.write_u32(self.duration_minutes as u32);
+        state.write_u32((self.duration_minutes*10_000_f32) as u32);
     }
 }
 impl MedicalAgent {

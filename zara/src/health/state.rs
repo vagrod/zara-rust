@@ -58,19 +58,19 @@ impl Hash for HealthStateContract {
         self.is_alive.hash(state);
         self.has_blood_loss.hash(state);
 
-        state.write_u32(self.stamina_regain_rate as u32);
-        state.write_u32(self.blood_regain_rate as u32);
-        state.write_u32(self.oxygen_regain_rate as u32);
-        state.write_u32(self.body_temperature as u32);
-        state.write_u32(self.heart_rate as u32);
-        state.write_u32(self.top_pressure as u32);
-        state.write_u32(self.bottom_pressure as u32);
-        state.write_u32(self.blood_level as u32);
-        state.write_u32(self.food_level as u32);
-        state.write_u32(self.water_level as u32);
-        state.write_u32(self.stamina_level as u32);
-        state.write_u32(self.fatigue_level as u32);
-        state.write_u32(self.oxygen_level as u32);
+        state.write_u32((self.stamina_regain_rate*10_000_f32) as u32);
+        state.write_u32((self.blood_regain_rate*10_000_f32) as u32);
+        state.write_u32((self.oxygen_regain_rate*10_000_f32) as u32);
+        state.write_u32((self.body_temperature*10_000_f32) as u32);
+        state.write_u32((self.heart_rate*10_000_f32) as u32);
+        state.write_u32((self.top_pressure*10_000_f32) as u32);
+        state.write_u32((self.bottom_pressure*10_000_f32) as u32);
+        state.write_u32((self.blood_level*10_000_f32) as u32);
+        state.write_u32((self.food_level*10_000_f32) as u32);
+        state.write_u32((self.water_level*10_000_f32) as u32);
+        state.write_u32((self.stamina_level*10_000_f32) as u32);
+        state.write_u32((self.fatigue_level*10_000_f32) as u32);
+        state.write_u32((self.oxygen_level*10_000_f32) as u32);
     }
 }
 

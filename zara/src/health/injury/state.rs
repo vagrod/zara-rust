@@ -57,9 +57,9 @@ impl Hash for StageDescriptionStateContract {
         self.chance_of_death.hash(state);
         self.is_endless.hash(state);
 
-        state.write_u32(self.reaches_peak_in_hours as u32);
-        state.write_u32(self.target_blood_drain as u32);
-        state.write_u32(self.target_stamina_drain as u32);
+        state.write_u32((self.reaches_peak_in_hours*10_000_f32) as u32);
+        state.write_u32((self.target_blood_drain*10_000_f32) as u32);
+        state.write_u32((self.target_stamina_drain*10_000_f32) as u32);
     }
 }
 
@@ -178,9 +178,9 @@ impl Hash for LerpDataStateContract {
 
         state.write_u32(self.start_time as u32);
         state.write_u32(self.end_time as u32);
-        state.write_u32(self.start_value as u32);
-        state.write_u32(self.end_value as u32);
-        state.write_u32(self.duration as u32);
+        state.write_u32((self.start_value*10_000_f32) as u32);
+        state.write_u32((self.end_value*10_000_f32) as u32);
+        state.write_u32((self.duration*10_000_f32) as u32);
     }
 }
 
@@ -205,8 +205,8 @@ impl PartialEq for InjuryDeltasStateContract {
 }
 impl Hash for InjuryDeltasStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32(self.stamina_drain as u32);
-        state.write_u32(self.blood_drain as u32);
+        state.write_u32((self.stamina_drain*10_000_f32) as u32);
+        state.write_u32((self.blood_drain*10_000_f32) as u32);
     }
 }
 
