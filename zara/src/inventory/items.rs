@@ -339,8 +339,8 @@ impl Hash for ConsumableC {
         self.spoiled_poisoning_chance.hash(state);
         self.spoil_time.hash(state);
 
-        state.write_u32(self.food_gain as u32);
-        state.write_u32(self.water_gain as u32);
+        state.write_i32(self.food_gain as i32);
+        state.write_i32(self.water_gain as i32);
     }
 }
 impl ConsumableC {

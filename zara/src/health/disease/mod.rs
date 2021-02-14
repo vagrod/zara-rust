@@ -201,10 +201,10 @@ impl Hash for StageDescription {
         state.write_u32((self.target_heart_rate*10_000_f32) as u32);
         state.write_u32((self.target_pressure_top*10_000_f32) as u32);
         state.write_u32((self.target_pressure_bottom*10_000_f32) as u32);
-        state.write_u32((self.target_fatigue_delta*10_000_f32) as u32);
-        state.write_u32((self.target_stamina_drain*10_000_f32) as u32);
-        state.write_u32((self.target_food_drain*10_000_f32) as u32);
-        state.write_u32((self.target_water_drain*10_000_f32) as u32);
+        state.write_i32((self.target_fatigue_delta*10_000_f32) as i32);
+        state.write_i32((self.target_stamina_drain*10_000_f32) as i32);
+        state.write_i32((self.target_food_drain*10_000_f32) as i32);
+        state.write_i32((self.target_water_drain*10_000_f32) as i32);
     }
 }
 impl StageDescription {
@@ -263,15 +263,15 @@ impl PartialEq for DiseaseDeltasC {
 }
 impl Hash for DiseaseDeltasC {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32((self.body_temperature_delta*10_000_f32) as u32);
-        state.write_u32((self.heart_rate_delta*10_000_f32) as u32);
-        state.write_u32((self.pressure_top_delta*10_000_f32) as u32);
-        state.write_u32((self.pressure_bottom_delta*10_000_f32) as u32);
-        state.write_u32((self.fatigue_delta*10_000_f32) as u32);
-        state.write_u32((self.stamina_drain*10_000_f32) as u32);
-        state.write_u32((self.oxygen_drain*10_000_f32) as u32);
-        state.write_u32((self.food_drain*10_000_f32) as u32);
-        state.write_u32((self.water_drain*10_000_f32) as u32);
+        state.write_i32((self.body_temperature_delta*10_000_f32) as i32);
+        state.write_i32((self.heart_rate_delta*10_000_f32) as i32);
+        state.write_i32((self.pressure_top_delta*10_000_f32) as i32);
+        state.write_i32((self.pressure_bottom_delta*10_000_f32) as i32);
+        state.write_i32((self.fatigue_delta*10_000_f32) as i32);
+        state.write_i32((self.stamina_drain*10_000_f32) as i32);
+        state.write_i32((self.oxygen_drain*10_000_f32) as i32);
+        state.write_i32((self.food_drain*10_000_f32) as i32);
+        state.write_i32((self.water_drain*10_000_f32) as i32);
     }
 }
 impl DiseaseDeltasC {

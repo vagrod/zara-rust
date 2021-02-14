@@ -151,7 +151,7 @@ impl Hash for EnvironmentStateContract {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.game_time.hash(state);
 
-        state.write_u32((self.temperature*10_000_f32) as u32);
+        state.write_i32((self.temperature*10_000_f32) as i32);
         state.write_u32((self.wind_speed*10_000_f32) as u32);
         state.write_u32((self.rain_intensity*10_000_f32) as u32);
     }

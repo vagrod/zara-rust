@@ -60,9 +60,9 @@ impl Hash for BodyStateContract {
         self.cached_player_in_water.hash(state);
 
         state.write_u32((self.last_sleep_duration*10_000_f32) as u32);
-        state.write_u32((self.warmth_level*10_000_f32) as u32);
+        state.write_i32((self.warmth_level*10_000_f32) as i32);
         state.write_u32((self.wetness_level*10_000_f32) as u32);
-        state.write_u32((self.cached_world_temp*10_000_f32) as u32);
+        state.write_i32((self.cached_world_temp*10_000_f32) as i32);
         state.write_u32((self.cached_wind_speed*10_000_f32) as u32);
         state.write_u32((self.cached_rain_intensity*10_000_f32) as u32);
         state.write_u64((self.sleeping_counter*1_000_f64) as u64);

@@ -58,9 +58,9 @@ impl Hash for HealthStateContract {
         self.is_alive.hash(state);
         self.has_blood_loss.hash(state);
 
-        state.write_u32((self.stamina_regain_rate*10_000_f32) as u32);
-        state.write_u32((self.blood_regain_rate*10_000_f32) as u32);
-        state.write_u32((self.oxygen_regain_rate*10_000_f32) as u32);
+        state.write_i32((self.stamina_regain_rate*10_000_f32) as i32);
+        state.write_i32((self.blood_regain_rate*10_000_f32) as i32);
+        state.write_i32((self.oxygen_regain_rate*10_000_f32) as i32);
         state.write_u32((self.body_temperature*10_000_f32) as u32);
         state.write_u32((self.heart_rate*10_000_f32) as u32);
         state.write_u32((self.top_pressure*10_000_f32) as u32);

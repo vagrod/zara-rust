@@ -206,8 +206,8 @@ impl Hash for StageDescription {
         self.is_endless.hash(state);
 
         state.write_u32((self.reaches_peak_in_hours*10_000_f32) as u32);
-        state.write_u32((self.target_blood_drain*10_000_f32) as u32);
-        state.write_u32((self.target_stamina_drain*10_000_f32) as u32);
+        state.write_i32((self.target_blood_drain*10_000_f32) as i32);
+        state.write_i32((self.target_stamina_drain*10_000_f32) as i32);
     }
 }
 impl StageDescription {
