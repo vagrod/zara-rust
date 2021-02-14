@@ -3,7 +3,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vagrod/zara-rust/blob/master/zara/LICENSE)
 ![Crates.io](https://img.shields.io/crates/v/zara?color=orange)
 
-Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org).
+Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org): [crates.io link](https://crates.io/crates/zara).
 
 
 ![Zara Rust Demo](http://imw.su/zara_rust_008.png)
@@ -30,4 +30,4 @@ Zara will be useful for you if you want your game to have weather-aware health c
 
 Saving and restoring engine state is supported: everything except inventory items. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands. More on this [here](https://github.com/vagrod/zara-rust/wiki/State-Management).
 
-The demo is using `crossterm`.
+The demo is using [crossterm](https://github.com/crossterm-rs/crossterm).
