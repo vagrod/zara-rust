@@ -209,7 +209,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));
 
-        return Ok(());
+        Ok(())
     }
 
     /// Takes an appliance (like bandage or injection). Item which name is passed must have the
@@ -284,7 +284,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ApplianceTaken(appliance, body_part));
 
-        return Ok(());
+        Ok(())
     }
 
     /// Removes body appliance. Item is **not** added back to the inventory.
