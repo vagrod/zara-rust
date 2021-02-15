@@ -31,3 +31,6 @@ Zara will be useful for you if you want your game to have weather-aware health c
 Saving and restoring engine state is supported: everything except inventory items. Inventory is very custom to every use case, and you must handle it in the way your project structure/logic demands. More on this [here](https://github.com/vagrod/zara-rust/wiki/State-Management).
 
 The demo is using [crossterm](https://github.com/crossterm-rs/crossterm).
+
+Project is supported by [JetBrains Opensource Licensing Program](https://www.jetbrains.com/opensource/?from=ZaraSurvivalEngine)\
+![JetBrains](http://imw.su/jetbrains-variant-3.png)
