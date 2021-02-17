@@ -175,7 +175,6 @@ impl<E: Listener + 'static> ZaraController<E> {
                 Some(c) => c,
                 None => return Err(ItemConsumeErr::ItemIsNotConsumable)
             };
-            let spoil = c.spoiling();
 
             consumable.name = item.get_name();
             consumable.is_water = c.is_water();
@@ -183,18 +182,12 @@ impl<E: Listener + 'static> ZaraController<E> {
             consumable.food_gain = c.food_gain_per_dose();
             consumable.water_gain = c.water_gain_per_dose();
             consumable.consumed_count = consumed_count;
-            consumable.fresh_poisoning_chance = match spoil {
-                Some(s) => s.fresh_poisoning_chance(),
-                None => 0
-            };
-            consumable.spoiled_poisoning_chance = match spoil {
-                Some(s) => s.spoil_poisoning_chance(),
-                None => 0
-            };
-            consumable.spoil_time = match spoil {
-                Some(s) => Some(s.spoil_time()),
-                _ => None
-            };
+
+            if let Some(s) = c.spoiling() {
+                consumable.fresh_poisoning_chance = s.fresh_poisoning_chance();
+                consumable.spoiled_poisoning_chance = s.spoil_poisoning_chance();
+                consumable.spoil_time = Some(s.spoil_time());
+            }
 
             let game_time = GameTime::from_duration(self.last_update_game_time.get()).to_contract();
 

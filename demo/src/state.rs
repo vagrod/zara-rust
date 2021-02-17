@@ -4,6 +4,7 @@ use crate::injuries::Cut;
 
 use zara::health::InjuryKey;
 use std::collections::HashMap;
+use zara::health::side::builtin::*;
 
 /// Object that manages save/load state for this demo app
 pub struct StateObject {
@@ -77,7 +78,7 @@ impl StateObject {
         // Remember states of all side effect monitors
         let monitors = controller.health.side_effects.borrow();
         self.monitor_fatigue_state = match &self.monitor_fatigue {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::FatigueSideEffects>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -87,7 +88,7 @@ impl StateObject {
             None => None
         };
         self.monitor_food_state = match &self.monitor_food {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::FoodDrainOverTimeSideEffect>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -97,7 +98,7 @@ impl StateObject {
             None => None
         };
         self.monitor_running_state = match &self.monitor_running {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::RunningSideEffects>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -107,7 +108,7 @@ impl StateObject {
             None => None
         };
         self.monitor_underwater_state = match &self.monitor_underwater {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::UnderwaterSideEffect>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -117,7 +118,7 @@ impl StateObject {
             None => None
         };
         self.monitor_vitals_state = match &self.monitor_vitals {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::DynamicVitalsSideEffect>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -127,7 +128,7 @@ impl StateObject {
             None => None
         };
         self.monitor_water_state = match &self.monitor_water {
-            Some(mid) => match &monitors.get(mid) {
+            Some(mid) => match monitors.get(mid) {
                 Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::WaterDrainOverTimeSideEffect>() {
                     Some(o) => Some(o.get_state()),
                     None => None
@@ -171,83 +172,59 @@ impl StateObject {
         // Restore states of all side effects monitors we use
         let monitors = controller.health.side_effects.borrow();
 
-        match &self.monitor_fatigue {
-            Some(mid) => match &self.monitor_fatigue_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::FatigueSideEffects>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
-        match &self.monitor_water {
-            Some(mid) => match &self.monitor_water_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::WaterDrainOverTimeSideEffect>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
-        match &self.monitor_vitals {
-            Some(mid) => match &self.monitor_vitals_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::DynamicVitalsSideEffect>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
-        match &self.monitor_underwater {
-            Some(mid) => match &self.monitor_underwater_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::UnderwaterSideEffect>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
-        match &self.monitor_running {
-            Some(mid) => match &self.monitor_running_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::RunningSideEffects>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
-        match &self.monitor_food {
-            Some(mid) => match &self.monitor_food_state {
-                Some(st) => match monitors.get(mid) {
-                    Some(m) => match m.as_any().downcast_ref::<zara::health::side::builtin::FoodDrainOverTimeSideEffect>() {
-                        Some(o) => o.restore_state(st),
-                        _ => { }
-                    },
-                    _ => { }
-                },
-                _ => { }
-            },
-            _ => { }
-        };
+        if let Some(st) = &self.monitor_fatigue_state {
+            if let Some(mid) = &self.monitor_fatigue {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<zara::health::side::builtin::FatigueSideEffects>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
+        if let Some(st) = &self.monitor_food_state {
+            if let Some(mid) = &self.monitor_food {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<FoodDrainOverTimeSideEffect>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
+        if let Some(st) = &self.monitor_running_state {
+            if let Some(mid) = &self.monitor_running {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<RunningSideEffects>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
+        if let Some(st) = &self.monitor_underwater_state {
+            if let Some(mid) = &self.monitor_underwater {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<UnderwaterSideEffect>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
+        if let Some(st) = &self.monitor_vitals_state {
+            if let Some(mid) = &self.monitor_vitals {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<DynamicVitalsSideEffect>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
+        if let Some(st) = &self.monitor_water_state {
+            if let Some(mid) = &self.monitor_water {
+                if let Some(m) = monitors.get(mid) {
+                    if let Some(o) = m.as_any().downcast_ref::<WaterDrainOverTimeSideEffect>() {
+                        o.restore_state(st)
+                    }
+                }
+            }
+        }
     }
 }
