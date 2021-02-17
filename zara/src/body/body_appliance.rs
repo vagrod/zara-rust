@@ -38,6 +38,6 @@ impl Body {
             if &item.item_name == item_name && item.body_part == body_part { return true; }
         }
 
-        return false;
+        false
     }
 }

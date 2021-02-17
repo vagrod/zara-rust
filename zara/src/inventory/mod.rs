@@ -110,7 +110,7 @@ impl Inventory {
             Some(o) => {
                 if o.get_is_infinite() {
                     self.queue_message(Event::InventoryItemUsedPartially(name.to_string(), amount));
-                    return Ok(())
+                    return Ok(());
                 }
 
                 let c = o.get_count();

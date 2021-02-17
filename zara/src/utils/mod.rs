@@ -97,7 +97,7 @@ impl GameTime {
 
         gt.update_from_duration(d);
 
-        return gt;
+        gt
     }
 
     /// Creates new `GameTime` object from its simple representation
@@ -567,7 +567,7 @@ pub fn clamp(value: f32, floor: f32, ceiling: f32) -> f32 {
         return floor;
     }
 
-    return value;
+    value
 }
 
 /// Clamps ceiling
@@ -576,7 +576,7 @@ pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
         return ceiling;
     }
 
-    return value;
+    value
 }
 
 /// Clamps floor
@@ -585,7 +585,7 @@ pub fn clamp_bottom(value: f32, floor: f32) -> f32 {
         return floor;
     }
 
-    return value;
+    value
 }
 
 
@@ -598,7 +598,7 @@ pub fn clamp_01(value: f32) -> f32 {
         return 0.;
     }
 
-    return value;
+    value
 }
 
 /// Will return `true` is a given probability is satisfied
@@ -609,18 +609,20 @@ pub fn roll_dice(probability: usize) -> bool {
     let mut rng = rand::thread_rng();
     let r = rng.gen_range(0..100);
 
-    return r < probability;
+    r < probability
 }
 
 /// Will return a random number between these two
 pub fn range(a: f32, b: f32) -> f32 {
     let mut rng = rand::thread_rng();
-    return rng.gen_range(a..b);
+
+    rng.gen_range(a..b)
 }
 
 /// Box equality check
 pub fn eq<T: ?Sized>(left: &Box<T>, right: &Box<T>) -> bool {
     let left : *const T = left.as_ref();
     let right : *const T = right.as_ref();
+
     left == right
 }

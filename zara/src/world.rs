@@ -85,6 +85,6 @@ impl EnvironmentData {
         e.temperature.set(ed.temperature);
         e.rain_intensity.set(ed.rain_intensity);
 
-        return e;
+        e
     }
 }

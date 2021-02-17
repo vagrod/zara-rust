@@ -75,7 +75,7 @@ impl Inventory {
             }
         }
 
-        return result;
+        result
     }
 
     /// Checks if inventory has enough resources to execute a given combination
@@ -290,5 +290,5 @@ fn get_match_key(items: Vec<&String>) -> String {
         match_key.push_str(&sep);
     }
 
-    return match_key.to_string();
+    match_key.to_string()
 }

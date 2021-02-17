@@ -184,6 +184,6 @@ impl ClothesGroup {
             }
         }
 
-        return true;
+        true
     }
 }

@@ -25,7 +25,7 @@ impl ActiveInjury {
             if stage.is_active(game_time) { return Some(stage.copy()) }
         }
 
-        return None;
+        None
     }
 
     /// Gets active stage level for a given game time
@@ -42,7 +42,7 @@ impl ActiveInjury {
             if level as i32 == *l as i32 { return Some(stage.copy()) }
         }
 
-        return None;
+        None
     }
 
     /// Gets whether injury is active or not for a given time

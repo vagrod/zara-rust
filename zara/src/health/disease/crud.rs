@@ -38,7 +38,7 @@ impl Health {
             activation_time
         )));
 
-        return Ok(disease_name);
+        Ok(disease_name)
     }
 
     /// Removes active disease if exists. Returns `Err` if not.
@@ -64,6 +64,6 @@ impl Health {
 
         self.queue_message(Event::DiseaseRemoved(disease_name.to_string()));
 
-        return Ok(());
+        Ok(())
     }
 }

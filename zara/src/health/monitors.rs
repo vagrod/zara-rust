@@ -18,7 +18,7 @@ impl Health {
 
         b.insert(key, monitor);
 
-        return key;
+        key
     }
 
     /// Unregisters disease monitor
@@ -37,7 +37,7 @@ impl Health {
 
         b.remove(&key);
 
-        return Ok(());
+        Ok(())
     }
 
     /// Registers new side effects monitor instance
@@ -53,7 +53,7 @@ impl Health {
 
         b.insert(key, monitor);
 
-        return key;
+        key
     }
 
     /// Unregisters side effects monitor
@@ -72,6 +72,6 @@ impl Health {
 
         b.remove(&key);
 
-        return Ok(());
+        Ok(())
     }
 }

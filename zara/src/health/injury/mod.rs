@@ -293,7 +293,7 @@ impl ActiveStage {
 
         let gt_d = gt - start;
 
-        return ((gt_d/d) * 100.) as usize;
+        ((gt_d/d) * 100.) as usize
     }
 
     pub fn copy(&self) -> ActiveStage {

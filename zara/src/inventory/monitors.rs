@@ -32,7 +32,7 @@ impl Inventory {
 
         b.insert(key, monitor);
 
-        return key;
+        key
     }
 
     /// Unregisters inventory monitor
@@ -51,6 +51,6 @@ impl Inventory {
 
         b.remove(&key);
 
-        return Ok(());
+        Ok(())
     }
 }

@@ -58,7 +58,7 @@ pub fn init_zara_instance() -> zara::ZaraController<ZaraEventsListener>{
     populate_inventory(&person);
     dress(&person);
 
-    return person;
+    person
 }
 
 fn dress(person: &zara::ZaraController<ZaraEventsListener>) {

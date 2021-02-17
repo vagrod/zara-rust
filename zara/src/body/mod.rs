@@ -234,7 +234,7 @@ impl Body {
 
         self.queue_message(Event::SleepStarted(game_hours));
 
-        return true;
+        true
     }
 }
 

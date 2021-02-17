@@ -54,6 +54,6 @@ impl Inventory {
             return Ok(());
         }
 
-        return Err(InventoryItemAccessErr::ItemNotFound)
+        Err(InventoryItemAccessErr::ItemNotFound)
     }
 }
