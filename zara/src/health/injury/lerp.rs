@@ -66,7 +66,7 @@ impl ActiveInjury {
             if gt > end { return false; } // we are not interested in stages that already passed
             if stage.info.is_endless { has_endless_child = true; }
             
-            let start_time= if gt > start { gt } else { start };
+            let start_time = if gt > start { gt } else { start };
 
             // Determine the next chain stage if any, only for the inverted chain.
             // Inverted chain lerp takes "start value" parameter of the next stage as its "end value".
@@ -75,9 +75,7 @@ impl ActiveInjury {
                 let next_level = StageLevel::try_from(stage.info.level as i32 - 1)
                     .unwrap_or(StageLevel::Undefined);
                 if next_level != StageLevel::Undefined {
-                    if let Some(st) = stages.get(&next_level) {
-                        next_stage = Some(st);
-                    }
+                    next_stage = stages.get(&next_level);
                 } else {
                     // Need to lerp to zeros (to "healthy" state) when reached
                     // last stage in the inverted chain
@@ -162,7 +160,7 @@ impl ActiveInjury {
             return true;
         }
 
-        return false;
+        false
     }
 
     /// Gets injury drain delta for a given time
@@ -222,6 +220,6 @@ impl ActiveInjury {
 
         self.last_deltas.replace(result.copy());
 
-        return result;
+        result
     }
 }

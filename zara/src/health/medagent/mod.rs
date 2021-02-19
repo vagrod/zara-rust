@@ -296,7 +296,7 @@ impl MedicalAgent {
     }
 
     fn generate_frames(gt: f32, duration_secs: f32, curve: CurveType) -> Vec<KeyFrame> {
-        return match curve {
+        match curve {
             CurveType::Linearly => {
                 vec![
                     KeyFrame::new(gt, 0.),

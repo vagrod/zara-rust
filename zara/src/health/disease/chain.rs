@@ -125,7 +125,7 @@ impl ActiveDisease {
 
         self.queue_message(Event::DiseaseInverted(self.disease.get_name()));
 
-        return Ok(());
+        Ok(())
     }
 
     /// Inverts disease stages back so that disease goes from the current state to its end.
@@ -212,7 +212,7 @@ impl ActiveDisease {
 
         t = new_peak_time;
         // Same thing with stages "to the right"
-        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
+        for l in (level_int+1)..=StageLevel::Critical as i32 {
             let b = self.initial_data.borrow();
             let ind = match b.iter().position(|x| (x.level as i32) == l) {
                 Some(o) => o,
@@ -260,6 +260,6 @@ impl ActiveDisease {
 
         self.queue_message(Event::DiseaseResumed(self.disease.get_name()));
 
-        return Ok(());
+        Ok(())
     }
 }

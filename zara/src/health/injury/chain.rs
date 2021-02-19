@@ -125,7 +125,7 @@ impl ActiveInjury {
 
         self.queue_message(Event::InjuryInverted(self.injury.get_name(), self.body_part));
 
-        return Ok(());
+        Ok(())
     }
 
     /// Inverts injury stages back so that injury goes from the current state to its end.
@@ -212,7 +212,7 @@ impl ActiveInjury {
 
         t = new_peak_time;
         // Same thing with stages "to the right"
-        for l in (level_int+1)..(StageLevel::Critical as i32+1) {
+        for l in (level_int+1)..=StageLevel::Critical as i32 {
             let b = self.initial_data.borrow();
             let ind = match b.iter().position(|x| (x.level as i32) == l) {
                 Some(o) => o,
@@ -260,6 +260,6 @@ impl ActiveInjury {
 
         self.queue_message(Event::InjuryResumed(self.injury.get_name(), self.body_part));
 
-        return Ok(());
+        Ok(())
     }
 }

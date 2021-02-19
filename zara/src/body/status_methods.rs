@@ -47,7 +47,7 @@ impl Body {
             result += g.bonus_cold_resistance;
         }
 
-        return result;
+        result
     }
 
     /// Returns total 0..100 bonus water resistance value calculated as a sum of all active clothes
@@ -66,6 +66,6 @@ impl Body {
             result += g.bonus_water_resistance;
         }
 
-        return result;
+        result
     }
 }

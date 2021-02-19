@@ -360,7 +360,7 @@ impl ActiveStage {
         let peak = self.peak_time.as_secs_f32();
         let gt = game_time.as_secs_f32();
 
-        return if self.info.is_endless {
+        if self.info.is_endless {
             gt >= start
         } else {
             gt >= start && gt <= peak

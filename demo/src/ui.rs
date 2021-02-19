@@ -256,7 +256,9 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     ).ok();
     for (name, item) in person.health.diseases.borrow().iter() {
         let active = item.is_active(&gt);
-        let info = format!("{} ({})", name, if active { "active now" } else { "scheduled" });
+        let is_healing = item.is_healing();
+        let active_string = if is_healing { "active [healing]" } else { "active" };
+        let info = format!("{} ({})", name, if active { active_string } else { "scheduled" });
         execute!(w,
             cursor::MoveToColumn(dis_col_base+3),
             style::Print(format!("{}", info)),
@@ -316,7 +318,9 @@ pub fn ui_frame<W>(w: &mut W, person: &zara::ZaraController<ZaraEventsListener>)
     ).ok();
     for (key, item) in person.health.injuries.borrow().iter() {
         let active = item.is_active(&gt);
-        let info = format!("{} on {:?} ({})", key.injury, key.body_part, if active { "active now" } else { "scheduled" });
+        let is_healing = item.is_healing();
+        let active_string = if is_healing { "active [healing]" } else { "active" };
+        let info = format!("{} on {:?} ({})", key.injury, key.body_part, if active { active_string } else { "scheduled" });
         execute!(w,
             cursor::MoveToColumn(inj_col_base+3),
             style::Print(format!("{}", info)),

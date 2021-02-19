@@ -50,7 +50,7 @@ impl ActiveDisease {
         let activation_secs = self.activation_time.borrow().as_secs_f32();
         let game_time_secs = game_time.as_secs_f32();
 
-        return if self.will_end.get() {
+        if self.will_end.get() {
             let b = self.end_time.borrow();
             let border_secs = match b.as_ref() {
                 Some(t) => t.as_secs_f32(),
@@ -66,7 +66,7 @@ impl ActiveDisease {
     /// Returns `true` if this disease already passed and is no longer relevant, for a given game time
     pub fn is_old(&self, game_time: &GameTimeC) -> bool {
         let gt = game_time.as_secs_f32();
-        return match self.end_time.borrow().as_ref() {
+        match self.end_time.borrow().as_ref() {
             Some(t) => gt > t.as_secs_f32(),
             None => false
         }

@@ -86,7 +86,7 @@ impl SideEffectsMonitor for DynamicVitalsSideEffect {
             self.init_new_cycle();
         }
 
-        return result;
+        result
     }
 
     fn as_any(&self) -> &dyn Any { self }

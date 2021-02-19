@@ -44,7 +44,7 @@ impl Health {
 
         self.queue_message(Event::InjurySpawned(name_for_message, body_part));
 
-        return Ok(result);
+        Ok(result)
     }
 
     /// Removes active injury if exists. Returns `Err` if not.
@@ -72,6 +72,6 @@ impl Health {
 
         self.queue_message(Event::InjuryRemoved(key.injury.to_string(), key.body_part));
 
-        return Ok(());
+        Ok(())
     }
 }

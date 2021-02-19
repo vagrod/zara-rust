@@ -169,7 +169,7 @@ impl Health {
             }
         }
 
-        return side_effects_summary;
+        side_effects_summary
     }
 
     fn process_diseases(&self, game_time: &GameTimeC, game_time_delta: f32) -> ProcessDiseasesResult {
@@ -263,7 +263,7 @@ impl Health {
 
         result.cleanup();
 
-        return ProcessDiseasesResult {
+        ProcessDiseasesResult {
             deltas: result
         }
     }
@@ -355,7 +355,7 @@ impl Health {
 
         result.cleanup();
 
-        return ProcessInjuriesResult {
+        ProcessInjuriesResult {
             deltas: result,
             blood_loss
         }
