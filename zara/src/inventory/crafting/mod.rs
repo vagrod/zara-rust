@@ -119,18 +119,16 @@ impl Inventory {
 
         // map_err if prettier here, but will need to "subclass" the Result<(), CombinationExecuteErr> then.
         // The `?` complains here, needs `From` trait
-        match self.check_for_resources(combination_id) {
-            Err(e) => return Err(CombinationExecuteErr::ResourceError(e)),
-            _ => { } // Pass if ok
+        if let Err(e) = self.check_for_resources(combination_id) {
+            return Err(CombinationExecuteErr::ResourceError(e));
         }
 
         {
             let mut b = self.items.borrow_mut();
             for (key, item_data) in cmb.items.borrow().iter() {
                 // Properly use the item. It should return ok because we just checked resources
-                match self.use_item_internal(key, item_data.count, &mut b) {
-                    Err(e) => return Err(CombinationExecuteErr::UseItemError(e)),
-                    _ => { } // Pass if ok
+                if let Err(e) = self.use_item_internal(key, item_data.count, &mut b) {
+                    return Err(CombinationExecuteErr::UseItemError(e));
                 }
             }
 
