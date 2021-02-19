@@ -144,10 +144,9 @@ impl StateObject {
         if !self.is_captured { return; }
 
         // Restore the main Zara state
-        match &self.main_state {
-            Some(st) => controller.restore_state(st),
-            _ => { }
-        };
+        if let Some(st) = &self.main_state {
+            controller.restore_state(st);
+        }
 
         // Clear diseases
         controller.health.clear_diseases();

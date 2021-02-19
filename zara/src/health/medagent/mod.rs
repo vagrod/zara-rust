@@ -223,12 +223,9 @@ impl MedicalAgent {
         for (_, dose) in doses.iter() {
             if start_time > dose.start_time { start_time = dose.start_time; }
             if dose.end_time > end_time { end_time = dose.end_time; }
-            match dose.lerp.evaluate(gt) {
-                Some(value) => {
-                    if max_percent_of_activity < value { max_percent_of_activity = value; }
-                },
-                _ => { }
-            };
+            if let Some(value) = dose.lerp.evaluate(gt) {
+                if max_percent_of_activity < value { max_percent_of_activity = value; }
+            }
         }
         // Sanity check
         let is_active;

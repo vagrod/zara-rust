@@ -140,7 +140,7 @@ impl ActiveDisease {
     ///
     /// [`invert`]: #method.invert
     ///
-    /// ## Returns
+    /// # Returns
     /// Ok on success.
     pub fn invert_back(&self, game_time: &GameTimeC) -> Result<(), ChainInvertBackErr> {
         if !self.is_inverted.get() { return Err(ChainInvertBackErr::AlreadyInvertedBack); }

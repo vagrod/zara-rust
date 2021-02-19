@@ -43,9 +43,8 @@ impl Body {
             result += data.cold_resistance;
         }
 
-        match self.clothes_group.borrow().as_ref() {
-            Some(g) => result += g.bonus_cold_resistance,
-            _ => { }
+        if let Some(g) = self.clothes_group.borrow().as_ref() {
+            result += g.bonus_cold_resistance;
         }
 
         return result;
@@ -63,9 +62,8 @@ impl Body {
             result += data.water_resistance;
         }
 
-        match self.clothes_group.borrow().as_ref() {
-            Some(g) => result += g.bonus_water_resistance,
-            _ => { }
+        if let Some(g) = self.clothes_group.borrow().as_ref() {
+            result += g.bonus_water_resistance;
         }
 
         return result;

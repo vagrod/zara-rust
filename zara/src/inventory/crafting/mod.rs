@@ -117,6 +117,8 @@ impl Inventory {
             None => return Err(CombinationExecuteErr::CombinationNotFound)
         };
 
+        // map_err if prettier here, but will need to "subclass" the Result<(), CombinationExecuteErr> then.
+        // The `?` complains here, needs `From` trait
         match self.check_for_resources(combination_id) {
             Err(e) => return Err(CombinationExecuteErr::ResourceError(e)),
             _ => { } // Pass if ok

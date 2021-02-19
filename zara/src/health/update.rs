@@ -205,39 +205,33 @@ impl Health {
                     let active_stage = disease.get_active_stage(game_time);
 
                     // Handling death probabilities
-                    match &active_stage {
-                        Some(st) => {
-                            let chance = st.info.chance_of_death.unwrap_or(0);
+                    if let Some(st) = &active_stage {
+                        let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if chance > 0 && !disease.is_healing() {
-                                // The further into the stage, the bigger is probability of death
-                                if crate::utils::roll_dice(st.percent_active(game_time))
-                                    && crate::utils::roll_dice(chance)
-                                {
-                                    self.is_alive.set(false);
+                        if chance > 0 && !disease.is_healing() {
+                            // The further into the stage, the bigger is probability of death
+                            if crate::utils::roll_dice(st.percent_active(game_time))
+                                && crate::utils::roll_dice(chance)
+                            {
+                                self.is_alive.set(false);
 
-                                    self.queue_message(Event::DeathFromDisease(disease_name.to_string()))
-                                }
+                                self.queue_message(Event::DeathFromDisease(disease_name.to_string()))
                             }
-                        },
-                        _ => { }
+                        }
                     }
 
                     // Handling self-heal
                     if !disease.needs_treatment && disease.will_self_heal_on != StageLevel::Undefined && !disease.is_healing() {
-                        match &active_stage {
-                            Some(st) => {
-                                let p = st.percent_active(game_time);
-                                let dice = crate::utils::range(50., 99.) as usize;
-                                if (st.info.level == disease.will_self_heal_on && p > dice) ||
-                                    st.info.level as i32 > disease.will_self_heal_on as i32
-                                {
-                                    // Invoke the healing process
-                                    disease.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::DiseaseSelfHealStarted(disease_name.to_string()));
-                                }
-                            },
-                            _ => { }
+                        if let Some(st) = &active_stage {
+                            let p = st.percent_active(game_time);
+                            let dice = crate::utils::range(50., 99.) as usize;
+                            if (st.info.level == disease.will_self_heal_on && p > dice) ||
+                                st.info.level as i32 > disease.will_self_heal_on as i32
+                            {
+                                // Invoke the healing process
+                                disease.invert(game_time).ok(); // aren't interested in result
+                                self.queue_message(Event::DiseaseSelfHealStarted(disease_name.to_string()));
+                            }
                         }
                     }
                 }
@@ -313,45 +307,39 @@ impl Health {
                     let active_stage = injury.get_active_stage(game_time);
 
                     // Handling death probabilities
-                    match &active_stage {
-                        Some(st) => {
-                            let chance = st.info.chance_of_death.unwrap_or(0);
+                    if let Some(st) = &active_stage {
+                        let chance = st.info.chance_of_death.unwrap_or(0);
 
-                            if chance > 0 && !injury.is_healing() {
-                                // The further into the stage, the bigger is probability of death
-                                if crate::utils::roll_dice(st.percent_active(game_time))
-                                    && crate::utils::roll_dice(chance)
-                                {
-                                    self.is_alive.set(false);
+                        if chance > 0 && !injury.is_healing() {
+                            // The further into the stage, the bigger is probability of death
+                            if crate::utils::roll_dice(st.percent_active(game_time))
+                                && crate::utils::roll_dice(chance)
+                            {
+                                self.is_alive.set(false);
 
-                                    self.queue_message(Event::DeathFromInjury(
-                                        injury.injury.get_name().to_string(),
-                                        injury.body_part
-                                    ));
-                                }
+                                self.queue_message(Event::DeathFromInjury(
+                                    injury.injury.get_name().to_string(),
+                                    injury.body_part
+                                ));
                             }
-                        },
-                        _ => { }
+                        }
                     }
 
                     // Handling self-heal
                     if !injury.needs_treatment && injury.will_self_heal_on != StageLevel::Undefined && !injury.is_healing() {
-                        match &active_stage {
-                            Some(st) => {
-                                let p = st.percent_active(game_time);
-                                let dice = crate::utils::range(50., 99.) as usize;
-                                if (st.info.level == injury.will_self_heal_on && p > dice) ||
-                                    st.info.level as i32 > injury.will_self_heal_on as i32
-                                {
-                                    // Invoke the healing process
-                                    injury.invert(game_time).ok(); // aren't interested in result
-                                    self.queue_message(Event::InjurySelfHealStarted(
-                                        injury.injury.get_name().to_string(),
-                                        injury.body_part
-                                    ));
-                                }
-                            },
-                            _ => { }
+                        if let Some(st) = &active_stage {
+                            let p = st.percent_active(game_time);
+                            let dice = crate::utils::range(50., 99.) as usize;
+                            if (st.info.level == injury.will_self_heal_on && p > dice) ||
+                                st.info.level as i32 > injury.will_self_heal_on as i32
+                            {
+                                // Invoke the healing process
+                                injury.invert(game_time).ok(); // aren't interested in result
+                                self.queue_message(Event::InjurySelfHealStarted(
+                                    injury.injury.get_name().to_string(),
+                                    injury.body_part
+                                ));
+                            }
                         }
                     }
                 }

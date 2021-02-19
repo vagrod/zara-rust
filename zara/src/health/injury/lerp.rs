@@ -75,9 +75,8 @@ impl ActiveInjury {
                 let next_level = StageLevel::try_from(stage.info.level as i32 - 1)
                     .unwrap_or(StageLevel::Undefined);
                 if next_level != StageLevel::Undefined {
-                    match stages.get(&next_level) {
-                        Some(st) => next_stage = Some(st),
-                        _ => { }
+                    if let Some(st) = stages.get(&next_level) {
+                        next_stage = Some(st);
                     }
                 } else {
                     // Need to lerp to zeros (to "healthy" state) when reached

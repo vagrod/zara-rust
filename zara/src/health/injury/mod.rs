@@ -488,13 +488,11 @@ impl ActiveInjury {
                                      inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
-        match self.treatment.as_ref() {
-            Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_appliance_taken(game_time, item, body_part, &st, &self, inventory_items),
-                None => { }
-            },
-            None => { }
-        };
+        if let Some(t) = self.treatment.as_ref() {
+            if let Some(st) = self.get_active_stage(game_time) {
+                t.on_appliance_taken(game_time, item, body_part, &st, &self, inventory_items);
+            }
+        }
     }
 
     /// Temporary stop blood drain. You can call [`resume_blood_loss`] to resume it

@@ -155,9 +155,8 @@ fn spawn_injuries(person: &zara::ZaraController<ZaraEventsListener>) {
     // Body appliances test
     person.take_appliance(&format!("Bandage"), BodyPart::LeftShoulder).ok();
 
-    match key_result {
-        Ok(key) => person.health.injuries.borrow().get(&key).unwrap().stop_blood_loss(),
-        _ => { }
+    if let Ok(key) = key_result {
+        person.health.injuries.borrow().get(&key).unwrap().stop_blood_loss();
     }
     //person.remove_appliance(&format!("Bandage"), BodyParts::LeftShoulder);
 }
