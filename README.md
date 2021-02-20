@@ -1,7 +1,9 @@
 ![Zara Survival Engine](http://imw.su/zaralogo_rust_gh.png)
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vagrod/zara-rust/blob/master/zara/LICENSE)
-![Crates.io](https://img.shields.io/crates/v/zara?color=orange)
+[![Crates.io](https://img.shields.io/crates/v/zara?color=orange)](https://crates.io/crates/zara)
+[![API](https://docs.rs/zara/badge.svg)](https://docs.rs/zara)
+![Minimum rustc version](https://img.shields.io/badge/rustc-1.36+-lightgray.svg)
 
 Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org): [crates.io link](https://crates.io/crates/zara).
 
