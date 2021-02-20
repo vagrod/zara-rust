@@ -5,7 +5,7 @@
 [![API](https://docs.rs/zara/badge.svg)](https://docs.rs/zara)
 ![Minimum rustc version](https://img.shields.io/badge/rustc-1.36+-lightgray.svg)
 
-Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org): [crates.io link](https://crates.io/crates/zara).
+Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in [Rust](https://www.rust-lang.org).
 
 
 ![Zara Rust Demo](http://imw.su/zara_rust_008.png)
