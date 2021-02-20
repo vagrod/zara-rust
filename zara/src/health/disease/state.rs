@@ -362,18 +362,12 @@ impl ActiveDisease {
             needs_treatment: self.needs_treatment,
             activation_time: self.activation_time.borrow().to_duration(),
             will_end: self.will_end.get(),
-            end_time: match self.end_time.borrow().as_ref() {
-                Some(t) => Some(t.to_duration()),
-                None => None
-            },
+            end_time: self.end_time.borrow().as_ref().map(|x| x.to_duration()),
             will_self_heal_on: self.will_self_heal_on,
             is_inverted: self.is_inverted.get(),
             total_duration: self.total_duration,
 
-            lerp_data: match self.lerp_data.borrow().as_ref() {
-                Some(l) => Some(l.get_state()),
-                None => None
-            },
+            lerp_data: self.lerp_data.borrow().as_ref().map(|x| x.get_state()),
             initial_data: self.initial_data.borrow().iter().map(|x| x.get_state()).collect(),
             last_deltas: self.last_deltas.borrow().get_state(),
             stages: self.stages.borrow().iter().map(|(k,x)| x.get_state(k)).collect()
@@ -384,10 +378,7 @@ impl ActiveDisease {
         self.activation_time.replace(GameTimeC::from_duration(state.activation_time));
         self.will_end.set(state.will_end);
 
-        self.end_time.replace(match state.end_time {
-            Some(d) => Some(GameTimeC::from_duration(d)),
-            None => None
-        });
+        self.end_time.replace(state.end_time.map(|x| GameTimeC::from_duration(x)));
         self.is_inverted.set(state.is_inverted);
 
         self.initial_data.replace(state.initial_data.iter().map(|x| StageDescription{

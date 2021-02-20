@@ -11,12 +11,7 @@ impl ActiveDisease {
 
     /// Gets the end time of this disease, if it is finite
     pub fn end_time(&self) -> Option<GameTimeC> {
-        let b = self.end_time.borrow();
-
-        match b.as_ref() {
-            Some(o) => Some(o.clone()),
-            None => None
-        }
+        self.end_time.borrow().as_ref().map(|x| x.clone())
     }
 
     /// Gets a copy of active disease stage data for a given time

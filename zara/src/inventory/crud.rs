@@ -9,9 +9,7 @@ impl Inventory {
     ///# Parameters
     ///- `item_name`: unique name of the item (item kind)
     pub fn has_item(&self, item_name: &String) -> bool {
-        let b = self.items.borrow();
-
-        b.contains_key(item_name)
+        self.items.borrow().contains_key(item_name)
     }
 
     /// Adds new item to the inventory and recalculates inventory weight
@@ -23,7 +21,7 @@ impl Inventory {
     /// Borrows the `items` collection
     pub fn add_item(&self, item: Box<dyn InventoryItem>) {
         let key = item.get_name();
-        let key_for_message = item.get_name().to_string();
+        let key_for_message = key.clone();
 
         self.items.borrow_mut().insert(key, item);
         self.recalculate_weight();
@@ -51,9 +49,9 @@ impl Inventory {
 
             self.queue_message(Event::InventoryItemRemoved(item_kind.to_string()));
 
-            return Ok(());
+            Ok(())
+        } else {
+            Err(InventoryItemAccessErr::ItemNotFound)
         }
-
-        Err(InventoryItemAccessErr::ItemNotFound)
     }
 }

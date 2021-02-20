@@ -117,19 +117,13 @@ impl Inventory {
             None => return Err(CombinationExecuteErr::CombinationNotFound)
         };
 
-        // map_err if prettier here, but will need to "subclass" the Result<(), CombinationExecuteErr> then.
-        // The `?` complains here, needs `From` trait
-        if let Err(e) = self.check_for_resources(combination_id) {
-            return Err(CombinationExecuteErr::ResourceError(e));
-        }
-
+        self.check_for_resources(combination_id).or_else(|e| Err(CombinationExecuteErr::ResourceError(e)))?;
         {
             let mut b = self.items.borrow_mut();
             for (key, item_data) in cmb.items.borrow().iter() {
                 // Properly use the item. It should return ok because we just checked resources
-                if let Err(e) = self.use_item_internal(key, item_data.count, &mut b) {
-                    return Err(CombinationExecuteErr::UseItemError(e));
-                }
+                self.use_item_internal(key, item_data.count, &mut b)
+                    .or_else(|e| Err(CombinationExecuteErr::UseItemError(e)))?;
             }
 
             let resulted = (cmb.create)();
@@ -207,7 +201,7 @@ impl Debug for CraftingCombination {
             .field("match_key", &self.match_key)
             .field("result_item", &self.result_item)
             .field("items", &self.items)
-            .finish()
+        .finish()
     }
 }
 impl fmt::Display for CraftingCombination {

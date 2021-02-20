@@ -544,14 +544,11 @@ impl ActiveDisease {
         let initial_data = disease.get_stages();
 
         for stage in disease.get_stages().iter() {
-            match stage.self_heal_chance {
-                Some(c) => {
-                    if !self_heal && crate::utils::roll_dice(c) {
-                        self_heal_level = stage.level;
-                        self_heal = true;
-                    }
-                },
-                None => { }
+            if let Some(c) = stage.self_heal_chance {
+                if !self_heal && crate::utils::roll_dice(c) {
+                    self_heal_level = stage.level;
+                    self_heal = true;
+                }
             }
 
             let start_time = GameTimeC::from_duration(time_elapsed);
@@ -598,13 +595,11 @@ impl ActiveDisease {
                        inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
-        match self.treatment.as_ref() {
-            Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_consumed(game_time, item, &st, &self, inventory_items),
-                None => { }
-            },
-            None => { }
-        };
+        if let Some(t) = self.treatment.as_ref() {
+            if let Some(st) = self.get_active_stage(game_time) {
+                t.on_consumed(game_time, item, &st, &self, inventory_items);
+            }
+        }
     }
 
     /// Is called by Zara from the health engine when appliance is taken
@@ -612,13 +607,11 @@ impl ActiveDisease {
                                      inventory_items: &HashMap<String, Box<dyn InventoryItem>>) {
         if !self.is_active(game_time) { return; }
 
-        match self.treatment.as_ref() {
-            Some(t) => match self.get_active_stage(game_time) {
-                Some(st) => t.on_appliance_taken(game_time, item, body_part, &st, &self, inventory_items),
-                None => { }
-            },
-            None => { }
-        };
+        if let Some(t) = self.treatment.as_ref() {
+            if let Some(st) = self.get_active_stage(game_time) {
+                t.on_appliance_taken(game_time, item, body_part, &st, &self, inventory_items);
+            }
+        }
     }
 }
 

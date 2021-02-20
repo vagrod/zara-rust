@@ -214,10 +214,7 @@ impl MedicalAgent {
             doses: self.doses.borrow().iter().map(|(k, x)| x.get_state(k)).collect(),
             name : self.name.to_string(),
             is_active: self.is_active.get(),
-            last_dose_end_time: match self.last_dose_end_time.borrow().as_ref() {
-                Some(t) => Some(t.to_duration()),
-                None => None
-            },
+            last_dose_end_time: self.last_dose_end_time.borrow().as_ref().map(|x| x.to_duration()),
             group: self.group.get_state(),
             percent_of_presence: self.percent_of_presence.get(),
             percent_of_activity: self.percent_of_activity.get(),
@@ -229,10 +226,7 @@ impl MedicalAgent {
         self.is_active.set(state.is_active);
         self.percent_of_presence.set(state.percent_of_presence);
         self.percent_of_activity.set(state.percent_of_activity);
-        self.last_dose_end_time.replace(match state.last_dose_end_time {
-            Some(t) => Some(GameTimeC::from_duration(t)),
-            None => None
-        });
+        self.last_dose_end_time.replace(state.last_dose_end_time.map(|x| GameTimeC::from_duration(x)));
 
         let mut b = self.doses.borrow_mut();
 

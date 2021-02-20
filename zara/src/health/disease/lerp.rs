@@ -46,19 +46,16 @@ impl ActiveDisease {
         lerp_data.start_time = gt;
 
         // Clear the old structure
-        match self.lerp_data.borrow_mut().as_mut() {
-            Some(m) => {
-                m.body_temp_data.clear();
-                m.heart_rate_data.clear();
-                m.pressure_top_data.clear();
-                m.pressure_bottom_data.clear();
-                m.fatigue_data.clear();
-                m.stamina_data.clear();
-                m.food_data.clear();
-                m.water_data.clear();
-            },
-            None => { }
-        };
+        if let Some(m) = self.lerp_data.borrow_mut().as_mut() {
+            m.body_temp_data.clear();
+            m.heart_rate_data.clear();
+            m.pressure_top_data.clear();
+            m.pressure_bottom_data.clear();
+            m.fatigue_data.clear();
+            m.stamina_data.clear();
+            m.food_data.clear();
+            m.water_data.clear();
+        }
         self.lerp_data.replace(None);
 
         let healthy_stage = ActiveStage {
@@ -322,12 +319,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.body_temperature_delta = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.body_temperature_delta = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Heart Rate
@@ -338,12 +332,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.heart_rate_delta = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.heart_rate_delta = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Top Pressure
@@ -354,12 +345,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.pressure_top_delta = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.pressure_top_delta = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Bottom Pressure
@@ -370,12 +358,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.pressure_bottom_delta = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Fatigue
@@ -386,12 +371,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.fatigue_delta = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.fatigue_delta = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Stamina
@@ -402,12 +384,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.stamina_drain = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.stamina_drain = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Food
@@ -418,12 +397,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.food_drain = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.food_drain = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Water
@@ -434,12 +410,9 @@ impl ActiveDisease {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.water_drain = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.water_drain = lerp(d.start_value, d.end_value, p);
             }
         }
 

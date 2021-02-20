@@ -133,15 +133,9 @@ impl Body {
 
             clothes: self.clothes.borrow().iter().map(|x|x.to_string()).collect(),
             appliances: self.appliances.borrow().iter().map(|x| x.get_state()).collect(),
-            clothes_group: match self.clothes_group.borrow().as_ref() {
-                Some(g) => Some(g.get_state()),
-                None => None
-            },
+            clothes_group: self.clothes_group.borrow().as_ref().map(|x| x.get_state()),
             clothes_data: self.clothes_data.borrow().iter().map(|(k, x)| x.get_state(k.to_string())).collect(),
-            last_sleep_time: match self.last_sleep_time.borrow().as_ref() {
-                Some(t) => Some(t.to_duration()),
-                None => None
-            }
+            last_sleep_time: self.last_sleep_time.borrow().as_ref().map(|x| x.to_duration())
         }
     }
 
@@ -157,21 +151,15 @@ impl Body {
         self.sleeping_counter.set(state.sleeping_counter);
 
         self.clothes_group.replace(
-            match &state.clothes_group {
-                Some(g) => Some(ClothesGroupC {
-                    name: g.name.to_string(),
-                    bonus_water_resistance: g.bonus_water_resistance,
-                    bonus_cold_resistance: g.bonus_cold_resistance
-                }),
-                None => None
-            }
+            state.clothes_group.as_ref().map(|x|
+                ClothesGroupC {
+                    name: x.name.to_string(),
+                    bonus_water_resistance: x.bonus_water_resistance,
+                    bonus_cold_resistance: x.bonus_cold_resistance
+                }
+            )
         );
-        self.last_sleep_time.replace(
-            match state.last_sleep_time {
-                Some(t) => Some(GameTimeC::from_duration(t)),
-                None => None
-            }
-        );
+        self.last_sleep_time.replace(state.last_sleep_time.map(|x| GameTimeC::from_duration(x)));
         {
             let mut b = self.clothes.borrow_mut();
 

@@ -21,7 +21,7 @@ impl Body {
 
         let mut b = self.appliances.borrow_mut();
 
-        return match b.iter().position(|x| x.body_part == body_part && &x.item_name == item_name) {
+        match b.iter().position(|x| x.body_part == body_part && &x.item_name == item_name) {
             Some(ind) => {
                 b.remove(ind);
 

@@ -33,13 +33,10 @@ impl ActiveInjury {
         lerp_data.start_time = gt;
 
         // Clear the old structure
-        match self.lerp_data.borrow_mut().as_mut() {
-            Some(m) => {
-                m.stamina_data.clear();
-                m.blood_data.clear();
-            },
-            None => { }
-        };
+        if let Some(m) = self.lerp_data.borrow_mut().as_mut() {
+            m.stamina_data.clear();
+            m.blood_data.clear();
+        }
         self.lerp_data.replace(None);
 
         let healthy_stage = ActiveStage {
@@ -189,12 +186,9 @@ impl ActiveInjury {
                     break;
                 }
             }
-            match ld {
-                Some(d) => {
-                    let p = clamp_01((gt - d.start_time) / d.duration);
-                    result.stamina_drain = lerp(d.start_value, d.end_value, p);
-                },
-                None => { }
+            if let Some(d) = ld {
+                let p = clamp_01((gt - d.start_time) / d.duration);
+                result.stamina_drain = lerp(d.start_value, d.end_value, p);
             }
         }
         { // Blood
@@ -208,12 +202,9 @@ impl ActiveInjury {
                         break;
                     }
                 }
-                match ld {
-                    Some(d) => {
-                        let p = clamp_01((gt - d.start_time) / d.duration);
-                        result.blood_drain = lerp(d.start_value, d.end_value, p);
-                    },
-                    None => { }
+                if let Some(d) = ld {
+                    let p = clamp_01((gt - d.start_time) / d.duration);
+                    result.blood_drain = lerp(d.start_value, d.end_value, p);
                 }
             }
         }

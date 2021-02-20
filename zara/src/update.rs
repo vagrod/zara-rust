@@ -166,13 +166,6 @@ impl<E: Listener + 'static> ZaraController<E> {
             }
         };
 
-        // Determine last sleep time
-        let last_slept =
-            match self.body.last_sleep_time().as_ref() {
-                Some(t) => Some(t.clone()),
-                None => { None }
-            };
-
         FrameSummaryC {
             game_time: self.environment.game_time.to_contract(),
             game_time_delta: time_delta.as_secs_f32(),
@@ -183,7 +176,7 @@ impl<E: Listener + 'static> ZaraController<E> {
                 is_underwater: self.player_state.is_underwater.get(),
                 is_sleeping: self.body.is_sleeping(),
                 last_slept_duration: self.body.last_sleep_duration(),
-                last_slept,
+                last_slept: self.body.last_sleep_time().as_ref().map(|x| x.clone()),
                 warmth_level: self.body.warmth_level(),
                 wetness_level: self.body.wetness_level(),
                 clothes: self.body.clothes.borrow().clone(),

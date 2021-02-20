@@ -67,10 +67,7 @@ impl Inventory {
     /// # Parameters
     /// - `name`: unique item kind name
     pub fn get_count_of(&self, name: &String) -> Option<usize> {
-        match self.items.borrow().get(name) {
-            Some(item) => Some(item.get_count()),
-            None => None
-        }
+        self.items.borrow().get(name).map(|x| x.get_count())
     }
 
     /// Returns total weight of a certain item. None if not found.
@@ -78,10 +75,7 @@ impl Inventory {
     /// # Parameters
     /// - `name`: unique item kind name
     pub fn get_weight_of(&self, name: &String) -> Option<f32> {
-        match self.items.borrow().get(name) {
-            Some(item) => Some(item.get_total_weight()),
-            None => None
-        }
+        self.items.borrow().get(name).map(|x| x.get_total_weight())
     }
 
     /// Decreases item count for a given item kind. If count becomes zero, removes item from
@@ -97,7 +91,7 @@ impl Inventory {
     pub fn use_item(&self, name: &String, amount: usize) -> Result<(), InventoryUseErr> {
         {
             let mut b = self.items.borrow_mut();
-            self.use_item_internal(name, amount, &mut b)?
+            self.use_item_internal(name, amount, &mut b)?;
         }
 
         self.recalculate_weight();

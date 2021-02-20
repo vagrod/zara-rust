@@ -25,10 +25,7 @@ impl Body {
 
     /// Returns copy of matched clothes group description.
     pub fn clothes_group(&self) -> Option<ClothesGroupC> {
-        match self.clothes_group.borrow().as_ref() {
-            Some(g) => Some(g.clone()),
-            _ => None
-        }
+        self.clothes_group.borrow().clone()
     }
 
     /// Returns total 0..100 bonus cold resistance value calculated as a sum of all active clothes

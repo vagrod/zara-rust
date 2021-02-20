@@ -197,7 +197,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         // Change items count
         self.inventory.use_item(item_name, consumable.consumed_count)
-            .or_else(|err| Err(ItemConsumeErr::CouldNotUseItem(err)))?;
+            .or_else(|e| Err(ItemConsumeErr::CouldNotUseItem(e)))?;
 
         // Send the event
         self.dispatcher.borrow_mut().dispatch(Event::ItemConsumed(consumable));
@@ -267,7 +267,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         // Change items count
         self.inventory.use_item(item_name, appliance.taken_count)
-            .or_else(|err| Err(ApplianceTakeErr::CouldNotUseItem(err)))?;
+            .or_else(|e| Err(ApplianceTakeErr::CouldNotUseItem(e)))?;
 
         if appliance.is_body_appliance {
             // Notify body controller

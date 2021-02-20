@@ -430,14 +430,11 @@ impl ActiveInjury {
         let initial_data = injury.get_stages();
 
         for stage in injury.get_stages().iter() {
-            match stage.self_heal_chance {
-                Some(c) => {
-                    if !self_heal && crate::utils::roll_dice(c) {
-                        self_heal_level = stage.level;
-                        self_heal = true;
-                    }
-                },
-                None => { }
+            if let Some(c) = stage.self_heal_chance {
+                if !self_heal && crate::utils::roll_dice(c) {
+                    self_heal_level = stage.level;
+                    self_heal = true;
+                }
             }
 
             let start_time = GameTimeC::from_duration(time_elapsed);
