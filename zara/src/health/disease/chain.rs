@@ -12,6 +12,20 @@ impl ActiveDisease {
     ///
     /// Use this to start the "curing" process
     ///
+    /// ``` none
+    /// |InitialStage------------->|Progressing----------->|Worrying--------------->|Critical...
+    ///                                                              ^
+    ///                                                         current time
+    ///                                                         (Worrying 5%)
+    /// ```
+    /// After the inversion (after `invert` call):
+    /// ``` none
+    /// |Critical--------->|Worrying------->|Progressing----------->|InitialStage--------->|Cured
+    ///                                 ^
+    ///                            current time
+    ///                           (Worrying 95%)
+    /// ```
+    ///
     /// # Parameters
     /// - `game_time`: "pivot point" game time for the inversion
     ///
@@ -128,8 +142,23 @@ impl ActiveDisease {
         Ok(())
     }
 
-    /// Inverts disease stages back so that disease goes from the current state to its end.
-    /// Use this to cancel the "curing" process and make disease getting "worse" again.
+    /// Only if disease is now healing. Inverts disease stages back so that disease goes from the
+    /// current state to its end. Use this to cancel the "curing" process and make disease getting
+    /// "worse" again.
+    ///
+    /// ``` none
+    /// |Critical----------->|Worrying----------->|Progressing--------->|InitialStage------->|Cured
+    ///                                       ^
+    ///                                  current time
+    ///                                 (Worrying 95%)
+    /// ```
+    /// After the `invert_back` call:
+    /// ``` none
+    /// |InitialStage------------->|Progressing----------->|Worrying--------------->|Critical...
+    ///                                                              ^
+    ///                                                         current time
+    ///                                                         (Worrying 5%)
+    /// ```
     ///
     /// # Parameters
     /// - `game_time`: "pivot point" game time for the inversion
