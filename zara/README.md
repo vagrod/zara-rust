@@ -1,6 +1,10 @@
 # Zara Survival Engine
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vagrod/zara-rust/blob/master/zara/LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/vagrod/zara-rust/blob/master/zara/LICENSE)
+[![API](https://img.shields.io/badge/github-wiki-blue.svg?&logo=github)](https://github.com/vagrod/zara-rust/wiki)
+![Minimum rustc version](https://img.shields.io/badge/rustc-1.43+-lightgray.svg?&logo=rust)
+
+![Zara logo](https://raw.githubusercontent.com/vagrod/zara-rust/master/logo_cropped.png)
 
 Full-featured [Zara Survival Engine](https://github.com/vagrod/zara) rewritten from scratch in Rust.
 
