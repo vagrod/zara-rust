@@ -12,6 +12,20 @@ impl ActiveInjury {
     ///
     /// Use this to start the "curing" process
     ///
+    /// ``` none
+    /// |InitialStage----------->|Progressing--------->|Worrying--------------->|Critical...
+    ///                                                          ^
+    ///                                                     current time
+    ///                                                     (Worrying 5%)
+    /// ```
+    /// After the inversion (after `invert` call):
+    /// ``` none
+    /// |Critical--------->|Worrying------->|Progressing------->|InitialStage--------->|Cured
+    ///                                 ^
+    ///                            current time
+    ///                           (Worrying 95%)
+    /// ```
+    ///
     /// [`invert_back`]: #method.invert_back
     ///
     /// # Parameters
@@ -128,8 +142,23 @@ impl ActiveInjury {
         Ok(())
     }
 
-    /// Inverts injury stages back so that injury goes from the current state to its end.
-    /// Use this to cancel the "curing" process and make injury getting "worse" again.
+    /// Only if injury is now healing. Inverts injury stages back so that injury goes from the
+    /// current state to its end. Use this to cancel the "curing" process and make injury getting
+    /// "worse" again.
+    ///
+    /// ``` none
+    /// |Critical----------->|Worrying----------->|Progressing--------->|InitialStage------->|Cured
+    ///                                       ^
+    ///                                  current time
+    ///                                 (Worrying 95%)
+    /// ```
+    /// After the `invert_back` call:
+    /// ``` none
+    /// |InitialStage------------->|Progressing----------->|Worrying--------------->|Critical...
+    ///                                                              ^
+    ///                                                         current time
+    ///                                                         (Worrying 5%)
+    /// ```
     ///
     /// [`invert`]: #method.invert
     ///

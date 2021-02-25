@@ -13,14 +13,14 @@ impl ActiveDisease {
     /// Use this to start the "curing" process
     ///
     /// ``` none
-    /// |InitialStage------------->|Progressing----------->|Worrying--------------->|Critical...
-    ///                                                              ^
-    ///                                                         current time
-    ///                                                         (Worrying 5%)
+    /// |InitialStage--------->|Progressing----------->|Worrying--------------->|Critical...
+    ///                                                          ^
+    ///                                                     current time
+    ///                                                     (Worrying 5%)
     /// ```
     /// After the inversion (after `invert` call):
     /// ``` none
-    /// |Critical--------->|Worrying------->|Progressing----------->|InitialStage--------->|Cured
+    /// |Critical--------->|Worrying------->|Progressing------->|InitialStage--------->|Cured
     ///                                 ^
     ///                            current time
     ///                           (Worrying 95%)
