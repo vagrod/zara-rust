@@ -238,7 +238,9 @@ pub struct ActiveStage {
 
 /// Describes deltas calculated by the active injury
 pub struct InjuryDeltasC {
+    /// Delta value for the stamina (relative drain, 0..100 per game second)
     pub stamina_drain: f32,
+    /// Delta value for the blood level (relative drain, 0..100 per game second)
     pub blood_drain: f32
 }
 
@@ -310,7 +312,7 @@ impl ActiveStage {
 pub trait Injury {
     /// Gets the unique name of this injury kind
     fn get_name(&self) -> String;
-    /// Gets all injury stages. Use [`StageBuilder`](zara::health::injury::StageBuilder) to
+    /// Gets all injury stages. Use [`StageBuilder`](crate::health::injury::StageBuilder) to
     /// describe a stage
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this injury object
@@ -417,7 +419,7 @@ impl ActiveInjury {
     /// Creates new active disease object
     ///
     /// # Parameters
-    /// - `injury`: instance of an object with the [`Injury`](crate::zara::health::injury::Injury) trait
+    /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
     /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately

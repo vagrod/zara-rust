@@ -16,7 +16,9 @@ pub mod event;
 /// Structure for storing all needed frame data for controllers
 /// including events dispatcher
 pub struct FrameC<'a, E: Listener + 'static> {
+    /// Snapshot of the current frame state
     pub data: &'a FrameSummaryC,
+    /// Events dispatcher
     pub events: &'a mut Dispatcher<E>
 }
 
@@ -206,9 +208,13 @@ impl GameTime {
 /// Structure for storing simple game time slice
 #[derive(Copy, Clone, Debug, Default)]
 pub struct GameTimeC {
+    /// Day value
     pub day: u64,
+    /// Hour value
     pub hour: u64,
+    /// Minute value
     pub minute: u64,
+    /// Second value
     pub second: f64
 }
 impl Ord for GameTimeC {
@@ -311,10 +317,14 @@ impl ops::Sub<GameTimeC> for GameTimeC {
     }
 }
 
+/// Describes clothes group object simplified contract
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesGroupC {
+    /// Name of the group
     pub name: String,
+    /// Group bonus cold resistance (0..100)
     pub bonus_cold_resistance: usize,
+    /// Group bonus water resistance (0..100)
     pub bonus_water_resistance: usize
 }
 impl fmt::Display for ClothesGroupC {
@@ -369,16 +379,24 @@ impl HealthC {
     }
 }
 
-/// Structure for storing active disease snapshot
+/// Structure for storing active disease simplified contract
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveDiseaseC {
+    /// Name of a disease
     pub name: String,
+    /// Time when this disease becomes active
     pub scheduled_time: GameTimeC,
+    /// Time when this disease ends (if ends)
     pub end_time: Option<GameTimeC>,
+    /// Current disease active level
     pub current_level: StageLevel,
+    /// Current disease active level progression (0..100)
     pub current_level_percent: usize,
+    /// Is this disease active now
     pub is_active: bool,
+    /// Is this disease inverted (healing) now
     pub is_healing: bool,
+    /// Do this disease needs treatment (or will self-heal)
     pub needs_treatment: bool
 }
 impl fmt::Display for ActiveDiseaseC {
@@ -387,19 +405,30 @@ impl fmt::Display for ActiveDiseaseC {
     }
 }
 
-/// Structure for storing active injury snapshot
+/// Structure for storing active injury simplified contract
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveInjuryC {
+    /// Name of the injury
     pub name: String,
+    /// Time when this injury becomes active
     pub scheduled_time: GameTimeC,
+    /// Time when this injury ends (if ends)
     pub end_time: Option<GameTimeC>,
+    /// Current injury active level
     pub current_level: StageLevel,
+    /// Current injury active level progression (0..100)
     pub current_level_percent: usize,
+    /// Is this injury active now
     pub is_active: bool,
+    /// Is this injury inverted (healing) now
     pub is_healing: bool,
+    /// Do this injury needs treatment (or will self-heal)
     pub needs_treatment: bool,
+    /// Was blood forcibly stopped for this injury
     pub is_blood_stopped: bool,
+    /// Body part where this injury resides
     pub body_part: BodyPart,
+    /// Is this injury a fracture
     pub is_fracture: bool
 }
 impl fmt::Display for ActiveInjuryC {
@@ -484,23 +513,38 @@ impl EnvironmentC {
     pub fn default() -> EnvironmentC { EnvironmentC::new(26., 0., 0.) }
 }
 
-/// Describes a snapshot of the player state for a single frame
+/// Simplified player state for a single frame
 #[derive(Clone, Debug, Default)]
 pub struct PlayerStatusC {
+    /// Is player walking now
     pub is_walking: bool,
+    /// Is player running now
     pub is_running: bool,
+    /// Is player swimming now
     pub is_swimming: bool,
+    /// Is player under the water now
     pub is_underwater: bool,
+    /// Is player sleeping now
     pub is_sleeping: bool,
+    /// Last time player slept (if any)
     pub last_slept: Option<GameTimeC>,
+    /// For how long player slept last time
     pub last_slept_duration: f32,
+    /// Player's current warmth level (-5..+5 is a comfort zone)
     pub warmth_level: f32,
+    /// Player's current wetness level (0..100)
     pub wetness_level: f32,
+    /// Clothes player is wearing now
     pub clothes: Vec<String>,
+    /// Body appliances player is wearing now
     pub appliances: Vec<BodyAppliance>,
+    /// Current clothes group (is any)
     pub clothes_group: Option<ClothesGroupC>,
+    /// Total calculated water resistance value (0..100)
     pub total_water_resistance: usize,
+    /// Total calculated cold resistance value (0..100)
     pub total_cold_resistance: usize,
+    /// Player's current inventory weight
     pub inventory_weight: f32
 }
 impl fmt::Display for PlayerStatusC {

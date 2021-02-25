@@ -77,7 +77,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// [`with_environment`]: #method.with_environment
     ///
     /// # Parameters
-    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose `notify` will be
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
     ///     called when Zara event occurs
     ///
     /// # Examples
@@ -95,9 +95,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// [`new`]: #method.new
     ///
     /// # Parameters
-    /// - `listener`: [`Listener`](crate::zara::utils::event::Listener) instance whose `notify` will be
+    /// - `listener`: [`Listener`](crate::utils::event::Listener) instance whose `notify` will be
     ///     called when Zara event occurs
-    /// - `env`: [`EnvironmentC`](crate::zara::utils::EnvironmentC) object that describes initial state of the environment
+    /// - `env`: [`EnvironmentC`](crate::utils::EnvironmentC) object that describes initial state of the environment
     ///
     /// # Examples
     /// ```
@@ -134,7 +134,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Consumes the item. Item which name is passed must have the
-    /// [`ConsumableDescription`](crate::zara::inventory::ConsumableDescription) option present, or
+    /// [`ConsumableDescription`](crate::inventory::items::ConsumableDescription) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters
@@ -206,7 +206,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     }
 
     /// Takes an appliance (like bandage or injection). Item which name is passed must have the
-    /// [`ApplianceDescription`](crate::zara::inventory::ApplianceDescription) option present, or
+    /// [`ApplianceDescription`](crate::inventory::items::ApplianceDescription) option present, or
     /// `Err` will be returned
     ///
     /// # Parameters
@@ -339,11 +339,11 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Parameters
     /// - `item_name`: unique inventory item name. Item must have `clothes` option present.
     ///
-    /// ## Note
-    /// This method borrows `body.clothes` collection.
-    ///
     /// # Returns
     /// Ok on success
+    /// 
+    /// ## Note
+    /// This method borrows `body.clothes` collection.
     ///
     /// # Examples
     /// ```
@@ -353,7 +353,7 @@ impl<E: Listener + 'static> ZaraController<E> {
         if !self.health.is_alive() { return Err(ClothesOnActionErr::CharacterIsDead); }
         if self.is_paused() { return Err(ClothesOnActionErr::InstancePaused); }
 
-        return match self.inventory.items.borrow().get(item_name) {
+        match self.inventory.items.borrow().get(item_name) {
             Some(item) => {
                 if item.get_count() <= 0 {
                     return Err(ClothesOnActionErr::InsufficientResources)
@@ -382,11 +382,11 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Parameters
     /// - `item_name`: unique name of the inventory item that was put on earlier.
     ///
-    /// ## Note
-    /// This method borrows `body.clothes` collection.
-    ///
     /// # Returns
     /// Ok on success
+    /// 
+    /// ## Note
+    /// This method borrows `body.clothes` collection.
     ///
     /// # Examples
     /// ```

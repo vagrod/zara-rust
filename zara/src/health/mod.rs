@@ -27,7 +27,10 @@ pub mod injury;
 pub mod side;
 pub mod medagent;
 
-/// Describes and controls player's health
+/// Node that describes and controls player's health. It contains
+/// vitals data, active disease, active injuries, registered medical
+/// agents, registered disease monitors and side effects controllers,
+/// plus you can change here values that control various regain rates
 pub struct Health {
     /// How fast stamina recovers (percents per game second)
     pub stamina_regain_rate: Cell<f32>,
@@ -93,7 +96,9 @@ pub struct Health {
 /// Compound injury key that consists of a "injury name"-"body part" pair
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct InjuryKey {
+    /// Inventory item name (key)
     pub injury: String,
+    /// Body part
     pub body_part: BodyPart
 }
 impl fmt::Display for InjuryKey {
@@ -139,10 +144,10 @@ impl TryFrom<i32> for StageLevel {
 }
 /// Used to describe a new medical agent. Use `start` method to begin.
 pub struct MedicalAgentBuilder {
-    pub name: RefCell<String>,
-    pub duration_minutes: Cell<f32>,
-    pub curve_type: RefCell<CurveType>,
-    pub items: RefCell<Vec<String>>
+    pub(crate) name: RefCell<String>,
+    pub(crate) duration_minutes: Cell<f32>,
+    pub(crate) curve_type: RefCell<CurveType>,
+    pub(crate) items: RefCell<Vec<String>>
 }
 impl MedicalAgentBuilder {
     /// Starts building process for a new medical agent

@@ -3,9 +3,12 @@ use crate::inventory::Inventory;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
+/// Contains state snapshot for the inventory node (not containing items itself)
 #[derive(Clone, Debug, Default)]
 pub struct InventoryStateContract {
+    /// Captured state of the `weight` field
     pub weight: f32,
+    /// Captured state of the `clothes_cache` field
     pub clothes_cache: Vec<String>,
 }
 impl fmt::Display for InventoryStateContract {

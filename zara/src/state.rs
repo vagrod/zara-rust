@@ -18,16 +18,26 @@ use std::hash::{Hash, Hasher};
 /// internal fields.
 #[derive(Clone, Debug, Default)]
 pub struct ZaraControllerStateContract {
+    /// Environment node status snapshot
     pub environment: EnvironmentStateContract,
+    /// Player status snapshot
     pub player_status: PlayerStatusContract,
+    /// Body node status snapshot
     pub body: BodyStateContract,
+    /// Health node status snapshot
     pub health: HealthStateContract,
+    /// Inventory node status snapshot (not including items itself)
     pub inventory: InventoryStateContract,
 
+    /// State of an update counter
     pub update_counter: f32,
+    /// State of a queue counter
     pub queue_counter: f32,
+    /// State of a game time when `update` was last called
     pub last_update_game_time: Duration,
+    /// State of a game time when controller was last updated
     pub last_frame_game_time: Duration,
+    /// Paused state value
     pub is_paused: bool
 }
 impl fmt::Display for ZaraControllerStateContract {
@@ -81,43 +91,71 @@ impl Hash for ZaraControllerStateContract {
 /// Describes captured state of an active disease
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub struct ActiveDiseaseStateContract {
+    /// Captured state of the `needs_treatment` field
     pub needs_treatment: bool,
+    /// Captured state of the `will_self_heal_on` field
     pub will_self_heal_on: crate::health::StageLevel,
+    /// Captured state of the `total_duration` field
     pub total_duration: Duration,
+    /// Captured state of the `initial_data` field
     pub initial_data: Vec<crate::health::disease::state::StageDescriptionStateContract>,
+    /// Captured state of the `stages` field
     pub stages: Vec<crate::health::disease::state::ActiveStageStateContract>,
+    /// Captured state of the `lerp_data` field
     pub lerp_data: Option<crate::health::disease::state::LerpDataNodeStateContract>,
+    /// Captured state of the `last_deltas` field
     pub last_deltas: crate::health::disease::state::DiseaseDeltasStateContract,
+    /// Captured state of the `is_inverted` field
     pub is_inverted: bool,
+    /// Captured state of the `activation_time` field
     pub activation_time: Duration,
+    /// Captured state of the `will_end` field
     pub will_end: bool,
+    /// Captured state of the `end_time` field
     pub end_time: Option<Duration>
 }
 
 /// Describes captured state of an active injury
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub struct ActiveInjuryStateContract {
+    /// Captured state of the `needs_treatment` field
     pub needs_treatment: bool,
+    /// Captured state of the `is_fracture` field
     pub is_fracture: bool,
+    /// Captured state of the `body_part` field
     pub body_part: crate::body::BodyPart,
+    /// Captured state of the `will_self_heal_on` field
     pub will_self_heal_on: crate::health::StageLevel,
+    /// Captured state of the `total_duration` field
     pub total_duration: Duration,
+    /// Captured state of the `initial_data` field
     pub initial_data: Vec<crate::health::injury::state::StageDescriptionStateContract>,
+    /// Captured state of the `stages` field
     pub stages: Vec<crate::health::injury::state::ActiveStageStateContract>,
+    /// Captured state of the `lerp_data` field
     pub lerp_data: Option<crate::health::injury::state::LerpDataNodeStateContract>,
+    /// Captured state of the `last_deltas` field
     pub last_deltas: crate::health::injury::state::InjuryDeltasStateContract,
+    /// Captured state of the `is_inverted` field
     pub is_inverted: bool,
+    /// Captured state of the `activation_time` field
     pub activation_time: Duration,
+    /// Captured state of the `will_end` field
     pub will_end: bool,
+    /// Captured state of the `end_time` field
     pub end_time: Option<Duration>
 }
 
 /// Describes captured state of an environment
 #[derive(Clone, Debug, Default)]
 pub struct EnvironmentStateContract {
+    /// Captured state of the `game_time` field
     pub game_time: Duration,
+    /// Captured state of the `wind_speed` field
     pub wind_speed: f32,
+    /// Captured state of the `temperature` field
     pub temperature: f32,
+    /// Captured state of the `rain_intensity` field
     pub rain_intensity: f32
 }
 impl fmt::Display for EnvironmentStateContract {
@@ -160,9 +198,13 @@ impl Hash for EnvironmentStateContract {
 /// Describes captured state of a player status
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct PlayerStatusContract {
+    /// Captured state of the `is_walking` field
     pub is_walking: bool,
+    /// Captured state of the `is_running` field
     pub is_running: bool,
+    /// Captured state of the `is_swimming` field
     pub is_swimming: bool,
+    /// Captured state of the `is_underwater` field
     pub is_underwater: bool
 }
 

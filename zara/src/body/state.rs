@@ -5,21 +5,36 @@ use std::time::Duration;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
+/// State snippet for the `Body` node
 #[derive(Clone, Debug, Default)]
 pub struct BodyStateContract {
+    /// Captured state of the `clothes` field
     pub clothes: Vec<String>,
+    /// Captured state of the `appliances` field
     pub appliances: Vec<BodyApplianceStateContract>,
+    /// Captured state of the `last_sleep_time` field
     pub last_sleep_time: Option<Duration>,
+    /// Captured state of the `last_sleep_duration` field
     pub last_sleep_duration: f32,
+    /// Captured state of the `is_sleeping` field
     pub is_sleeping: bool,
+    /// Captured state of the `clothes_group` field
     pub clothes_group: Option<ClothesGroupStateContract>,
+    /// Captured state of the `clothes_data` field
     pub clothes_data: Vec<ClothesItemStateContract>,
+    /// Captured state of the `warmth_level` field
     pub warmth_level: f32,
+    /// Captured state of the `wetness_level` field
     pub wetness_level: f32,
+    /// Captured state of the `sleeping_counter` field
     pub sleeping_counter: f64,
+    /// Captured state of the `cached_world_temp` field
     pub cached_world_temp: f32,
+    /// Captured state of the `cached_wind_speed` field
     pub cached_wind_speed: f32,
+    /// Captured state of the `cached_player_in_water` field
     pub cached_player_in_water: bool,
+    /// Captured state of the `cached_rain_intensity` field
     pub cached_rain_intensity: f32,
 }
 impl fmt::Display for BodyStateContract {
@@ -69,23 +84,34 @@ impl Hash for BodyStateContract {
     }
 }
 
+/// State snippet for the body appliance item
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct BodyApplianceStateContract {
+    /// Captured state of the `item_name` field
     pub item_name: String,
+    /// Captured state of the `body_part` field
     pub body_part: BodyPart
 }
 
+/// State snippet for the clothes group
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesGroupStateContract {
+    /// Captured state of the `name` field
     pub name: String,
+    /// Captured state of the `bonus_cold_resistance` field
     pub bonus_cold_resistance: usize,
+    /// Captured state of the `bonus_water_resistance` field
     pub bonus_water_resistance: usize
 }
 
+/// State snippet for the applied clothes item
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesItemStateContract {
+    /// Captured state of the `key` field
     pub key: String,
+    /// Captured state of the `cold_resistance` field
     pub cold_resistance: usize,
+    /// Captured state of the `water_resistance` field
     pub water_resistance: usize,
 }
 

@@ -1,6 +1,8 @@
 use std::cmp::Ordering::Equal;
 use std::cell::RefCell;
 
+/// Provides ability to chain different lerp segments together to form
+/// something like "lerp curve" (very simple analog to the Unity's AnimationCurve)
 #[derive(Default, Debug, Clone)]
 pub struct MultiKeyedLerp {
     segments: Vec<(KeyFrame, KeyFrame)>,
@@ -9,6 +11,7 @@ pub struct MultiKeyedLerp {
 }
 
 impl MultiKeyedLerp {
+    /// Constructs new lerp curve using a list of a keyframes
     pub fn new(mut keyframes: Vec<KeyFrame>) -> Self {
         let mut segments = Vec::new();
 
@@ -27,6 +30,8 @@ impl MultiKeyedLerp {
         }
     }
 
+    /// Evaluates curve at a given time. Returns `None` if a given time is not on a
+    /// curve time scale.
     pub fn evaluate(&self, time: f32) -> Option<f32> {
         let rescan_segments = || {
             match self.find_segment(time) {
@@ -75,12 +80,17 @@ impl MultiKeyedLerp {
     }
 }
 
+/// Keyframe of the lerp curve (`MultiKeyedLerp`). It consists of a time marker and a value
+/// at this time point
 #[derive(Copy, Clone, Default, Debug)]
 pub struct KeyFrame {
+    /// Time value
     pub time: f32,
+    /// Value at this time point
     pub value: f32
 }
 
 impl KeyFrame {
+    /// Constructs a new keyframe.
     pub fn new(time: f32, value: f32) -> Self { KeyFrame { time, value } }
 }

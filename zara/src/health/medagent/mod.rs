@@ -42,7 +42,7 @@ impl Health {
     /// Registers new medical agent.
     ///
     /// # Parameters
-    /// - `agents`: medical agents to register. Use [`MedicalAgentBuilder`](crate::zara::health::MedicalAgentBuilder)
+    /// - `agents`: medical agents to register. Use [`MedicalAgentBuilder`](crate::health::MedicalAgentBuilder)
     ///     to create one.
     ///
     /// # Examples
@@ -70,6 +70,7 @@ impl Health {
     }
 }
 
+/// Medical agents group. Contains a list of inventory items keys.
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct MedicalAgentGroup {
     items: Vec<String>

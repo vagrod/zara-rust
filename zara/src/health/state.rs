@@ -4,24 +4,40 @@ use crate::health::medagent::state::MedicalAgentsMonitorStateContract;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
+/// Holds state snapshot data for the player's `Health` node
 #[derive(Clone, Debug, Default)]
 pub struct HealthStateContract {
+    /// Captured state of the `stamina_regain_rate` field
     pub stamina_regain_rate: f32,
+    /// Captured state of the `blood_regain_rate` field
     pub blood_regain_rate: f32,
+    /// Captured state of the `oxygen_regain_rate` field
     pub oxygen_regain_rate: f32,
+    /// Captured state of the `medical_agents` field
     pub medical_agents: MedicalAgentsMonitorStateContract,
-
+    /// Captured state of the `body_temperature` field
     pub body_temperature: f32,
+    /// Captured state of the `heart_rate` field
     pub heart_rate: f32,
+    /// Captured state of the `top_pressure` field
     pub top_pressure: f32,
+    /// Captured state of the `bottom_pressure` field
     pub bottom_pressure: f32,
+    /// Captured state of the `blood_level` field
     pub blood_level: f32,
+    /// Captured state of the `food_level` field
     pub food_level: f32,
+    /// Captured state of the `water_level` field
     pub water_level: f32,
+    /// Captured state of the `stamina_level` field
     pub stamina_level: f32,
+    /// Captured state of the `fatigue_level` field
     pub fatigue_level: f32,
+    /// Captured state of the `oxygen_level` field
     pub oxygen_level: f32,
+    /// Captured state of the `is_alive` field
     pub is_alive: bool,
+    /// Captured state of the `has_blood_loss` field
     pub has_blood_loss: bool
 }
 impl fmt::Display for HealthStateContract {

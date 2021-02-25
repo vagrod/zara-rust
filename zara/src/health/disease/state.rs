@@ -11,20 +11,34 @@ use std::fmt;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
+/// COntains state snapshot for stage description
 #[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
+    /// Captured state of the `level` field
     pub level: StageLevel,
+    /// Captured state of the `self_heal_chance` field
     pub self_heal_chance: Option<usize>,
+    /// Captured state of the `chance_of_death` field
     pub chance_of_death: Option<usize>,
+    /// Captured state of the `reaches_peak_in_hours` field
     pub reaches_peak_in_hours: f32,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool,
+    /// Captured state of the `target_body_temp` field
     pub target_body_temp: f32,
+    /// Captured state of the `target_heart_rate` field
     pub target_heart_rate: f32,
+    /// Captured state of the `target_pressure_top` field
     pub target_pressure_top: f32,
+    /// Captured state of the `target_pressure_bottom` field
     pub target_pressure_bottom: f32,
+    /// Captured state of the `target_fatigue_delta` field
     pub target_fatigue_delta: f32,
+    /// Captured state of the `target_food_drain` field
     pub target_food_drain: f32,
+    /// Captured state of the `target_water_drain` field
     pub target_water_drain: f32,
+    /// Captured state of the `target_stamina_drain` field
     pub target_stamina_drain: f32
 }
 impl fmt::Display for StageDescriptionStateContract {
@@ -81,28 +95,47 @@ impl Hash for StageDescriptionStateContract {
     }
 }
 
+/// COntains state snapshot for active stage
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveStageStateContract {
+    /// Captured state of the `key` field
     pub key: StageLevel,
+    /// Captured state of the `info` field
     pub info: StageDescriptionStateContract,
+    /// Captured state of the `start_time` field
     pub start_time: Duration,
+    /// Captured state of the `peak_time` field
     pub peak_time: Duration,
+    /// Captured state of the `duration` field
     pub duration: Duration
 }
 
+/// COntains state snapshot for lerp data nodes
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataNodeStateContract {
+    /// Captured state of the `start_time` field
     pub start_time: f32,
+    /// Captured state of the `end_time` field
     pub end_time: f32,
+    /// Captured state of the `body_temp_data` field
     pub body_temp_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `heart_rate_data` field
     pub heart_rate_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `pressure_top_data` field
     pub pressure_top_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `pressure_bottom_data` field
     pub pressure_bottom_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `fatigue_data` field
     pub fatigue_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `stamina_data` field
     pub stamina_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `food_data` field
     pub food_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `water_data` field
     pub water_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool,
+    /// Captured state of the `is_for_inverted` field
     pub is_for_inverted: bool
 }
 impl fmt::Display for LerpDataNodeStateContract {
@@ -164,13 +197,20 @@ impl Hash for LerpDataNodeStateContract {
     }
 }
 
+/// COntains state snapshot for lerp data node
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataStateContract {
+    /// Captured state of the `start_time` field
     pub start_time: f32,
+    /// Captured state of the `end_time` field
     pub end_time: f32,
+    /// Captured state of the `start_value` field
     pub start_value: f32,
+    /// Captured state of the `end_value` field
     pub end_value: f32,
+    /// Captured state of the `duration` field
     pub duration: f32,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool
 }
 impl fmt::Display for LerpDataStateContract {
@@ -220,16 +260,26 @@ impl Hash for LerpDataStateContract {
     }
 }
 
+/// Contains state snapshot for current disease deltas
 #[derive(Clone, Debug, Default)]
 pub struct DiseaseDeltasStateContract {
+    /// Captured state of the `body_temperature_delta` field
     pub body_temperature_delta: f32,
+    /// Captured state of the `heart_rate_delta` field
     pub heart_rate_delta: f32,
+    /// Captured state of the `pressure_top_delta` field
     pub pressure_top_delta: f32,
+    /// Captured state of the `pressure_bottom_delta` field
     pub pressure_bottom_delta: f32,
+    /// Captured state of the `fatigue_delta` field
     pub fatigue_delta: f32,
+    /// Captured state of the `stamina_drain` field
     pub stamina_drain: f32,
+    /// Captured state of the `oxygen_drain` field
     pub oxygen_drain: f32,
+    /// Captured state of the `food_drain` field
     pub food_drain: f32,
+    /// Captured state of the `water_drain` field
     pub water_drain: f32
 }
 impl fmt::Display for DiseaseDeltasStateContract {

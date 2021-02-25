@@ -6,8 +6,8 @@ use crate::utils::event::{MessageQueue, Event};
 impl Inventory {
     /// Returns `true` if item of this kind exists in the inventory
     ///
-    ///# Parameters
-    ///- `item_name`: unique name of the item (item kind)
+    /// # Parameters
+    /// - `item_name`: unique name of the item (item kind)
     pub fn has_item(&self, item_name: &String) -> bool {
         self.items.borrow().contains_key(item_name)
     }
@@ -32,7 +32,7 @@ impl Inventory {
     /// Removes item kind from the inventory and recalculates inventory weight
     ///
     /// # Parameters
-    /// - `item_kind`: unique name of the item ("InventoryItem.name")
+    /// - `item_kind`: unique name of the item (`"InventoryItem.name"`)
     ///
     /// # Returns
     /// Ok on success.

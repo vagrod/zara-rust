@@ -22,7 +22,7 @@ mod lerp;
 mod chain;
 mod status_methods;
 
-/// Macro for declaring a disease. Use [`StageBuilder`](crate::zara::health::disease::StageBuilder)
+/// Macro for declaring a disease. Use [`StageBuilder`](crate::health::disease::StageBuilder)
 /// to create a stage
 ///
 /// # Examples
@@ -230,14 +230,23 @@ impl StageDescription {
 /// Describes deltas calculated by the active diseases
 #[derive(Copy, Clone, Debug, Default)]
 pub struct DiseaseDeltasC {
+    /// Delta value for the body temperature (absolute delta, degrees C per game second)
     pub body_temperature_delta: f32,
+    /// Delta value for the heart rate (absolute delta, bpm per game second)
     pub heart_rate_delta: f32,
+    /// Delta value for the top blood pressure (absolute delta, mmHg per game second)
     pub pressure_top_delta: f32,
+    /// Delta value for the bottom blood pressure (absolute delta, mmHg per game second)
     pub pressure_bottom_delta: f32,
+    /// Delta value for the fatigue (absolute delta, 0..100 per game second)
     pub fatigue_delta: f32,
+    /// Delta value for the stamina (relative drain, 0..100 per game second)
     pub stamina_drain: f32,
+    /// Delta value for the oxygen level (relative drain, 0..100 per game second)
     pub oxygen_drain: f32,
+    /// Delta value for the food level (relative drain, 0..100 per game second)
     pub food_drain: f32,
+    /// Delta value for the water level (relative drain, 0..100 per game second)
     pub water_drain: f32
 }
 impl fmt::Display for DiseaseDeltasC {
@@ -427,7 +436,7 @@ pub trait DiseaseMonitor {
 pub trait Disease {
     /// Gets the unique name of this disease kind
     fn get_name(&self) -> String;
-    /// Gets all disease stages. Use [`StageBuilder`](zara::health::disease::StageBuilder) to
+    /// Gets all disease stages. Use [`StageBuilder`](crate::health::disease::StageBuilder) to
     /// describe a stage
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this disease object
@@ -461,7 +470,7 @@ struct LerpDataC {
     is_endless: bool
 }
 
-/// Describes an active disease that can be also scheduled
+/// Describes a disease that can be active or scheduled to activate later
 pub struct ActiveDisease {
     /// Disease instance linked to this `ActiveDisease`
     pub disease: Rc<Box<dyn Disease>>,
@@ -532,7 +541,7 @@ impl ActiveDisease {
     /// Creates new active disease object
     ///
     /// # Parameters
-    /// - `disease`: instance of an object with the [`Disease`](crate::zara::health::disease::Disease) trait
+    /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {

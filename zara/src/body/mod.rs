@@ -16,6 +16,8 @@ mod body_appliance;
 pub(crate) mod state;
 pub mod clothes;
 
+/// Node that controls player body information. Containing clothes, 
+/// body appliances, player warmth and wetness levels
 pub struct Body {
     /// Clothes that character is wearing now.
     ///
@@ -27,8 +29,8 @@ pub struct Body {
     /// Body appliances that character is wearing now.
     ///
     /// # Important
-    /// Currently active body appliances. Do not alter this collection manually, use `ZaraController.take_appliance` and
-    /// `ZaraController.remove_appliance`
+    /// Currently active body appliances. Do not alter this collection manually, 
+    /// use `ZaraController.take_appliance` and `ZaraController.remove_appliance`
     pub appliances: Arc<RefCell<Vec<BodyAppliance>>>,
 
     /// Game time when player slept last time

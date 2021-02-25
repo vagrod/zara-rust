@@ -2,7 +2,8 @@ use std::cell::Cell;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
-/// Runtime player game state
+/// Runtime player game state. You can change any of its values at any time
+/// to give Zara up-to-date information on player's status
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Default)]
 pub struct PlayerStatus {
     /// Is player walking now

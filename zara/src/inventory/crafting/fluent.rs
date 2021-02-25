@@ -4,7 +4,7 @@ use crate::inventory::items::InventoryItem;
 /// Macro to describe crafting combination resulting instance creation.
 ///
 /// Receives an instance of an object that implements
-/// [`InventoryItem`](crate::zara::inventory::InventoryItem) trait.
+/// [`InventoryItem`](crate::inventory::items::InventoryItem) trait.
 #[macro_export]
 macro_rules! inv_result(
     ($r:expr) => (

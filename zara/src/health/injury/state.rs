@@ -13,12 +13,19 @@ use std::hash::{Hash, Hasher};
 
 #[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
+    /// Captured state of the `level` field
     pub level: StageLevel,
+    /// Captured state of the `self_heal_chance` field
     pub self_heal_chance: Option<usize>,
+    /// Captured state of the `chance_of_death` field
     pub chance_of_death: Option<usize>,
+    /// Captured state of the `reaches_peak_in_hours` field
     pub reaches_peak_in_hours: f32,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool,
+    /// Captured state of the `target_blood_drain` field
     pub target_blood_drain: f32,
+    /// Captured state of the `target_stamina_drain` field
     pub target_stamina_drain: f32
 }
 impl fmt::Display for StageDescriptionStateContract {
@@ -63,22 +70,35 @@ impl Hash for StageDescriptionStateContract {
     }
 }
 
+/// Contains state snapshot for active stage object
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveStageStateContract {
+    /// Captured state of the `key` field
     pub key: StageLevel,
+    /// Captured state of the `info` field
     pub info: StageDescriptionStateContract,
+    /// Captured state of the `start_time` field
     pub start_time: Duration,
+    /// Captured state of the `peak_time` field
     pub peak_time: Duration,
+    /// Captured state of the `duration` field
     pub duration: Duration
 }
 
+/// Contains state snapshot for the lerp data node
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataNodeStateContract {
+    /// Captured state of the `start_time` field
     pub start_time: f32,
+    /// Captured state of the `end_time` field
     pub end_time: f32,
+    /// Captured state of the `stamina_data` field
     pub stamina_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `blood_data` field
     pub blood_data: Vec<LerpDataStateContract>,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool,
+    /// Captured state of the `is_for_inverted` field
     pub is_for_inverted: bool
 }
 impl fmt::Display for LerpDataNodeStateContract {
@@ -128,13 +148,20 @@ impl Hash for LerpDataNodeStateContract {
     }
 }
 
+/// Contains snapshot for the single lerp data record
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataStateContract {
+    /// Captured state of the `start_time` field
     pub start_time: f32,
+    /// Captured state of the `end_time` field
     pub end_time: f32,
+    /// Captured state of the `start_value` field
     pub start_value: f32,
+    /// Captured state of the `end_value` field
     pub end_value: f32,
+    /// Captured state of the `duration` field
     pub duration: f32,
+    /// Captured state of the `is_endless` field
     pub is_endless: bool
 }
 impl fmt::Display for LerpDataStateContract {
@@ -184,9 +211,12 @@ impl Hash for LerpDataStateContract {
     }
 }
 
+/// Contains snapshot for the injury deltas contract
 #[derive(Clone, Debug, Default)]
 pub struct InjuryDeltasStateContract {
+    /// Captured state of the `stamina_drain` field
     pub stamina_drain: f32,
+    /// Captured state of the `blood_drain` field
     pub blood_drain: f32
 }
 impl fmt::Display for InjuryDeltasStateContract {

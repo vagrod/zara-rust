@@ -7,22 +7,35 @@ use std::fmt;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
+/// Contains state snapshot for medical agents monitors node
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub struct MedicalAgentsMonitorStateContract {
+    /// Captured state of the `active_count` field
     pub active_count: usize,
+    /// Captured state of the `agents` field
     pub agents: Vec<MedicalAgentStateContract>
 }
 
+/// Contains state snapshot for a single medical agents monitor
 #[derive(Clone, Debug, Default)]
 pub struct MedicalAgentStateContract {
+    /// Captured state of the `name` field
     pub name: String,
+    /// Captured state of the `group` field
     pub group: MedicalAgentGroupStateContract,
+    /// Captured state of the `activation_curve` field
     pub activation_curve: CurveType,
+    /// Captured state of the `duration_minutes` field
     pub duration_minutes: f32,
+    /// Captured state of the `percent_of_activity` field
     pub percent_of_activity: f32,
+    /// Captured state of the `percent_of_presence` field
     pub percent_of_presence: f32,
+    /// Captured state of the `is_active` field
     pub is_active: bool,
+    /// Captured state of the `last_dose_end_time` field
     pub last_dose_end_time: Option<Duration>,
+    /// Captured state of the `doses` field
     pub doses: Vec<AgentDoseStateContract>,
 }
 impl fmt::Display for MedicalAgentStateContract {
@@ -61,13 +74,20 @@ impl Hash for MedicalAgentStateContract {
     }
 }
 
+/// Contains state snapshot for a single medical agent dose
 #[derive(Clone, Debug, Default)]
 pub struct AgentDoseStateContract {
+    /// Captured state of the `item` field
     pub item: String,
+    /// Captured state of the `timestamp` field
     pub timestamp: i32,
+    /// Captured state of the `start_time` field
     pub start_time: f32,
+    /// Captured state of the `end_time` field
     pub end_time: f32,
+    /// Captured state of the `duration` field
     pub duration: f32,
+    /// Captured state of the `lerp` field
     pub lerp: MultiKeyedLerpStateContract
 }
 impl fmt::Display for AgentDoseStateContract {
@@ -117,14 +137,19 @@ impl Hash for AgentDoseStateContract {
     }
 }
 
+/// Contains state snapshot for a lerp curve
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct MultiKeyedLerpStateContract {
-    keyframes: Vec<KeyFrameStateContract>
+    /// Captured state of the `keyframes` field
+    pub keyframes: Vec<KeyFrameStateContract>
 }
 
+/// Contains state snapshot for a single lerp curve keyframe
 #[derive(Clone, Debug, Default)]
 pub struct KeyFrameStateContract {
+    /// Captured state of the `time` field
     pub time: f32,
+    /// Captured state of the `value` field
     pub value: f32
 }
 impl fmt::Display for KeyFrameStateContract {
@@ -165,8 +190,10 @@ impl Hash for KeyFrameStateContract {
     }
 }
 
+/// Contains state snapshot for a medical agent group
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct MedicalAgentGroupStateContract {
+    /// Captured state of the `items` field
     pub items: Vec<String>
 }
 

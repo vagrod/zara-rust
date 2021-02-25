@@ -219,6 +219,7 @@ pub trait Dispatchable<T>
     fn register_listener(&mut self, listener: Arc<RefCell<T>>);
 }
 
+/// Zara events dispatcher object
 pub struct Dispatcher<T>
     where T: Listener
 {

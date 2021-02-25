@@ -17,7 +17,7 @@ impl Body {
     /// Registers a list of clothes groups.
     ///
     /// # Parameters
-    /// - `groups`: a list of clothes groups to register. Use [`ClothesGroupBuilder`](crate::zara::body::ClothesGroupBuilder)
+    /// - `groups`: a list of clothes groups to register. Use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
     ///     to create one.
     ///
     /// # Examples
@@ -117,8 +117,11 @@ impl Body {
 /// Holds the information about clothes item
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ClothesItem {
+    /// Name of the inventory item
     pub name: String,
+    /// Water resistance value, 0..100
     pub water_resistance: usize,
+    /// Cold resistance value, 0..100
     pub cold_resistance: usize
 }
 impl fmt::Display for ClothesItem {
@@ -140,9 +143,13 @@ impl ClothesItem {
 /// Holds the information about clothes group set
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ClothesGroup {
+    /// Name of the group
     pub name: String,
+    /// Items that are included in this group
     pub items: HashMap<String, ClothesItem>,
+    /// Group cold resistance bonus, 0..100
     pub bonus_cold_resistance: usize,
+    /// Group water resistance bonus, 0..100
     pub bonus_water_resistance: usize
 }
 impl fmt::Display for ClothesGroup {
@@ -160,7 +167,7 @@ impl Hash for ClothesGroup {
 }
 
 impl ClothesGroup {
-    /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::zara::body::ClothesGroupBuilder) to construct new group.
+    /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder) to construct new group.
     pub fn new(name: String, items: Vec<ClothesItem>, bonus_cold_resistance: usize, bonus_water_resistance: usize) -> Self {
         let mut items_map = HashMap::new();
 
