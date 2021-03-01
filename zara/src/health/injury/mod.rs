@@ -22,7 +22,8 @@ mod lerp;
 mod chain;
 mod status_methods;
 
-/// Macro for declaring a simple injury
+/// Macro for declaring a simple injury. Use [`StageBuilder`](crate::health::injury::StageBuilder)
+/// to create a stage
 ///
 /// # Examples
 ///

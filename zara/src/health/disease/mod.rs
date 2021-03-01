@@ -409,7 +409,7 @@ pub trait DiseaseMonitor {
     ///
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
+    /// - `game_time`: game time when this item is being consumed
     /// - `item`: consumable description
     /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
@@ -420,7 +420,7 @@ pub trait DiseaseMonitor {
     ///
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
-    /// - `game_time`: health controller object. It can be used to call `spawn_disease` for example
+    /// - `game_time`: game time when this appliance is being taken
     /// - `item`: appliance description
     /// - `body_part`: body part to which this item was applied
     /// - `inventory_items`: all inventory items. Applied item is still in this list at the
