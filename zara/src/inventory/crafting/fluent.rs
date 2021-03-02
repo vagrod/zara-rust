@@ -12,6 +12,7 @@ macro_rules! inv_result(
     );
 );
 
+/// Crafting fluent step trait
 pub trait BuilderStepResultItem {
     /// Defines the resulted item kind.
     ///
@@ -20,6 +21,7 @@ pub trait BuilderStepResultItem {
     fn build_for(&self, key: &str) -> &dyn BuilderStepFirstItem;
 }
 
+/// Crafting fluent step trait
 pub trait BuilderStepFirstItem {
     /// Adds first item to the combination. Items order does not matter.
     ///
@@ -29,6 +31,7 @@ pub trait BuilderStepFirstItem {
     fn is(&self, key: &str, count: usize) -> &dyn BuilderStepItemNode;
 }
 
+/// Crafting fluent step trait
 pub trait BuilderStepItemNode {
     /// Adds new item to the combination. Items order does not matter.
     ///
@@ -44,6 +47,7 @@ pub trait BuilderStepItemNode {
     fn and(&self, key: &str, count: usize) -> &dyn BuilderStepDone;
 }
 
+/// Crafting fluent step trait
 pub trait BuilderStepDone {
     /// Builds the crafting combination based on the info provided.
     ///
@@ -97,7 +101,7 @@ impl BuilderStepDone for Builder {
         let mut items = Vec::new();
 
         for item in self.items.borrow().iter() {
-            items.push(item.copy());
+            items.push(item.clone());
         }
 
         CraftingCombination::new(self.result_item.borrow().to_string(), items, create)

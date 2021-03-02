@@ -8,21 +8,25 @@ impl MedicalAgentBuilder {
     fn as_agent_end(&self) -> &dyn AgentEnd { self }
 }
 
+/// Agent fluent step trait
 pub trait AgentStart {
     /// Unique name of a medical agent. Will become its key
     fn for_agent(&self, name: &str) -> &dyn AgentCurve;
 }
 
+/// Agent fluent step trait
 pub trait AgentCurve {
     /// Activation curve type for this agent
     fn activates(&self, curve_type: CurveType) -> &dyn AgentDuration;
 }
 
+/// Agent fluent step trait
 pub trait AgentDuration {
     /// Duration, in game minutes, of a single agent dose to have an effect
     fn and_lasts_for_minutes(&self, game_minutes: f32) -> &dyn AgentItems;
 }
 
+/// Agent fluent step trait
 pub trait AgentItems {
     /// What kinds of inventory items are describing this agent. It can be consumable items,
     /// as well as appliances (like injections or bandages)
@@ -40,6 +44,7 @@ pub trait AgentItems {
     fn includes(&self, items: Vec<&str>) -> &dyn AgentEnd;
 }
 
+/// Agent fluent step trait
 pub trait AgentEnd {
     /// Builds resulted medical agent according with the information provided
     fn build(&self) -> MedicalAgent;

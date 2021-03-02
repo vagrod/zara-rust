@@ -11,6 +11,7 @@ impl StageBuilder {
     fn as_stage_end(&self) -> &dyn StageEnd { self }
 }
 
+/// Stage fluent step trait
 pub trait StageInit {
     /// Starts stage building process
     ///
@@ -19,6 +20,7 @@ pub trait StageInit {
     fn build_for(&self, level: StageLevel) -> &dyn StageSelfHeal;
 }
 
+/// Stage fluent step trait
 pub trait StageSelfHeal {
     /// Will this stage have a chance of triggering self-healing
     ///
@@ -29,11 +31,13 @@ pub trait StageSelfHeal {
     fn no_self_heal(&self) -> &dyn StageVitalsNode;
 }
 
+/// Stage fluent step trait
 pub trait StageVitalsNode {
     /// Describe how this stage affects vitals
     fn vitals(&self) -> &dyn StageVitalsValues;
 }
 
+/// Stage fluent step trait
 pub trait StageVitalsValues {
     /// Set the target body temperature for this stage
     ///
@@ -68,6 +72,7 @@ pub trait StageVitalsValues {
     fn will_last_forever(&self) -> &dyn StageDrainsNode;
 }
 
+/// Stage fluent step trait
 pub trait StageDrainsNode {
     /// Describe how this stage affects other parameters
     fn drains(&self) -> &dyn StageDrainsValues;
@@ -75,6 +80,7 @@ pub trait StageDrainsNode {
     fn no_drains(&self) -> &dyn StageDeathChance;
 }
 
+/// Stage fluent step trait
 pub trait StageDrainsValues {
     /// Set the static drain rate for the stamina for this stage. 0..100 percents per game second.
     ///
@@ -101,6 +107,7 @@ pub trait StageDrainsValues {
     fn no_fatigue_effect(&self) -> &dyn StageDeathChance;
 }
 
+/// Stage fluent step trait
 pub trait StageDeathChance {
     /// Set chance of death for this stage. This chance will be tested on every Zara pass
     /// (every real second) while this stage is active
@@ -109,6 +116,7 @@ pub trait StageDeathChance {
     fn no_death_probability(&self) -> &dyn StageEnd;
 }
 
+/// Stage fluent step trait
 pub trait StageEnd {
     /// Builds disease stage object with all the information provided
     fn build(&self) -> StageDescription;

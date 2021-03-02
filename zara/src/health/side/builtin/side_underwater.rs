@@ -21,6 +21,7 @@ impl UnderwaterSideEffect {
             underwater_state: Cell::new(false)
         }
     }
+    /// Returns a state snapshot contract for this `UnderwaterSideEffect` instance
     pub fn get_state(&self) -> UnderwaterSideEffectStateContract {
         UnderwaterSideEffectStateContract {
             oxygen_drain_amount: self.oxygen_drain_amount.get(),
@@ -31,6 +32,10 @@ impl UnderwaterSideEffect {
             time_under_water: self.time_under_water.get()
         }
     }
+    /// Restores the state from the given state contract
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &UnderwaterSideEffectStateContract) {
         self.oxygen_drain_amount.set(state.oxygen_drain_amount);
         self.stamina_drain_amount.set(state.stamina_drain_amount);

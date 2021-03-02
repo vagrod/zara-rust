@@ -11,7 +11,7 @@ use std::fmt;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
-/// COntains state snapshot for stage description
+/// Contains state snapshot for stage description
 #[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
     /// Captured state of the `level` field
@@ -95,7 +95,7 @@ impl Hash for StageDescriptionStateContract {
     }
 }
 
-/// COntains state snapshot for active stage
+/// Contains state snapshot for active stage
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Default)]
 pub struct ActiveStageStateContract {
     /// Captured state of the `key` field
@@ -110,7 +110,7 @@ pub struct ActiveStageStateContract {
     pub duration: Duration
 }
 
-/// COntains state snapshot for lerp data nodes
+/// Contains state snapshot for lerp data nodes
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataNodeStateContract {
     /// Captured state of the `start_time` field
@@ -197,7 +197,7 @@ impl Hash for LerpDataNodeStateContract {
     }
 }
 
-/// COntains state snapshot for lerp data node
+/// Contains state snapshot for lerp data node
 #[derive(Clone, Debug, Default)]
 pub struct LerpDataStateContract {
     /// Captured state of the `start_time` field
@@ -407,6 +407,7 @@ impl Health {
 }
 
 impl ActiveDisease {
+    /// Gets active disease state snapshot contract
     pub fn get_state(&self) -> ActiveDiseaseStateContract {
         ActiveDiseaseStateContract {
             needs_treatment: self.needs_treatment,

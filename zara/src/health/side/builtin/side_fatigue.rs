@@ -17,11 +17,16 @@ impl FatigueSideEffects {
             hours_until_exhausted: Cell::new(hours_until_exhausted)
         }
     }
+    /// Returns a state snapshot contract for this `FatigueSideEffects` instance
     pub fn get_state(&self) -> FatigueSideEffectsStateContract {
         FatigueSideEffectsStateContract {
             hours_until_exhausted: self.hours_until_exhausted.get()
         }
     }
+    /// Restores the state from the given state contract
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &FatigueSideEffectsStateContract) {
         self.hours_until_exhausted.set(state.hours_until_exhausted);
     }

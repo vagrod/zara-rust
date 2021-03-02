@@ -209,7 +209,7 @@ impl ActiveInjury {
             }
         }
 
-        self.last_deltas.replace(result.copy());
+        self.last_deltas.replace(result.clone());
 
         result
     }

@@ -22,6 +22,7 @@ impl RunningSideEffects
             water_drain_amount: Cell::new(water_drain)
         }
     }
+    /// Returns a state snapshot contract for this `RunningSideEffects` instance
     pub fn get_state(&self) -> RunningSideEffectsStateContract {
         RunningSideEffectsStateContract {
             stamina_drain_amount: self.stamina_drain_amount.get(),
@@ -32,6 +33,10 @@ impl RunningSideEffects
             gained_fatigue: self.gained_fatigue.get()
         }
     }
+    /// Restores the state from the given state contract
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &RunningSideEffectsStateContract) {
         self.stamina_drain_amount.set(state.stamina_drain_amount);
         self.water_drain_amount.set(state.water_drain_amount);

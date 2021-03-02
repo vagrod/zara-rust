@@ -15,11 +15,16 @@ impl WaterDrainOverTimeSideEffect {
             drain_amount: Cell::new(drain_amount)
         }
     }
+    /// Returns a state snapshot contract for this `WaterDrainOverTimeSideEffect` instance
     pub fn get_state(&self) -> WaterDrainOverTimeSideEffectStateContract {
         WaterDrainOverTimeSideEffectStateContract {
             drain_amount: self.drain_amount.get()
         }
     }
+    /// Restores state snapshot
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &WaterDrainOverTimeSideEffectStateContract) {
         self.drain_amount.set(state.drain_amount);
     }

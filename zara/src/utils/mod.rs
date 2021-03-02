@@ -253,6 +253,7 @@ impl Hash for GameTimeC {
     }
 }
 impl GameTimeC {
+    /// Creates empty (zero) `GameTimeC`
     pub fn empty() -> Self {
         GameTimeC {
             day: 0,
@@ -262,6 +263,7 @@ impl GameTimeC {
         }
     }
 
+    /// Creates new `GameTimeC` with given time values
     pub fn new(day: u64, hour: u64, minute: u64, second: f64) -> Self {
         GameTimeC {
             day,
@@ -271,6 +273,7 @@ impl GameTimeC {
         }
     }
 
+    /// Returns `f32` that describes duration (in game seconds) of this `GameTimeC` instance
     pub fn as_secs_f32(&self) -> f32 {
         self.second as f32+
             (self.minute as f32)*60_f32+
@@ -292,6 +295,7 @@ impl GameTimeC {
             self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
     }
 
+    /// Returns new `GameTimeC` instance based on the given `Duration` object
     pub fn from_duration(d: Duration) -> Self {
         GameTime::from_duration(d).to_contract()
     }
@@ -361,6 +365,8 @@ pub struct HealthC {
     pub injuries: Vec<ActiveInjuryC>
 }
 impl HealthC {
+    /// Return "healthy" contract instance, with all vitals set to 
+    /// values that describes a healthy individual
     pub fn healthy() -> Self {
         HealthC {
             blood_level: 100.,

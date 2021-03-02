@@ -12,6 +12,7 @@ impl StageBuilder {
     fn as_stage_end(&self) -> &dyn StageEnd { self }
 }
 
+/// Stage fluent step trait
 pub trait StageInit {
     /// Starts stage building process
     ///
@@ -20,6 +21,7 @@ pub trait StageInit {
     fn build_for(&self, level: StageLevel) -> &dyn StageSelfHeal;
 }
 
+/// Stage fluent step trait
 pub trait StageSelfHeal {
     /// Will this stage have a chance of triggering self-healing
     ///
@@ -30,6 +32,7 @@ pub trait StageSelfHeal {
     fn no_self_heal(&self) -> &dyn StageDrainsNode;
 }
 
+/// Stage fluent step trait
 pub trait StageDrainsNode {
     /// Describe how this stage affects other parameters
     fn drains(&self) -> &dyn StageDrainsValues;
@@ -37,6 +40,7 @@ pub trait StageDrainsNode {
     fn no_drains(&self) -> &dyn StageAfterNoDrains;
 }
 
+/// Stage fluent step trait
 pub trait StageDrainsValues {
     /// Set the static drain rate for the stamina for this stage. 0..100 percents per game second.
     ///
@@ -54,6 +58,7 @@ pub trait StageDrainsValues {
     fn deadly(&self) -> &dyn StageDeathChance;
 }
 
+/// Stage fluent step trait
 pub trait StageAfterNoDrains {
     /// This stage is not deadly
     fn no_death_probability(&self) -> &dyn StageTargets;
@@ -61,12 +66,14 @@ pub trait StageAfterNoDrains {
     fn deadly(&self) -> &dyn StageDeathChance;
 }
 
+/// Stage fluent step trait
 pub trait StageDeathChance {
     /// Set chance of death for this stage. This chance will be tested on every Zara pass
     /// (every real second) while this stage is active
     fn with_chance_of_death(&self, value: usize) -> &dyn StageTargets;
 }
 
+/// Stage fluent step trait
 pub trait StageTargets {
     /// In what time this stage should reach those vitals values (in game time hours)
     ///
@@ -75,6 +82,7 @@ pub trait StageTargets {
     fn will_reach_target_in(&self, hours: f32) -> &dyn StageDuration;
 }
 
+/// Stage fluent step trait
 pub trait StageDuration {
     /// Tells that injury will move on when `will_reach_target_in` time ends.
     ///
@@ -87,6 +95,7 @@ pub trait StageDuration {
     fn will_last_forever(&self) -> &dyn StageEnd;
 }
 
+/// Stage fluent step trait
 pub trait StageEnd {
     /// Builds injury stage object with all the information provided
     fn build(&self) -> StageDescription;

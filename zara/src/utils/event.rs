@@ -209,10 +209,12 @@ impl fmt::Display for Event {
     }
 }
 
+/// Zara game events listener trait
 pub trait Listener {
     fn notify(&mut self, event: &Event);
 }
 
+/// Zara game events dispatcher trait
 pub trait Dispatchable<T>
     where T: Listener
 {
@@ -239,14 +241,17 @@ impl<T> Dispatchable<T> for Dispatcher<T>
 impl<T> Dispatcher<T>
     where T: Listener
 {
+    /// Creates new instance of the `Dispatcher`
     pub fn new() -> Dispatcher<T> {
         Dispatcher { listeners: Vec::new() }
     }
 
+    /// Returns count of active listeners
     pub fn num_listeners(&self) -> usize {
         self.listeners.len()
     }
 
+    /// Dispatches a message to all active listeners
     pub fn dispatch(&mut self, event: Event) {
         let mut cleanup = false;
         // Call the listeners

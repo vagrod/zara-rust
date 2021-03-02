@@ -6,6 +6,7 @@ use std::cell::Cell;
 use std::any::Any;
 
 impl DynamicVitalsSideEffect {
+    /// Creates a new instance of the `DynamicVitalsSideEffect`
     pub fn new() -> Self {
         DynamicVitalsSideEffect {
             first_iteration: Cell::new(true),
@@ -18,6 +19,7 @@ impl DynamicVitalsSideEffect {
             bottom_pressure_ceiling: Cell::new(0.0)
         }
     }
+    /// Returns a state snapshot contract for this `DynamicVitalsSideEffect` instance
     pub fn get_state(&self) -> DynamicVitalsSideEffectStateContract {
         DynamicVitalsSideEffectStateContract {
             body_temperature_ceiling: self.body_temperature_ceiling.get(),
@@ -30,6 +32,10 @@ impl DynamicVitalsSideEffect {
             top_pressure_ceiling: self.top_pressure_ceiling.get()
         }
     }
+    /// Restores the state from the given state contract
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &DynamicVitalsSideEffectStateContract) {
         self.body_temperature_ceiling.set(state.body_temperature_ceiling);
         self.bottom_pressure_ceiling.set(state.bottom_pressure_ceiling);

@@ -171,14 +171,6 @@ impl ItemInCombination {
             count
         }
     }
-
-    /// Creates a copy of this instance
-    pub fn copy(&self) -> ItemInCombination {
-        ItemInCombination {
-            item_name: String::from(&self.item_name),
-            count: self.count
-        }
-    }
 }
 
 /// Describes crafting recipe
@@ -210,6 +202,12 @@ impl fmt::Display for CraftingCombination {
     }
 }
 impl CraftingCombination {
+    /// Creates a new instance of the `CraftingCombination`
+    ///
+    /// # Parameters
+    /// - `result_item`: unique name of the inventory item kind that is a result of this combination
+    /// - `items`: collection of combination items that describe this combination
+    /// - `create`: a function that returns resulted item instance with set count
     pub fn new(result_item: String, items: Vec<ItemInCombination>,
                create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {
         let mut mapped = HashMap::new();
@@ -225,7 +223,7 @@ impl CraftingCombination {
         for item in copy.iter() {
             item_names.push(&item.item_name);
 
-            mapped.insert(String::from(&item.item_name), item.copy());
+            mapped.insert(String::from(&item.item_name), item.clone());
             key.push_str(&item.item_name);
             key.push_str(&sep);
             key.push_str(&item.count.to_string());
@@ -263,6 +261,7 @@ pub struct Builder {
 }
 
 impl Builder {
+    /// Starts building a crafting combination
     pub fn start() -> Box<dyn BuilderStepResultItem> {
         Box::new(Builder {
             result_item: RefCell::new(String::new()),

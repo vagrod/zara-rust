@@ -131,6 +131,12 @@ impl fmt::Display for ClothesItem {
 }
 
 impl ClothesItem {
+    /// Creates a new clothes item
+    ///
+    /// # Parameters
+    /// - `name`: unique name of the inventory item
+    /// - `water_resistance`: percent 0..100 of the water resistance value
+    /// - `cold_resistance`: percent 0..100 of the cold resistance value
     pub fn new(name: String, water_resistance: usize, cold_resistance: usize) -> Self {
         ClothesItem {
             name,
@@ -182,7 +188,9 @@ impl ClothesGroup {
             bonus_water_resistance
         }
     }
+    /// Returns `true` is this group contains particular clothes item
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains_key(item_name) }
+    /// Returns `true` if given set of clothes has all the items needed for this group
     pub fn has_complete(&self, items: Vec<String>) -> bool {
         if items.len() == 0 { return false; }
 

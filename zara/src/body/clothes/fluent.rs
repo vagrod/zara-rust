@@ -11,23 +11,27 @@ impl ClothesGroupBuilder {
     fn as_group_end(&self) -> &dyn ClothesGroupEnd { self }
 }
 
+/// Group fluent step trait
 pub trait ClothesGroupStart {
     /// Unique name of a clothes group. Will become its key
     fn with_name(&self, name: &str) -> &dyn ClothesGroupCold;
 }
 
+/// Group fluent step trait
 pub trait ClothesGroupCold {
     /// Bonus cold resistance level that gets applied when player is wearing the whole
     /// clothes group set on top of all other resistances. 0..100 percents.
     fn bonus_cold_resistance(&self, value: usize) -> &dyn ClothesGroupWater;
 }
 
+/// Group fluent step trait
 pub trait ClothesGroupWater {
     /// Bonus water resistance level that gets applied when player is wearing the whole
     /// clothes group set on top of all other resistances. 0..100 percents.
     fn bonus_water_resistance(&self, value: usize) -> &dyn ClothesGroupItems;
 }
 
+/// Group fluent step trait
 pub trait ClothesGroupItems {
     /// Description of all clothes that form this group ("suit")
     ///
@@ -46,6 +50,7 @@ pub trait ClothesGroupItems {
     fn includes(&self, items: Vec<(&str, Box<dyn ClothesDescription>)>) -> &dyn ClothesGroupEnd;
 }
 
+/// Group fluent step trait
 pub trait ClothesGroupEnd {
     /// Builds resulted clothes group according with the information provided
     fn build(&self) -> ClothesGroup;

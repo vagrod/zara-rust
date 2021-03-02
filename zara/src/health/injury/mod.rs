@@ -110,6 +110,7 @@ macro_rules! fracture(
 );
 
 impl InjuryKey {
+    /// Creates new injury key containing injury name and a body part
     pub fn new(injury: String, body_part: BodyPart) -> Self {
         InjuryKey {
             injury,
@@ -143,6 +144,7 @@ pub struct StageBuilder {
 }
 
 impl StageBuilder {
+    /// Starts stage building process
     pub fn start() -> Box<dyn StageInit> {
         Box::new(
             StageBuilder {
@@ -177,7 +179,7 @@ pub trait InjuryTreatment {
 }
 
 /// Describes injury stage
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Default)]
 pub struct StageDescription {
     /// Level of seriousness (order)
     pub level: StageLevel,
@@ -211,21 +213,9 @@ impl Hash for StageDescription {
         state.write_i32((self.target_stamina_drain*10_000_f32) as i32);
     }
 }
-impl StageDescription {
-    pub fn copy(&self) -> StageDescription {
-        StageDescription {
-            level: self.level,
-            self_heal_chance: match self.self_heal_chance { Some(o) => Some(o), None => None },
-            chance_of_death: match self.chance_of_death { Some(o) => Some(o), None => None },
-            reaches_peak_in_hours: self.reaches_peak_in_hours,
-            is_endless: self.is_endless,
-            target_stamina_drain: self.target_stamina_drain,
-            target_blood_drain: self.target_blood_drain,
-        }
-    }
-}
 
 /// Describes active stages
+#[derive(Copy, Clone, Debug)]
 pub struct ActiveStage {
     /// Stage data
     pub info: StageDescription,
@@ -238,34 +228,29 @@ pub struct ActiveStage {
 }
 
 /// Describes deltas calculated by the active injury
+#[derive(Copy, Clone, Debug, Default)]
 pub struct InjuryDeltasC {
     /// Delta value for the stamina (relative drain, 0..100 per game second)
     pub stamina_drain: f32,
     /// Delta value for the blood level (relative drain, 0..100 per game second)
     pub blood_drain: f32
 }
-
 impl InjuryDeltasC {
+    /// Returns a new object with empty deltas
     pub fn empty() -> Self {
         InjuryDeltasC {
             stamina_drain: 0.,
             blood_drain: 0.
         }
     }
-    pub fn for_related() -> Self {
+    pub(crate) fn for_related() -> Self {
         InjuryDeltasC {
             stamina_drain: 0.,
             blood_drain: 0.
         }
     }
-    pub fn cleanup(&mut self){
+    pub(crate) fn cleanup(&mut self){
         // No "max" logic here (yet?)
-    }
-    pub fn copy(&self) -> InjuryDeltasC {
-        InjuryDeltasC {
-            stamina_drain: self.stamina_drain,
-            blood_drain: self.blood_drain
-        }
     }
 }
 
@@ -297,15 +282,6 @@ impl ActiveStage {
         let gt_d = gt - start;
 
         ((gt_d/d) * 100.) as usize
-    }
-
-    pub fn copy(&self) -> ActiveStage {
-        ActiveStage {
-            info: self.info.copy(),
-            peak_time: self.peak_time.clone(),
-            start_time: self.start_time.clone(),
-            duration: self.duration.clone()
-        }
     }
 }
 

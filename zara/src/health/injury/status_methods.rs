@@ -17,7 +17,7 @@ impl ActiveInjury {
     /// Gets a copy of active injury stage data for a given time
     pub fn get_active_stage(&self, game_time: &GameTimeC) -> Option<ActiveStage> {
         for (_, stage) in self.stages.borrow().iter() {
-            if stage.is_active(game_time) { return Some(stage.copy()) }
+            if stage.is_active(game_time) { return Some(stage.clone()) }
         }
 
         None
@@ -34,7 +34,7 @@ impl ActiveInjury {
     /// Returns a copy of stage data by its level
     pub fn get_stage(&self, level: StageLevel) -> Option<ActiveStage> {
         for (l, stage) in self.stages.borrow().iter() {
-            if level as i32 == *l as i32 { return Some(stage.copy()) }
+            if level as i32 == *l as i32 { return Some(stage.clone()) }
         }
 
         None

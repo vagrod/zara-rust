@@ -15,11 +15,16 @@ impl FoodDrainOverTimeSideEffect {
             drain_amount: Cell::new(drain_amount)
         }
     }
+    /// Returns a state snapshot contract for this `FoodDrainOverTimeSideEffect` instance
     pub fn get_state(&self) -> FoodDrainOverTimeSideEffectStateContract {
         FoodDrainOverTimeSideEffectStateContract {
             drain_amount: self.drain_amount.get()
         }
     }
+    /// Restores the state from the given state contract
+    /// 
+    /// # Parameters
+    /// - `state`: captured earlier state
     pub fn restore_state(&self, state: &FoodDrainOverTimeSideEffectStateContract) {
         self.drain_amount.set(state.drain_amount);
     }

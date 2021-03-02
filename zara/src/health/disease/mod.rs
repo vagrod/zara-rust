@@ -101,6 +101,7 @@ pub struct StageBuilder {
 }
 
 impl StageBuilder {
+    /// Starts stage building process
     pub fn start() -> Box<dyn StageInit> {
         Box::new(
             StageBuilder {
@@ -207,25 +208,6 @@ impl Hash for StageDescription {
         state.write_i32((self.target_water_drain*10_000_f32) as i32);
     }
 }
-impl StageDescription {
-    pub fn copy(&self) -> StageDescription {
-        StageDescription {
-            level: self.level,
-            self_heal_chance: match self.self_heal_chance { Some(o) => Some(o), None => None },
-            chance_of_death: match self.chance_of_death { Some(o) => Some(o), None => None },
-            reaches_peak_in_hours: self.reaches_peak_in_hours,
-            is_endless: self.is_endless,
-            target_body_temp: self.target_body_temp,
-            target_heart_rate: self.target_heart_rate,
-            target_pressure_top: self.target_pressure_top,
-            target_pressure_bottom: self.target_pressure_bottom,
-            target_fatigue_delta: self.target_fatigue_delta,
-            target_stamina_drain: self.target_stamina_drain,
-            target_food_drain: self.target_food_drain,
-            target_water_drain: self.target_water_drain
-        }
-    }
-}
 
 /// Describes deltas calculated by the active diseases
 #[derive(Copy, Clone, Debug, Default)]
@@ -284,6 +266,7 @@ impl Hash for DiseaseDeltasC {
     }
 }
 impl DiseaseDeltasC {
+    /// Creates an empty disease deltas (all zeros)
     pub fn empty() -> Self {
         DiseaseDeltasC {
             body_temperature_delta: 0.,
@@ -319,7 +302,7 @@ impl DiseaseDeltasC {
 }
 
 /// Describes active stages
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug)]
 pub struct ActiveStage {
     /// Stage data
     pub info: StageDescription,

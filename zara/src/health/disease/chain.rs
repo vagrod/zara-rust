@@ -58,7 +58,7 @@ impl ActiveDisease {
 
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
-            info: active_stage.info.copy(),
+            info: active_stage.info.clone(),
             duration: Duration::from_secs_f32(new_peak_time-new_start_time),
             start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
             peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
@@ -74,7 +74,7 @@ impl ActiveDisease {
                 None => continue
             };
             let mut info = match b.get(ind) {
-                Some(i) => i.copy(),
+                Some(i) => i.clone(),
                 None => continue
             };
             let start_time = clamp_bottom(t - info.reaches_peak_in_hours*60.*60.,0.);
@@ -196,7 +196,7 @@ impl ActiveDisease {
 
         // Add this calculated stage to the list.
         stages.insert(active_stage.info.level, ActiveStage {
-            info: active_stage.info.copy(),
+            info: active_stage.info.clone(),
             duration: Duration::from_secs_f32(clamp_bottom(new_peak_time-new_start_time, 0.)),
             start_time: GameTimeC::from_duration(Duration::from_secs_f64(new_start_time as f64)),
             peak_time: GameTimeC::from_duration(Duration::from_secs_f64(new_peak_time as f64)),
@@ -227,7 +227,7 @@ impl ActiveDisease {
             };
 
             stages.insert(level, ActiveStage {
-                info: info.copy(),
+                info: info.clone(),
                 duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),
@@ -262,7 +262,7 @@ impl ActiveDisease {
             };
 
             stages.insert(level, ActiveStage {
-                info: info.copy(),
+                info: info.clone(),
                 duration: Duration::from_secs_f32(clamp_bottom(peak_time-start_time, 0.)),
                 start_time: GameTimeC::from_duration(Duration::from_secs_f64(start_time as f64)),
                 peak_time: GameTimeC::from_duration(Duration::from_secs_f64(peak_time as f64)),

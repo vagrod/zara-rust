@@ -344,6 +344,7 @@ impl Hash for ConsumableC {
     }
 }
 impl ConsumableC {
+    /// Creates a new instance of `ConsumableC`
     pub fn new() -> Self {
         ConsumableC {
             name: String::new(),
@@ -359,7 +360,7 @@ impl ConsumableC {
     }
 }
 
-/// Describes appliance  contract
+/// Describes appliance contract
 #[derive(Clone, Debug)]
 pub struct ApplianceC {
     /// Unique name of the item
@@ -404,6 +405,7 @@ impl Hash for ApplianceC {
     }
 }
 impl ApplianceC {
+    /// Creates new instance of the `ApplianceC`
     pub fn new() -> Self {
         ApplianceC {
             name: String::new(),

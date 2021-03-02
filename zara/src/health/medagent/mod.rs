@@ -81,26 +81,34 @@ impl fmt::Display for MedicalAgentGroup {
     }
 }
 impl MedicalAgentGroup {
+    /// Creates new medical agents group based on the given set of inventory items
+    /// 
+    /// # Parameters
+    /// - `items`: a list of inventory items unique names
     pub fn new(items: Vec<String>) -> Self {
         MedicalAgentGroup {
             items
         }
     }
+    /// Checks whether this group contains a particular inventory item
+    /// 
+    /// # Parameters
+    /// - `item_name`: unique inventory item name
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains(item_name) }
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 struct AgentDoseKey {
-    pub item: String,
-    pub timestamp: i32
+    item: String,
+    timestamp: i32
 }
 
 #[derive(Default, Debug, Clone)]
 struct AgentDose {
-    pub lerp: MultiKeyedLerp,
-    pub start_time: f32,
-    pub end_time: f32,
-    pub duration: f32
+    lerp: MultiKeyedLerp,
+    start_time: f32,
+    end_time: f32,
+    duration: f32
 }
 
 struct AgentUpdateResult {
@@ -108,6 +116,7 @@ struct AgentUpdateResult {
 }
 
 impl AgentUpdateResult {
+    /// Returns a new empty agent update result (inactive)
     pub fn empty() -> Self {
         AgentUpdateResult {
             is_active: false
@@ -178,6 +187,14 @@ impl Hash for MedicalAgent {
     }
 }
 impl MedicalAgent {
+    /// Creates a new medical agent. You can use [`MedicalAgentBuilder`](crate::health::MedicalAgentBuilder) 
+    /// to construct new medical agent.
+    /// 
+    /// # Parameters
+    /// - `name`: name of the medical agent. Will be used as its key
+    /// - `activation_curve`: agent activation curve type
+    /// - `duration_minutes`: duration, in game minutes, of a single agent dose effect
+    /// - `group`: medical agent group associated with this medical agent
     pub fn new(name: String, activation_curve: CurveType, duration_minutes: f32, group: MedicalAgentGroup) -> Self {
         MedicalAgent {
             name: name.to_string(),
@@ -349,6 +366,7 @@ impl fmt::Display for MedicalAgentsMonitor {
     }
 }
 impl MedicalAgentsMonitor {
+    /// Creates a new instance of the `MedicalAgentsMonitor`
     pub fn new() -> Self {
         MedicalAgentsMonitor {
             agents: Arc::new(RefCell::new(HashMap::new())),

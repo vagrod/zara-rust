@@ -325,6 +325,7 @@ impl Health {
 }
 
 impl ActiveInjury {
+    /// Returns a state snapshot contract for this active injury
     pub fn get_state(&self) -> ActiveInjuryStateContract {
         ActiveInjuryStateContract {
             needs_treatment: self.needs_treatment,
