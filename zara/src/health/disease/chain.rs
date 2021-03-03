@@ -28,15 +28,23 @@ impl ActiveDisease {
     ///
     /// # Parameters
     /// - `game_time`: "pivot point" game time for the inversion
-    ///
-    /// [`invert_back`]: #method.invert_back
     /// 
     /// # Returns
     /// Ok on success.
     /// 
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// disease.invert();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
+    /// 
+    /// ## Notes
     /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
     /// direction of passing stages again.
+    /// 
+    /// [`invert_back`]: #method.invert_back
     pub fn invert(&self, game_time: &GameTimeC) -> Result<(), ChainInvertErr> {
         if self.is_inverted.get() { return Err(ChainInvertErr::AlreadyInverted); }
         if !self.is_active(game_time) { return Err(ChainInvertErr::DiseaseNotActiveAtGivenTime); }
@@ -163,14 +171,22 @@ impl ActiveDisease {
     /// # Parameters
     /// - `game_time`: "pivot point" game time for the inversion
     ///
-    /// [`invert`]: #method.invert
-    ///
     /// # Returns
     /// Ok on success.
+    ///
+    /// # Examples
+    /// ```
+    /// disease.invert_back();
+    /// ```
     /// 
-    /// ## Note
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
+    ///  
+    /// ## Notes
     /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
     /// direction of passing stages again.
+    /// 
+    /// [`invert`]: #method.invert
     pub fn invert_back(&self, game_time: &GameTimeC) -> Result<(), ChainInvertBackErr> {
         if !self.is_inverted.get() { return Err(ChainInvertBackErr::AlreadyInvertedBack); }
         if !self.is_active(game_time) {

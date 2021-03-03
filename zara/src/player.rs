@@ -30,6 +30,13 @@ impl Hash for PlayerStatus {
 }
 impl PlayerStatus {
     /// Creates an empty default player state
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::player;
+    ///
+    /// let o = player::PlayerStatus::empty();
+    /// ```
     pub fn empty() -> Self {
         PlayerStatus {
             is_walking: Cell::new(false),

@@ -7,6 +7,15 @@ use std::any::Any;
 
 impl DynamicVitalsSideEffect {
     /// Creates a new instance of the `DynamicVitalsSideEffect`
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health::side:::buitin;
+    /// let o = buitin::DynamicVitalsSideEffect::new();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Built-in-side-effects) for more info.
     pub fn new() -> Self {
         DynamicVitalsSideEffect {
             first_iteration: Cell::new(true),
@@ -20,6 +29,14 @@ impl DynamicVitalsSideEffect {
         }
     }
     /// Returns a state snapshot contract for this `DynamicVitalsSideEffect` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = monitor.get_state();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn get_state(&self) -> DynamicVitalsSideEffectStateContract {
         DynamicVitalsSideEffectStateContract {
             body_temperature_ceiling: self.body_temperature_ceiling.get(),
@@ -36,6 +53,14 @@ impl DynamicVitalsSideEffect {
     /// 
     /// # Parameters
     /// - `state`: captured earlier state
+    /// 
+    /// # Examples
+    /// ```
+    /// monitor.restore_state(state);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn restore_state(&self, state: &DynamicVitalsSideEffectStateContract) {
         self.body_temperature_ceiling.set(state.body_temperature_ceiling);
         self.bottom_pressure_ceiling.set(state.bottom_pressure_ceiling);

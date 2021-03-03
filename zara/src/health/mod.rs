@@ -33,16 +33,28 @@ pub mod medagent;
 /// plus you can change here values that control various regain rates
 pub struct Health {
     /// How fast stamina recovers (percents per game second)
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Changing-regain-rates) for more info.
     pub stamina_regain_rate: Cell<f32>,
     /// How fast blood recovers (percents per game second)
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Changing-regain-rates) for more info.
     pub blood_regain_rate: Cell<f32>,
     /// How fast oxygen recovers (percents per game second)
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Changing-regain-rates) for more info.
     pub oxygen_regain_rate: Cell<f32>,
     /// All active or scheduled diseases
     pub diseases: Arc<RefCell<HashMap<String, Rc<ActiveDisease>>>>,
     /// All active or scheduled injuries
     pub injuries: Arc<RefCell<HashMap<InjuryKey, Rc<ActiveInjury>>>>,
     /// Registered medical agents
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
     pub medical_agents: Arc<MedicalAgentsMonitor>,
     /// Stores all registered disease monitors.
     ///
@@ -52,6 +64,9 @@ pub struct Health {
     ///
     /// [`register_disease_monitor`]: #method.register_disease_monitor
     /// [`unregister_disease_monitor`]: #method.unregister_disease_monitor
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     pub disease_monitors: Rc<RefCell<HashMap<usize, Box<dyn DiseaseMonitor>>>>,
     /// Stores all registered side effects monitors.
     ///
@@ -61,6 +76,9 @@ pub struct Health {
     ///
     /// [`register_side_effect_monitor`]: #method.register_side_effect_monitor
     /// [`unregister_side_effect_monitor`]: #method.unregister_side_effect_monitor
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
     pub side_effects: Rc<RefCell<HashMap<usize, Box<dyn SideEffectsMonitor>>>>,
 
     // Health state fields
@@ -151,6 +169,26 @@ pub struct MedicalAgentBuilder {
 }
 impl MedicalAgentBuilder {
     /// Starts building process for a new medical agent
+    /// 
+    /// # Examples
+    /// ```
+    /// MedicalAgentBuilder::start()
+    ///     .for_agent("Epinephrine")
+    ///         .activates(CurveType::Immediately)
+    ///         .and_lasts_for_minutes(23.)
+    ///         .includes(
+    ///             vec![
+    ///                 "Adrenaline Pills",
+    ///                 "Big Green Leaves",
+    ///                 "Syringe With Epinephrine",
+    ///                 // ... and so on
+    ///             ]
+    ///         )
+    ///     .build()
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
     pub fn start() -> Box<dyn AgentStart> {
         Box::new(MedicalAgentBuilder {
             name: RefCell::new(String::new()),
@@ -250,7 +288,12 @@ impl Health {
 
     /// Removes all diseases.
     ///
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// person.health.clear_diseases();
+    /// ```
+    /// 
+    /// ## Notes
     /// Borrows `diseases` collection
     pub fn clear_diseases(&self) {
         self.diseases.borrow_mut().clear();
@@ -258,7 +301,12 @@ impl Health {
 
     /// Removes all injuries.
     ///
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// person.health.clear_injuries();
+    /// ```
+    /// 
+    /// ## Notes
     /// Borrows `injuries` collection
     pub fn clear_injuries(&self) {
         self.injuries.borrow_mut().clear();

@@ -17,8 +17,16 @@ impl Health {
     ///
     /// # Returns
     /// Disease key on success
+    /// 
+    /// # Examples
+    /// ```
+    /// person.health.spawn_disease(disease, game_time);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Spawning-a-Disease) for more info.
     ///
-    /// # Notes
+    /// ## Notes
     /// This method borrows the `diseases` collection
     pub fn spawn_disease(&self, disease: Box<dyn Disease>, activation_time: GameTimeC)
                                                                     -> Result<String, SpawnDiseaseErr> {
@@ -48,8 +56,13 @@ impl Health {
     ///
     /// # Returns
     /// Ok on success
+    /// 
+    /// # Examples
+    /// ```
+    /// person.health.remove_disease(disease_name);
+    /// ```
     ///
-    /// # Notes
+    /// ## Notes
     /// This method borrows the `diseases` collection
     pub fn remove_disease(&self, disease_name: &String) -> Result<(), RemoveDiseaseErr> {
         if !self.is_alive.get() { return Err(RemoveDiseaseErr::CharacterIsDead); }

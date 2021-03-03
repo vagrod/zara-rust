@@ -22,7 +22,7 @@ mod lerp;
 mod chain;
 mod status_methods;
 
-/// Macro for declaring a simple injury. Use [`StageBuilder`](crate::health::injury::StageBuilder)
+/// Macro for declaring a simple injury. Use [`injury::StageBuilder`](crate::health::injury::StageBuilder)
 /// to create a stage
 ///
 /// # Examples
@@ -111,6 +111,13 @@ macro_rules! fracture(
 
 impl InjuryKey {
     /// Creates new injury key containing injury name and a body part
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// 
+    /// let o = health::InjuryKey::new(injury_name, body_part);
+    /// ```
     pub fn new(injury: String, body_part: BodyPart) -> Self {
         InjuryKey {
             injury,
@@ -127,11 +134,17 @@ impl InjuryKey {
 /// use zara::health::injury::StageBuilder;
 /// use zara::health::StageLevel;
 ///
-/// StageBuilder::start()
+/// let stage = StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
-///         .self_heal(15)
-///         .drains(); // and so on...
-/// //  .build();
+///         .self_heal(20)
+///         .drains()
+///             .stamina(0.2)
+///             .blood_level(0.08)
+///         .deadly()
+///             .with_chance_of_death(1)
+///         .will_reach_target_in(0.3)
+///         .will_end()
+///     .build();
 /// ```
 pub struct StageBuilder {
     level: RefCell<StageLevel>,
@@ -161,6 +174,9 @@ impl StageBuilder {
 }
 
 /// Here you can describe any injury treatment logic based on the appliances
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
 pub trait InjuryTreatment {
     /// Called on all active injuries when player takes an appliance (bandage, injection, etc)
     ///
@@ -173,6 +189,9 @@ pub trait InjuryTreatment {
     ///     "curing" the injury
     /// - `inventory_items`: all inventory items. Used item is still in this list at the
     ///     moment of this call
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
     fn on_appliance_taken(&self, game_time: &GameTimeC, item: &ApplianceC, body_part: BodyPart,
                           active_stage: &ActiveStage, injury: &ActiveInjury,
                           inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
@@ -214,7 +233,7 @@ impl Hash for StageDescription {
     }
 }
 
-/// Describes active stages
+/// Describes injury active stage
 #[derive(Copy, Clone, Debug)]
 pub struct ActiveStage {
     /// Stage data
@@ -237,6 +256,12 @@ pub struct InjuryDeltasC {
 }
 impl InjuryDeltasC {
     /// Returns a new object with empty deltas
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// let o = health:InjuryDeltasC:new();
+    /// ```
     pub fn empty() -> Self {
         InjuryDeltasC {
             stamina_drain: 0.,
@@ -256,6 +281,11 @@ impl InjuryDeltasC {
 
 impl ActiveStage {
     /// Checks if stage is active for a given time
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = stage.is_active(game_time);
+    /// ```
     pub fn is_active(&self, game_time: &GameTimeC) -> bool {
         let start = self.start_time.as_secs_f32();
         let peak = self.peak_time.as_secs_f32();
@@ -269,6 +299,11 @@ impl ActiveStage {
     }
 
     /// Returns percent of activity of this stage. Always in 0..100 range.
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = stage.percent_active(game_time);
+    /// ```
     pub fn percent_active(&self, game_time: &GameTimeC) -> usize {
         let gt = game_time.as_secs_f32();
         let start = self.start_time.as_secs_f32();
@@ -288,13 +323,38 @@ impl ActiveStage {
 /// Trait that must be implemented by all injuries
 pub trait Injury {
     /// Gets the unique name of this injury kind
+    /// 
+    /// # Examples
+    /// ```
+    /// let name = injury.get_name();
+    /// ```
     fn get_name(&self) -> String;
     /// Gets all injury stages. Use [`StageBuilder`](crate::health::injury::StageBuilder) to
     /// describe a stage
+    /// 
+    /// # Examples
+    /// ```
+    /// let stages = injury.get_stages();
+    /// ```
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this injury object
+    /// 
+    /// # Examples
+    /// ```
+    /// if let Some(treatment) = injury.get_treatment() {
+    /// 
+    /// }
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
     fn get_treatment(&self) -> Option<Box<dyn InjuryTreatment>>;
     /// True if injury is a fracture
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = injury.get_is_fracture();
+    /// ```
     fn get_is_fracture(&self) -> bool;
     /// For downcasting
     fn as_any(&self) -> &dyn Any;
@@ -393,13 +453,23 @@ impl Hash for ActiveInjury {
     }
 }
 impl ActiveInjury {
-    /// Creates new active disease object
+    /// Creates new active injury object
     ///
     /// # Parameters
     /// - `injury`: instance of an object with the [`Injury`](crate::health::injury::Injury) trait
     /// - `body_part`: body part associated with this injury
     /// - `activation_time`: game time when this injury will start to be active. Use the
     ///     current game time to activate immediately
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// 
+    /// let o = health::ActiveInjury::new(injury, body_part, activation_time);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Spawning-an-Injury) for more info.
     pub fn new(injury: Box<dyn Injury>, body_part: BodyPart, activation_time: GameTimeC) -> Self {
         let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();
@@ -474,6 +544,14 @@ impl ActiveInjury {
     /// Temporary stop blood drain. You can call [`resume_blood_loss`] to resume it
     ///
     /// [`resume_blood_loss`]: #method.resume_blood_loss
+    /// 
+    /// # Examples
+    /// ```
+    /// injury.stop_blood_loss();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Controlling-blood-loss) for more info.
     pub fn stop_blood_loss(&self) {
         self.blood_loss_stop.set(true);
 
@@ -483,6 +561,14 @@ impl ActiveInjury {
     /// Resumes stopped by the [`stop_blood_loss`] call blood drain
     ///
     /// [`stop_blood_loss`]: #method.stop_blood_loss
+    /// 
+    /// # Examples
+    /// ```
+    /// injury.resume_blood_loss();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Controlling-blood-loss) for more info.
     pub fn resume_blood_loss(&self) {
         self.blood_loss_stop.set(false);
 

@@ -27,6 +27,9 @@ pub mod player;
 ///
 /// [`new`]: #method.new
 /// [`with_environment`]: #method.with_environment
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Getting-Started) for more info.
 pub struct ZaraController<E: Listener + 'static> {
     /// Environment node.
     ///
@@ -143,7 +146,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
-    /// ## Note
+    /// ## Notes
     /// Borrows `inventory.items` collection
     ///
     /// # Examples
@@ -216,7 +219,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
-    /// ## Note
+    /// ## Notes
     /// Borrows `inventory.items` collection, can borrow `body.appliances` collection
     ///
     /// # Examples
@@ -286,7 +289,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// - `item_name`: inventory kind of appliance to remove
     /// - `body_part`: from which body part
     ///
-    /// ## Note
+    /// ## Notes
     /// Borrows `body.appliances` collection
     ///
     /// # Examples
@@ -342,7 +345,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     /// 
-    /// ## Note
+    /// ## Notes
     /// This method borrows `body.clothes` collection.
     ///
     /// # Examples
@@ -385,7 +388,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     /// 
-    /// ## Note
+    /// ## Notes
     /// This method borrows `body.clothes` collection.
     ///
     /// # Examples

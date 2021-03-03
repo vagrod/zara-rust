@@ -218,6 +218,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// It will capture current game time, state of all medical agents, environment snapshot, saved
     /// payer status, health vitals and levels, clothes and body appliances, cached inventory weight
     /// and related internal fields.
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = person.get_state();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn get_state(&self) -> ZaraControllerStateContract {
         ZaraControllerStateContract {
             environment: EnvironmentStateContract {
@@ -251,6 +259,14 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// and related internal fields.
     ///
     /// To restore a disease or injury, call `restore_disease` or `restore_injury` on a `health` node.
+    /// 
+    /// # Examples
+    /// ```
+    /// person.restore_state(state);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn restore_state(&self, state: &ZaraControllerStateContract) {
         self.update_counter.set(state.update_counter);
         self.queue_counter.set(state.queue_counter);

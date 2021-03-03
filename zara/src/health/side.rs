@@ -7,6 +7,9 @@ use std::hash::{Hash, Hasher};
 pub mod builtin;
 
 /// Trait that must be implemented by all side effects monitors
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
 pub trait SideEffectsMonitor {
     /// Being called once a `UPDATE_INTERVAL` real seconds.
     ///
@@ -16,6 +19,9 @@ pub trait SideEffectsMonitor {
     /// # Returns
     /// [`SideEffectDeltasC`](crate::health::side::SideEffectDeltasC) structure containing deltas
     /// that will be added to the `healthy player state`, and NOT THE CURRENT health state
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
     fn check(&self, frame_data: &FrameSummaryC) -> SideEffectDeltasC;
 
     /// For downcasting
@@ -34,6 +40,9 @@ pub trait SideEffectsMonitor {
 ///
 /// let result = side::SideEffectDeltasC { body_temp_bonus: 0.05, ..Default::default() };
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
 #[derive(Copy, Clone, Debug, Default)]
 pub struct SideEffectDeltasC {
     /// Delta that will be added to the healthy value (absolute delta)

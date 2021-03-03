@@ -22,7 +22,7 @@ mod lerp;
 mod chain;
 mod status_methods;
 
-/// Macro for declaring a disease. Use [`StageBuilder`](crate::health::disease::StageBuilder)
+/// Macro for declaring a disease. Use [`disease::StageBuilder`](crate::health::disease::StageBuilder)
 /// to create a stage
 ///
 /// # Examples
@@ -80,10 +80,24 @@ macro_rules! disease(
 ///
 /// StageBuilder::start()
 ///     .build_for(StageLevel::InitialStage)
-///         .self_heal(15)
-///         .vitals(); // and so on...
-/// //  .build();
+///     .self_heal(5)
+///     .vitals()
+///         .with_target_body_temp(37.6)
+///         .with_target_heart_rate(85.)
+///         .with_target_blood_pressure(130., 90.)
+///         .will_reach_target_in(0.1)
+///         .will_end()
+///     .drains()
+///         .stamina(0.2)
+///         .food_level(0.05)
+///         .water_level(0.1)
+///     .affects_fatigue(5.)
+///     .with_chance_of_death(2)
+/// .build()
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declaring-a-Disease) for more info.
 pub struct StageBuilder {
     level: RefCell<StageLevel>,
     self_heal_chance: RefCell<Option<usize>>,
@@ -125,6 +139,9 @@ impl StageBuilder {
 
 /// Here you can describe any disease treatment logic based on the consumed items (food/pills/etc)
 /// or an appliance (bandage, injection, etc)
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
 pub trait DiseaseTreatment {
     /// Called on all active diseases when player eats something
     ///
@@ -134,7 +151,7 @@ pub trait DiseaseTreatment {
     /// - `active_stage`: instance of the active stage of a disease
     /// - `disease`: disease object itself. You can call `invert` or `invert_back` to start or stop
     ///     "curing" the disease
-    ///  - `inventory_items`: all inventory items. Consumed item is still in this list at the
+    /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
     fn on_consumed(&self, game_time: &GameTimeC, item: &ConsumableC, active_stage: &ActiveStage,
                    disease: &ActiveDisease, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
@@ -301,7 +318,7 @@ impl DiseaseDeltasC {
     }
 }
 
-/// Describes active stages
+/// Describes disease active stage
 #[derive(Copy, Clone, Debug)]
 pub struct ActiveStage {
     /// Stage data
@@ -347,6 +364,11 @@ impl Hash for ActiveStage {
 }
 impl ActiveStage {
     /// Checks if stage is active for a given time
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = stage.is_active(game_time);
+    /// ```
     pub fn is_active(&self, game_time: &GameTimeC) -> bool {
         let start = self.start_time.as_secs_f32();
         let peak = self.peak_time.as_secs_f32();
@@ -363,6 +385,11 @@ impl ActiveStage {
     ///
     /// # Parameters
     /// - `game_time`: game time for which to calculate the value
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = stage.percent_active(game_time);
+    /// ```
     pub fn percent_active(&self, game_time: &GameTimeC) -> usize {
         let gt = game_time.as_secs_f32();
         let start = self.start_time.as_secs_f32();
@@ -379,13 +406,19 @@ impl ActiveStage {
     }
 }
 
-/// Trait for disease monitors
+/// Trait for declaring a disease monitor.
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
 pub trait DiseaseMonitor {
     /// Being called once a `UPDATE_INTERVAL` real seconds.
     ///
     /// # Parameters
     /// - `health`: health controller object. It can be used to call `spawn_disease` for example
     /// - `frame_data`: summary containing all environmental data, game time, health snapshot and etc.
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     fn check(&self, health: &Health, frame_data: &FrameSummaryC);
 
     /// Being called when player consumes food or water
@@ -396,6 +429,9 @@ pub trait DiseaseMonitor {
     /// - `item`: consumable description
     /// - `inventory_items`: all inventory items. Consumed item is still in this list at the
     ///     moment of this call
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     fn on_consumed(&self, health: &Health, game_time: &GameTimeC, item: &ConsumableC,
                    inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 
@@ -408,6 +444,9 @@ pub trait DiseaseMonitor {
     /// - `body_part`: body part to which this item was applied
     /// - `inventory_items`: all inventory items. Applied item is still in this list at the
     ///     moment of this call
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     fn on_appliance_taken(&self, health: &Health, game_time: &GameTimeC, item: &ApplianceC,
                           body_part: BodyPart, inventory_items: &HashMap<String, Box<dyn InventoryItem>>);
 
@@ -415,14 +454,35 @@ pub trait DiseaseMonitor {
     fn as_any(&self) -> &dyn Any;
 }
 
-/// Trait that must be implemented by all diseases
+/// Trait for declaring a disease.
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declaring-a-Disease) for more info.
 pub trait Disease {
     /// Gets the unique name of this disease kind
+    /// 
+    /// # Examples
+    /// ```
+    /// let name = disease.get_name();
+    /// ```
     fn get_name(&self) -> String;
     /// Gets all disease stages. Use [`StageBuilder`](crate::health::disease::StageBuilder) to
     /// describe a stage
+    /// 
+    /// # Examples
+    /// ```
+    /// let stages = disease.get_stages();
+    /// ```
     fn get_stages(&self) -> Vec<StageDescription>;
     /// Treatment instance associated with this disease object
+    /// 
+    /// # Examples
+    /// ```
+    /// let o = disease.get_treatment();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
     fn get_treatment(&self) -> Option<Box<dyn DiseaseTreatment>>;
     /// For downcasting
     fn as_any(&self) -> &dyn Any;
@@ -527,6 +587,13 @@ impl ActiveDisease {
     /// - `disease`: instance of an object with the [`Disease`](crate::health::disease::Disease) trait
     /// - `activation_time`: game time when this disease will start to be active. Use the
     ///     current game time to activate immediately
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health
+    /// 
+    /// let disease = health::ActiveDisease::new(disease, game_time);
+    /// ```
     pub fn new(disease: Box<dyn Disease>, activation_time: GameTimeC) -> Self {
         let mut stages: BTreeMap<StageLevel, ActiveStage> = BTreeMap::new();
         let mut time_elapsed= activation_time.to_duration();

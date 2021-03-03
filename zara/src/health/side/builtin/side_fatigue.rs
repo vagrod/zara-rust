@@ -12,12 +12,29 @@ impl FatigueSideEffects {
     /// # Parameters
     /// - `hours_until_exhausted`: game hours for player from being fully rested to become
     ///     extremely exhausted
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health::side:::buitin;
+    /// let o = buitin::FatigueSideEffects::new(14);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Built-in-side-effects) for more info.
     pub fn new(hours_until_exhausted: usize) -> Self {
         FatigueSideEffects {
             hours_until_exhausted: Cell::new(hours_until_exhausted)
         }
     }
     /// Returns a state snapshot contract for this `FatigueSideEffects` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = monitor.get_state();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn get_state(&self) -> FatigueSideEffectsStateContract {
         FatigueSideEffectsStateContract {
             hours_until_exhausted: self.hours_until_exhausted.get()
@@ -27,6 +44,14 @@ impl FatigueSideEffects {
     /// 
     /// # Parameters
     /// - `state`: captured earlier state
+    /// 
+    /// # Examples
+    /// ```
+    /// monitor.restore_state(state);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn restore_state(&self, state: &FatigueSideEffectsStateContract) {
         self.hours_until_exhausted.set(state.hours_until_exhausted);
     }

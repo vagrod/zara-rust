@@ -19,8 +19,16 @@ impl Health {
     ///
     /// # Returns
     /// Injury instance key on success
+    /// 
+    /// # Examples
+    /// ```
+    /// person.health.spawn_injury(injury, body_part, game_time);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Spawning-an-Injury) for more info.
     ///
-    /// # Notes
+    /// ## Notes
     /// This method borrows the `injuries` collection
     pub fn spawn_injury(&self, injury: Box<dyn Injury>, body_part: BodyPart, activation_time: GameTimeC)
                         -> Result<InjuryKey, SpawnInjuryErr> {
@@ -56,7 +64,12 @@ impl Health {
     /// # Returns
     /// Ok on success
     ///
-    /// # Notes
+    /// # Examples
+    /// ```
+    /// person.health.remove_injury(injury_name, body_part);
+    /// ```
+    /// 
+    /// ## Notes
     /// This method borrows the `injuries` collection
     pub fn remove_injury(&self, injury_name: String, body_part: BodyPart) -> Result<(), RemoveInjuryErr> {
         if !self.is_alive.get() { return Err(RemoveInjuryErr::CharacterIsDead); }

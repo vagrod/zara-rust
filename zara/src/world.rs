@@ -10,7 +10,6 @@ use std::hash::{Hash, Hasher};
 pub struct EnvironmentData {
     /// Game time for this Zara instance
     pub game_time: Rc<GameTime>,
-
     /// Wind speed (m/s)
     pub wind_speed: Cell<f32>,
     /// Temperature, degrees C
@@ -56,6 +55,9 @@ impl EnvironmentData {
     ///
     /// let env = EnvironmentData::new();
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Environment) for more info.
     pub fn new() -> Self {
         EnvironmentData {
             game_time: Rc::new(GameTime::new()),
@@ -64,7 +66,6 @@ impl EnvironmentData {
             temperature: Cell::new(0.)
         }
     }
-
     /// Creates new `EnvironmentData` from a given `EnvironmentC` object.
     /// To create default `EnvironmentData`, use [`new`] method.
     ///
@@ -78,6 +79,9 @@ impl EnvironmentData {
     ///
     /// let env = EnvironmentData::from_description(env_desc);
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Environment) for more info.
     pub fn from_description(ed: EnvironmentC) -> EnvironmentData {
         let e = EnvironmentData::new();
 

@@ -22,6 +22,14 @@ impl Body {
     }
 
     /// Recalculates cached wetness level. This is automatically called every update.
+    /// 
+    /// # Examples
+    /// ```
+    /// person.body.recalculate_wetness_level();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Wetness-level) for more info.
     pub fn recalculate_wetness_level(&self, game_time_delta: f32) {
         if self.cached_player_in_water.get() {
             self.wetness_level.set(100.);

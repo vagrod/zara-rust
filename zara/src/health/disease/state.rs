@@ -11,7 +11,7 @@ use std::fmt;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
-/// Contains state snapshot for stage description
+/// Contract for storing captured state snippet for the disease stage description
 #[derive(Clone, Debug, Default)]
 pub struct StageDescriptionStateContract {
     /// Captured state of the `level` field
@@ -376,6 +376,14 @@ impl Health {
     /// - `disease_data`: saved disease state (from `ActiveDisease.get_state` method call)
     /// - `disease`: disease instance
     ///
+    /// # Examples
+    /// ```
+    /// person.health.restore_disease(disease_state, disease_instance);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management#saving-and-restoring-diseases-and-injuries) for more info.
+    /// 
     /// ## Notes
     /// Borrows `diseases` collection
     pub fn restore_disease(&self, disease_data: &ActiveDiseaseStateContract, disease: Box<dyn Disease>) {
@@ -408,6 +416,14 @@ impl Health {
 
 impl ActiveDisease {
     /// Gets active disease state snapshot contract
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = disease.get_state();
+    /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management#saving-and-restoring-diseases-and-injuries) for more info.
     pub fn get_state(&self) -> ActiveDiseaseStateContract {
         ActiveDiseaseStateContract {
             needs_treatment: self.needs_treatment,

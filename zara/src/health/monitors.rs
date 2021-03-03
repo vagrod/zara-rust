@@ -12,6 +12,14 @@ impl Health {
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let mid = person.health.register_disease_monitor(Box::new(FluMonitor::new()));
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     pub fn register_disease_monitor(&self, monitor: Box<dyn DiseaseMonitor>) -> usize {
         let mut b = self.disease_monitors.borrow_mut();
         let key = b.keys().max().unwrap_or(&0) + 1;
@@ -27,6 +35,14 @@ impl Health {
     /// - `key`: unique key given as a result of a [`register_disease_monitor`] method.
     ///
     /// [`register_disease_monitor`]: #method.register_disease_monitor
+    /// 
+    /// # Examples
+    /// ```
+    /// person.health.unregister_disease_monitor(mid)?
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Monitors) for more info.
     pub fn unregister_disease_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.disease_monitors.borrow_mut();
 
@@ -47,6 +63,14 @@ impl Health {
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let mid = person.health.register_side_effect_monitor(Box::new(RunningMonitor::new()));
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
     pub fn register_side_effect_monitor(&self, monitor: Box<dyn SideEffectsMonitor>) -> usize {
         let mut b = self.side_effects.borrow_mut();
         let key = b.keys().max().unwrap_or(&0) + 1;
@@ -62,6 +86,14 @@ impl Health {
     /// - `key`: unique key given as a result of a [`register_side_effect_monitor`] method.
     ///
     /// [`register_side_effect_monitor`]: #method.register_side_effect_monitor
+    /// 
+    /// # Examples
+    /// ```
+    /// person.health.unregister_side_effect_monitor(mid)?
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Side-effects-Monitors) for more info.
     pub fn unregister_side_effect_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.side_effects.borrow_mut();
 

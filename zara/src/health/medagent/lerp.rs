@@ -11,7 +11,17 @@ pub struct MultiKeyedLerp {
 }
 
 impl MultiKeyedLerp {
-    /// Constructs new lerp curve using a list of a keyframes
+    /// Constructs new lerp curve using a list of keyframes
+    /// 
+    /// # Examples
+    /// use zara::health;
+    /// ```
+    /// let o = health::MultiKeyedLerp::new(vec![
+    ///     health::KeyFrame::new(0., 0.),
+    ///     health::KeyFrame::new(0.5, 7.),
+    ///     health::KeyFrame::new(1., 12.3)
+    /// ])
+    /// ```
     pub fn new(mut keyframes: Vec<KeyFrame>) -> Self {
         let mut segments = Vec::new();
 
@@ -32,6 +42,16 @@ impl MultiKeyedLerp {
 
     /// Evaluates curve at a given time. Returns `None` if a given time is not on a
     /// curve time scale.
+    /// 
+    /// # Parameters
+    /// - `time`: time value to evaluate at
+    /// 
+    /// # Examples
+    /// ```
+    /// if let Some(value) = curve.evaluate(0.75) {
+    ///     // ...
+    /// }
+    /// ```
     pub fn evaluate(&self, time: f32) -> Option<f32> {
         let rescan_segments = || {
             match self.find_segment(time) {
@@ -91,6 +111,17 @@ pub struct KeyFrame {
 }
 
 impl KeyFrame {
-    /// Constructs a new keyframe.
+    /// Constructs a new keyframe
+    /// 
+    /// # Parameters
+    /// - `time`: time value of the curve keyframe
+    /// - `value`: value for the given time
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// 
+    /// let o = health::KeyFrame::new(0.5, 7.6);
+    /// ```
     pub fn new(time: f32, value: f32) -> Self { KeyFrame { time, value } }
 }

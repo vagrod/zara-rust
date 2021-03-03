@@ -25,12 +25,18 @@ pub struct Body {
     /// Do not alter this collection manually, use `ZaraController.put_on_clothes` and
     /// `ZaraController.take_off_clothes`, otherwise clothes will not be correctly synchronized
     /// between controllers
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes) for more info.
     pub clothes: Arc<RefCell<Vec<String>>>,
     /// Body appliances that character is wearing now.
     ///
     /// # Important
     /// Currently active body appliances. Do not alter this collection manually, 
     /// use `ZaraController.take_appliance` and `ZaraController.remove_appliance`
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Body-Appliances) for more info.
     pub appliances: Arc<RefCell<Vec<BodyAppliance>>>,
 
     /// Game time when player slept last time
@@ -49,7 +55,8 @@ pub struct Body {
     warmth_level: Cell<f32>,
     /// Wetness level value
     wetness_level: Cell<f32>,
-
+    
+    // Counters and caches
     sleeping_counter: Cell<f64>,
     cached_world_temp: Cell<f32>,
     cached_wind_speed: Cell<f32>,
@@ -103,6 +110,9 @@ impl Hash for BodyAppliance {
 ///         )
 ///     .build()
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
 pub struct ClothesGroupBuilder {
     pub(crate) name: RefCell<String>,
     pub(crate) bonus_cold_resistance: Cell<usize>,
@@ -111,6 +121,16 @@ pub struct ClothesGroupBuilder {
 }
 impl ClothesGroupBuilder {
     /// Starts building process for a new clothes group.
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::body;
+    /// 
+    /// let o = body::ClothesGroupBuilder::start(); // and continue with `.with_name`
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn start() -> Box<dyn ClothesGroupStart> {
         Box::new(ClothesGroupBuilder {
             name: RefCell::new(String::new()),
@@ -152,7 +172,6 @@ pub enum BodyPart {
     RightFoot = 24,
     Back = 25
 }
-
 impl Default for BodyPart {
     fn default() -> Self {
         BodyPart::Unknown
@@ -229,6 +248,14 @@ impl Body {
     ///
     /// # Parameters
     /// - `game_hours`: for how many game hours should player sleep
+    /// 
+    /// # Examples
+    /// ```
+    /// person.body.start_sleeping(5.5);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Sleeping) for more info.
     pub fn start_sleeping(&self, game_hours: f32) -> bool {
         self.is_sleeping.set(true);
         self.sleeping_counter.set(game_hours as f64 * 60. * 60.);

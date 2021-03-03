@@ -31,6 +31,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// person.update(time_delta);
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Getting-Started#progressing-zara-state) for more info.
     pub fn update(&self, frame_time: f32) -> Result<(), ZaraUpdateErr>{
         if !self.health.is_alive() { return Err(ZaraUpdateErr::CharacterIsDead); }
         if self.is_paused() { return Err(ZaraUpdateErr::InstancePaused); }

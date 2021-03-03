@@ -10,12 +10,29 @@ impl WaterDrainOverTimeSideEffect {
     ///
     /// # Parameters
     /// - `drain_amount`: drain speed, 0..100 percents per game second
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health::side:::buitin;
+    /// let o = buitin::WaterDrainOverTimeSideEffect::new(0.03);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Built-in-side-effects) for more info.
     pub fn new(drain_amount: f32) -> Self {
         WaterDrainOverTimeSideEffect {
             drain_amount: Cell::new(drain_amount)
         }
     }
     /// Returns a state snapshot contract for this `WaterDrainOverTimeSideEffect` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = monitor.get_state();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn get_state(&self) -> WaterDrainOverTimeSideEffectStateContract {
         WaterDrainOverTimeSideEffectStateContract {
             drain_amount: self.drain_amount.get()
@@ -25,6 +42,14 @@ impl WaterDrainOverTimeSideEffect {
     /// 
     /// # Parameters
     /// - `state`: captured earlier state
+    /// 
+    /// # Examples
+    /// ```
+    /// monitor.restore_state(state);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn restore_state(&self, state: &WaterDrainOverTimeSideEffectStateContract) {
         self.drain_amount.set(state.drain_amount);
     }

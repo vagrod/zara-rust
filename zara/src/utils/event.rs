@@ -16,6 +16,9 @@ pub(crate) trait MessageQueue {
 }
 
 /// All Zara public events
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Game-events) for more info.
 #[derive(Clone, Debug)]
 pub enum Event {
     /// When sleep is started.
@@ -242,16 +245,33 @@ impl<T> Dispatcher<T>
     where T: Listener
 {
     /// Creates new instance of the `Dispatcher`
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utils;
+    /// 
+    /// let o = utils::Dispatcher::new();
+    /// ```
     pub fn new() -> Dispatcher<T> {
         Dispatcher { listeners: Vec::new() }
     }
 
     /// Returns count of active listeners
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = dispatcher.num_listeners();
+    /// ```
     pub fn num_listeners(&self) -> usize {
         self.listeners.len()
     }
 
     /// Dispatches a message to all active listeners
+    /// 
+    /// # Examples
+    /// ```
+    /// dispatcher.dispatch(event);
+    /// ```
     pub fn dispatch(&mut self, event: Event) {
         let mut cleanup = false;
         // Call the listeners

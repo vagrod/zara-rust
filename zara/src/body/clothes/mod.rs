@@ -42,6 +42,9 @@ impl Body {
     ///     ]
     ///  );
     ///```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn register_clothes_groups(&self, groups: Vec<ClothesGroup>) {
         let mut b = self.clothes_groups.borrow_mut();
         for group in groups {
@@ -137,6 +140,16 @@ impl ClothesItem {
     /// - `name`: unique name of the inventory item
     /// - `water_resistance`: percent 0..100 of the water resistance value
     /// - `cold_resistance`: percent 0..100 of the cold resistance value
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::body;
+    /// 
+    /// let o = body::ClothesItem::new(name, wr, cr);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes) for more info.
     pub fn new(name: String, water_resistance: usize, cold_resistance: usize) -> Self {
         ClothesItem {
             name,
@@ -174,6 +187,27 @@ impl Hash for ClothesGroup {
 
 impl ClothesGroup {
     /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder) to construct new group.
+    /// 
+    /// # Parameters
+    /// - `name`: unique name of the group. Will become its key
+    /// - `items`: a list of inventory items names that form this group
+    /// - `bonus_cold_resistance`: bonus cold resistance value, 0..100 percents
+    /// - `bonus_water_resistance`: bonus water resistance value, 0..100 percents
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::body;
+    /// 
+    /// let o = body::ClothesGroup::new(name, 
+    ///         vec![
+    ///             ("Pants", Box::new(PantsClothes)),
+    ///             ("Jacket", Box::new(JacketClothes)),
+    ///             // ... and so on
+    ///         ], 5, 7);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn new(name: String, items: Vec<ClothesItem>, bonus_cold_resistance: usize, bonus_water_resistance: usize) -> Self {
         let mut items_map = HashMap::new();
 
@@ -189,8 +223,30 @@ impl ClothesGroup {
         }
     }
     /// Returns `true` is this group contains particular clothes item
+    /// 
+    /// # Parameters
+    /// - `item_name`: unique name of the inventory item
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = group.contains(jacket_name);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains_key(item_name) }
     /// Returns `true` if given set of clothes has all the items needed for this group
+    /// 
+    /// # Parameters
+    /// - `items`: a list of inventory items names
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = group.has_complete(items_list);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn has_complete(&self, items: Vec<String>) -> bool {
         if items.len() == 0 { return false; }
 

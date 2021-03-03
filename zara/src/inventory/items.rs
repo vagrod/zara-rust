@@ -16,6 +16,9 @@ use std::hash::{Hash, Hasher};
 ///     /* weight per unit */ 351.
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_item(
     ($t:ty, $nm:expr, $wt:expr) => (
@@ -44,6 +47,9 @@ macro_rules! inv_item(
 ///     /* weight per unit */ 351.
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_infinite(
     ($t:ty, $nm:expr, $wt:expr) => (
@@ -73,6 +79,9 @@ macro_rules! inv_infinite(
 ///     /* consumable option */ Some(&MeatConsumableOption)
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_item_cons(
     ($t:ty, $nm:expr, $wt:expr, $cons:expr) => (
@@ -102,6 +111,9 @@ macro_rules! inv_item_cons(
 ///     /* appliance option */ Some(&MorphineInjectionAppliance)
 /// )
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_item_appl (
     ($t:ty, $nm:expr, $wt:expr, $appl:expr) => (
@@ -131,6 +143,9 @@ macro_rules! inv_item_appl (
 ///     /* clothes item description */ Some(&JacketClothes).
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_item_clothes (
     ($t:ty, $nm:expr, $wt:expr, $cl:expr) => (
@@ -155,6 +170,9 @@ macro_rules! inv_item_clothes (
 /// ```
 /// zara::inv_body_appliance!(BandageOption);
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_body_appliance (
     ($t:ty) => (
@@ -172,6 +190,9 @@ macro_rules! inv_body_appliance (
 /// ```
 /// zara::inv_injection_appliance!(InjectionOption);
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_injection_appliance (
     ($t:ty) => (
@@ -194,6 +215,9 @@ macro_rules! inv_injection_appliance (
 ///     /* spoil option */ Some(&MeatSpoiling)
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_food(
     ($t:ty, $wg:expr, $fg:expr, $sp:expr) => (
@@ -219,6 +243,9 @@ macro_rules! inv_food(
 ///     /* spoil option */ Some(&DrinkableWaterSpoiling)
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_water(
     ($t:ty, $wg:expr, $fg:expr, $sp:ty) => (
@@ -244,6 +271,9 @@ macro_rules! inv_water(
 ///     /* spoil time */ GameTimeC::new(0,4,30,0.)
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_spoil(
     ($t:ty, $c1:expr, $c2:expr, $st:expr) => (
@@ -266,6 +296,9 @@ macro_rules! inv_spoil(
 ///     /* water resistance, 0..100% */ 14.
 /// );
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 #[macro_export]
 macro_rules! inv_clothes(
     ($t:ty, $c1:expr, $c2:expr) => (
@@ -345,6 +378,13 @@ impl Hash for ConsumableC {
 }
 impl ConsumableC {
     /// Creates a new instance of `ConsumableC`
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::inventory::items;
+    /// 
+    /// let o = items::ConsumableC::new();
+    /// ```
     pub fn new() -> Self {
         ConsumableC {
             name: String::new(),
@@ -406,6 +446,13 @@ impl Hash for ApplianceC {
 }
 impl ApplianceC {
     /// Creates new instance of the `ApplianceC`
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::inventory::items;
+    /// 
+    /// let o = items::ApplianceC::new();
+    /// ```
     pub fn new() -> Self {
         ApplianceC {
             name: String::new(),
@@ -417,6 +464,9 @@ impl ApplianceC {
 }
 
 /// Trait that must be implemented by all inventory items
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 pub trait InventoryItem {
     /// Returns count of items of this kind in the inventory
     ///
@@ -471,6 +521,9 @@ pub trait InventoryItem {
 }
 
 /// Trait to describe appliance behavior of the inventory item
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 pub trait ApplianceDescription {
     /// True if this appliance is a body appliance (like bandage)
     fn is_body_appliance(&self) -> bool;
@@ -479,6 +532,9 @@ pub trait ApplianceDescription {
 }
 
 /// Trait to describe consumable behavior of the inventory item
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 pub trait ConsumableDescription {
     /// True if this item should be treated as food
     fn is_food(&self) -> bool;
@@ -493,6 +549,9 @@ pub trait ConsumableDescription {
 }
 
 /// Trait to describe the spoiling options of the consumable
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 pub trait SpoilingBehavior {
     /// Chance of getting a food poisoning after eating one fresh item (0..100 scale)
     fn fresh_poisoning_chance(&self) -> usize;
@@ -504,6 +563,9 @@ pub trait SpoilingBehavior {
 }
 
 /// Trait to describe clothes-related options of the item
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Implementing-inventory-items) for more info.
 pub trait ClothesDescription {
     /// Cold resistance value (0..100 scale)
     fn cold_resistance(&self) -> usize;

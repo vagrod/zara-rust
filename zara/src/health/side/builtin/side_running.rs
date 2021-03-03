@@ -12,6 +12,15 @@ impl RunningSideEffects
     /// # Parameters
     /// - `stamina_drain`: stamina drain when running, 0..100 percents per game second
     /// - `water_drain`: water level drain speed when running, 0..100 percents per game second
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health::side:::buitin;
+    /// let o = buitin::RunningSideEffects::new(0.22, 0.009);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Built-in-side-effects) for more info.
     pub fn new(stamina_drain: f32, water_drain: f32) -> Self {
         RunningSideEffects {
             running_state: Cell::new(false),
@@ -23,6 +32,14 @@ impl RunningSideEffects
         }
     }
     /// Returns a state snapshot contract for this `RunningSideEffects` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let state = monitor.get_state();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn get_state(&self) -> RunningSideEffectsStateContract {
         RunningSideEffectsStateContract {
             stamina_drain_amount: self.stamina_drain_amount.get(),
@@ -37,6 +54,14 @@ impl RunningSideEffects
     /// 
     /// # Parameters
     /// - `state`: captured earlier state
+    /// 
+    /// # Examples
+    /// ```
+    /// monitor.restore_state(state);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/State-Management) for more info.
     pub fn restore_state(&self, state: &RunningSideEffectsStateContract) {
         self.stamina_drain_amount.set(state.stamina_drain_amount);
         self.water_drain_amount.set(state.water_drain_amount);

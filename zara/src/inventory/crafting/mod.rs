@@ -45,6 +45,9 @@ impl Inventory {
     ///    ]
     /// );
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Register-crafting-combinations) for more info.
     pub fn register_crafting_combinations(&self, combinations: Vec<CraftingCombination>) {
         let mut b = self.crafting_combinations.borrow_mut();
         for combination in combinations {
@@ -65,6 +68,9 @@ impl Inventory {
     ///     ]
     /// );
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Finding-crafting-combinations) for more info.
     pub fn get_suitable_combinations_for(&self, items: Vec<&String>) -> Vec<String> {
         let key_to_check_against = get_match_key(items);
         let mut result = Vec::new();
@@ -82,6 +88,14 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `combination_id`: unique id of a combination to check
+    /// 
+    /// # Examples
+    /// ```
+    /// let result = person.inventory.check_for_resources(combination_id);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Crafting-resources-availability) for more info.
     pub fn check_for_resources(&self, combination_id: &String) -> Result<(), CheckForResourcesErr> {
         match self.crafting_combinations.borrow().get(combination_id) {
             Some(cmb) => {
@@ -108,7 +122,15 @@ impl Inventory {
     /// # Parameters
     /// - `combination_id`: unique key of a combination to execute
     ///
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// let result = person.inventory.execute_combination(combination_id);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Executing-crafting-combinations) for more info.
+    /// 
+    /// ## Notes
     /// Borrows `items` collection
     pub fn execute_combination(&self, combination_id: &String) -> Result<(), CombinationExecuteErr> {
         let cc = self.crafting_combinations.borrow();
@@ -165,6 +187,16 @@ impl ItemInCombination {
     /// # Parameters
     /// - `name`: unique name of the inventory item kind
     /// - `count`: how many these items we'll need
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::inventory;
+    /// 
+    /// let o = inventory::ItemInCombination::new("Stick", 3);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Register-crafting-combinations) for more info.
     pub fn new(name: &str, count: usize) -> Self {
         ItemInCombination {
             item_name: String::from(name),
@@ -202,12 +234,16 @@ impl fmt::Display for CraftingCombination {
     }
 }
 impl CraftingCombination {
-    /// Creates a new instance of the `CraftingCombination`
+    /// Creates a new instance of the `CraftingCombination`. You can use ['crafting::Builder'](crate::inventory::crafting::Builder)
+    /// to build a new crafting recipe.
     ///
     /// # Parameters
     /// - `result_item`: unique name of the inventory item kind that is a result of this combination
     /// - `items`: collection of combination items that describe this combination
     /// - `create`: a function that returns resulted item instance with set count
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Register-crafting-combinations) for more info.
     pub fn new(result_item: String, items: Vec<ItemInCombination>,
                create: Box<dyn Fn() -> Box<dyn InventoryItem> + 'static>) -> Self {
         let mut mapped = HashMap::new();
@@ -255,6 +291,9 @@ impl CraftingCombination {
 ///     .and("Worm", 2)
 ///   .build(zara::inv_result!(FishingRod { count: 1 }));
 /// ```
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Register-crafting-combinations) for more info.
 pub struct Builder {
     result_item: RefCell<String>,
     items: Rc<RefCell<Vec<ItemInCombination>>>

@@ -5,6 +5,9 @@ use crate::error::UnregisterMonitorErr;
 use std::any::Any;
 
 /// Trait for implementing the inventory monitor functionality
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory-Monitors) for more info.
 pub trait InventoryMonitor {
     /// Method is called once a `UPDATE_INTERVAL` real seconds.
     ///
@@ -26,6 +29,14 @@ impl Inventory {
     ///
     /// # Returns
     /// `usize`: unique key of this registered instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let mid = person.inventory.register_monitor(boxed_monitor);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory-Monitors) for more info.
     pub fn register_monitor(&self, monitor: Box<dyn InventoryMonitor>) -> usize {
         let mut b = self.inventory_monitors.borrow_mut();
         let key = b.keys().max().unwrap_or(&0) + 1;
@@ -41,6 +52,14 @@ impl Inventory {
     /// - `key`: unique key given as a result of a [`register_monitor`] method.
     ///
     /// [`register_monitor`]: #method.register_monitor
+    /// 
+    /// # Examples
+    /// ```
+    /// person.inventory.unregister_monitor(mid);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory-Monitors) for more info.
     pub fn unregister_monitor(&self, key: usize) -> Result<(), UnregisterMonitorErr> {
         let mut b = self.inventory_monitors.borrow_mut();
 

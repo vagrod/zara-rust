@@ -54,14 +54,23 @@ impl Health {
     /// person.health.register_medical_agents(
     ///     vec![
     ///         MedicalAgentBuilder::start()
-    ///             .for_agent("Agent Name")
-    ///                 .activates(CurveType::Immediately)
-    ///                 //.. and so on
-    ///         // .build()
+    ///            .for_agent("Epinephrine")
+    ///            .activates(CurveType::Immediately)
+    ///            .and_lasts_for_minutes(23.)
+    ///            .includes(
+    ///                vec![
+    ///                    "Adrenaline Pills",
+    ///                    "Big Green Leaves",
+    ///                    "Syringe With Epinephrine",
+    ///                    // ... and so on
+    ///                ]
+    ///            )
+    ///        .build(),
+    ///         // ... and so on
     ///     ]
     ///  );
     ///```
-    pub fn register_medical_agents (&self, agents: Vec<MedicalAgent>) {
+    pub fn register_medical_agents(&self, agents: Vec<MedicalAgent>) {
         let mut b = self.medical_agents.agents.borrow_mut();
 
         for agent in agents {
@@ -85,6 +94,21 @@ impl MedicalAgentGroup {
     /// 
     /// # Parameters
     /// - `items`: a list of inventory items unique names
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// 
+    /// let o = health::MedicalAgentGroup::new(vec![
+    ///     "Adrenaline Pills",
+    ///     "Big Green Leaves",
+    ///     "Syringe With Epinephrine",
+    ///     // ... and so on
+    /// ]);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
     pub fn new(items: Vec<String>) -> Self {
         MedicalAgentGroup {
             items
@@ -94,6 +118,14 @@ impl MedicalAgentGroup {
     /// 
     /// # Parameters
     /// - `item_name`: unique inventory item name
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = group.contains(item_name);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains(item_name) }
 }
 
@@ -117,6 +149,13 @@ struct AgentUpdateResult {
 
 impl AgentUpdateResult {
     /// Returns a new empty agent update result (inactive)
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara:health;
+    /// 
+    /// let o = health::AgentUpdateResult::empty();
+    /// ```
     pub fn empty() -> Self {
         AgentUpdateResult {
             is_active: false
@@ -195,6 +234,16 @@ impl MedicalAgent {
     /// - `activation_curve`: agent activation curve type
     /// - `duration_minutes`: duration, in game minutes, of a single agent dose effect
     /// - `group`: medical agent group associated with this medical agent
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::health;
+    /// 
+    /// let agent = health::MedicalAgent::new(agent_name, health::CurveType::ActivateImmediately, 32., group);
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
     pub fn new(name: String, activation_curve: CurveType, duration_minutes: f32, group: MedicalAgentGroup) -> Self {
         MedicalAgent {
             name: name.to_string(),
@@ -300,12 +349,34 @@ impl MedicalAgent {
     }
 
     /// Tells if this medical agent is active now
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = agent.is_active();
+    /// ```
     pub fn is_active(&self) -> bool { self.is_active.get() }
     /// Returns medical agent percent of presence in blood (0..100%)
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = agent.percent_of_presence();
+    /// ```
     pub fn percent_of_presence(&self) -> usize { self.percent_of_presence.get() as usize }
     /// Returns medical agent percent of overall activity (0..100%)
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = agent.percent_of_activity();
+    /// ```
     pub fn percent_of_activity(&self) -> usize { self.percent_of_activity.get() as usize }
     /// Returns time when the last dose for this agent was taken
+    /// 
+    /// # Examples
+    /// ```
+    /// if let Some(game_time) = agent.last_dose_end_time() {
+    ///     // ...
+    /// }
+    /// ```
     pub fn last_dose_end_time(&self) -> Option<GameTimeC> {
         match self.last_dose_end_time.borrow().as_ref() {
             Some(t) => Some(t.clone()),
@@ -345,6 +416,9 @@ impl MedicalAgent {
 }
 
 /// Node that controls all the medical agents
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Medical-Agents) for more info.
 pub struct MedicalAgentsMonitor {
     /// All registered medical agents
     ///
@@ -367,7 +441,7 @@ impl fmt::Display for MedicalAgentsMonitor {
 }
 impl MedicalAgentsMonitor {
     /// Creates a new instance of the `MedicalAgentsMonitor`
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         MedicalAgentsMonitor {
             agents: Arc::new(RefCell::new(HashMap::new())),
             active_count: Cell::new(0),
@@ -379,6 +453,11 @@ impl MedicalAgentsMonitor {
     ///
     /// # Parameters
     /// - `agent_name` unique medical agent name
+    /// 
+    /// # Examples
+    /// ```
+    /// let result = monitors.is_active(name_of_agent);
+    /// ```
     pub fn is_active(&self, agent_name: &String) -> Result<bool, MedicalAgentErr> {
         match self.agents.borrow().get(agent_name) {
             Some(agent) => Ok(agent.is_active()),
@@ -401,6 +480,11 @@ impl MedicalAgentsMonitor {
     }
 
     /// Returns number of active medical agents
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = monitors.active_count();
+    /// ```
     pub fn active_count(&self) -> usize { self.active_count.get() }
 
     fn flush_queue(&self, mut q: RefMut<BTreeMap<usize, Event>>) {

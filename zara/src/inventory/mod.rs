@@ -19,6 +19,9 @@ pub mod crafting;
 pub mod monitors;
 
 /// Controls player's inventory
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory) for more info.
 pub struct Inventory {
     /// All inventory items
     ///
@@ -66,6 +69,16 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `name`: unique item kind name
+    /// 
+    /// # Examples
+    /// ```
+    /// if let Some(count) = person.inventory.get_count_of(item_name) {
+    ///     // ...
+    /// }
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory) for more info.
     pub fn get_count_of(&self, name: &String) -> Option<usize> {
         self.items.borrow().get(name).map(|x| x.get_count())
     }
@@ -74,6 +87,16 @@ impl Inventory {
     ///
     /// # Parameters
     /// - `name`: unique item kind name
+    /// 
+    /// # Examples
+    /// ```
+    /// if let Some(weight) = person.inventory.get_weight_of(item_name) {
+    ///     // ...
+    /// }
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory) for more info.
     pub fn get_weight_of(&self, name: &String) -> Option<f32> {
         self.items.borrow().get(name).map(|x| x.get_total_weight())
     }
@@ -84,9 +107,18 @@ impl Inventory {
     /// Will recalculate weight automatically on success
     ///
     /// # Parameters
+    /// - `name`: unique inventory item name to use
     /// - `amount`: this number will be subtracted from the count
+    /// 
+    /// # Examples
+    /// ```
+    /// let result = person.inventory.use_item(item_name, 3);
+    /// ```
     ///
-    /// ## Note
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Using-inventory-items) for more info.
+    /// 
+    /// ## Notes
     /// Borrows `items` collection
     pub fn use_item(&self, name: &String, amount: usize) -> Result<(), InventoryUseErr> {
         {
@@ -127,10 +159,26 @@ impl Inventory {
     }
 
     /// Returns total cached inventory weight (in grams)
+    /// 
+    /// # Examples
+    /// ```
+    /// let weight = person.inventory.get_weight();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory) for more info.
     pub fn get_weight(&self) -> f32 { self.weight.get() }
 
     /// Recalculates the inventory weight. Is called automatically every time inventory
     /// or clothes changes
+    /// 
+    /// # Examples
+    /// ```
+    /// person.inventory.recalculate_weight();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Inventory) for more info.
     pub fn recalculate_weight(&self) {
         let old_weight = self.weight.get();
         let mut new_weight: f32;

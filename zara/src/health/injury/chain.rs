@@ -26,17 +26,25 @@ impl ActiveInjury {
     ///                           (Worrying 95%)
     /// ```
     ///
-    /// [`invert_back`]: #method.invert_back
-    ///
     /// # Parameters
     /// - `game_time`: the time when inversion occurs
     ///
     /// # Returns
     /// Ok on success.
     ///  
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// injury.invert();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
+    /// 
+    /// ## Notes
     /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
     /// direction of passing stages again.
+    /// 
+    /// [`invert_back`]: #method.invert_back
     pub fn invert(&self, game_time: &GameTimeC) -> Result<(), ChainInvertErr> {
         if self.is_inverted.get() { return Err(ChainInvertErr::AlreadyInverted); }
         if !self.is_active(game_time) { return Err(ChainInvertErr::DiseaseNotActiveAtGivenTime); }
@@ -160,17 +168,25 @@ impl ActiveInjury {
     ///                                                         (Worrying 5%)
     /// ```
     ///
-    /// [`invert`]: #method.invert
-    ///
     /// # Parameters
     /// - `game_time`: the time when inversion occurs
     /// 
     /// # Returns
     /// Ok on success.
     /// 
-    /// ## Note
+    /// # Examples
+    /// ```
+    /// injury.invert_back();
+    /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
+    /// 
+    /// ## Notes
     /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
     /// direction of passing stages again.
+    /// 
+    /// [`invert`]: #method.invert
     pub fn invert_back(&self, game_time: &GameTimeC) -> Result<(), ChainInvertBackErr> {
         if !self.is_inverted.get() { return Err(ChainInvertBackErr::AlreadyInvertedBack); }
         if !self.is_active(game_time) {

@@ -46,6 +46,9 @@ pub struct FrameSummaryC {
 /// - `minute`: day of game time (whole number)
 /// - `second`: day of game time (with floating point)
 /// - `duration`: `Duration` that corresponds to the above values
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Game-Time) for more info.
 #[derive(Default)]
 pub struct GameTime {
     /// Day of the game time (whole number)
@@ -73,6 +76,9 @@ impl GameTime {
     ///
     /// let gt = utils::GameTime::new();
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Game-Time) for more info.
     pub fn new() -> Self {
         GameTime {
             day: Cell::new(0),
@@ -103,11 +109,23 @@ impl GameTime {
     }
 
     /// Creates new `GameTime` object from its simple representation
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utils;
+    ///
+    /// let game_time = utils::GameTime::from_contract(game_time_contract);
+    /// ```
     pub fn from_contract(gt: GameTimeC) -> Self {
         GameTime::from_duration(gt.to_duration())
     }
 
     /// Creates `GameTimeC` contract from this `GameTime` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let game_time_contract = game_time.to_contract();
+    /// ```
     pub fn to_contract(&self) -> GameTimeC {
         GameTimeC {
             day: self.day.get(),
@@ -205,7 +223,10 @@ impl GameTime {
 
 }
 
-/// Structure for storing simple game time slice
+/// Structure for storing simple game time slice.ActiveDiseaseC
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Game-Time) for more info.
 #[derive(Copy, Clone, Debug, Default)]
 pub struct GameTimeC {
     /// Day value
@@ -254,6 +275,13 @@ impl Hash for GameTimeC {
 }
 impl GameTimeC {
     /// Creates empty (zero) `GameTimeC`
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utils;
+    /// 
+    /// let game_time = utils::GameTimeC::empty();
+    /// ```
     pub fn empty() -> Self {
         GameTimeC {
             day: 0,
@@ -264,6 +292,13 @@ impl GameTimeC {
     }
 
     /// Creates new `GameTimeC` with given time values
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utils;
+    /// 
+    /// let game_time = utils::GameTimeC::new(0, 5, 52, 34.);
+    /// ```
     pub fn new(day: u64, hour: u64, minute: u64, second: f64) -> Self {
         GameTimeC {
             day,
@@ -274,6 +309,11 @@ impl GameTimeC {
     }
 
     /// Returns `f32` that describes duration (in game seconds) of this `GameTimeC` instance
+    /// 
+    /// # Examples
+    /// ```
+    /// let value = game_time.as_secs_f32();
+    /// ```
     pub fn as_secs_f32(&self) -> f32 {
         self.second as f32+
             (self.minute as f32)*60_f32+
@@ -283,6 +323,11 @@ impl GameTimeC {
 
     /// Returns new `GameTimeC` by adding a given amount of minutes
     /// to the current one
+    /// 
+    /// # Examples
+    /// ```
+    /// let new_game_time = game_time.add_minutes(12);
+    /// ```
     pub fn add_minutes(&self, amount: u64) -> GameTimeC {
         let d= self.to_duration() + Duration::from_secs(amount*60);
 
@@ -290,12 +335,24 @@ impl GameTimeC {
     }
 
     /// Returns `Duration` object that describes current `GameTimeC`
+    /// 
+    /// # Examples
+    /// ```
+    /// let d = game_time.to_duration();
+    /// ```
     pub fn to_duration(&self) -> Duration {
         Duration::from_secs_f64(
             self.second+((self.minute*60+self.hour*60*60+self.day*24*60*60) as f64))
     }
 
     /// Returns new `GameTimeC` instance based on the given `Duration` object
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utils;
+    /// 
+    /// let game_time = utils::GameTimeC::from_duration(d);
+    /// ```
     pub fn from_duration(d: Duration) -> Self {
         GameTime::from_duration(d).to_contract()
     }
@@ -367,6 +424,13 @@ pub struct HealthC {
 impl HealthC {
     /// Return "healthy" contract instance, with all vitals set to 
     /// values that describes a healthy individual
+    /// 
+    /// # Examples
+    /// ```
+    /// use zara::utile;
+    /// 
+    /// let o = utils::HealthC::healthy();
+    /// ```
     pub fn healthy() -> Self {
         HealthC {
             blood_level: 100.,
@@ -445,6 +509,9 @@ impl fmt::Display for ActiveInjuryC {
 }
 
 /// Describes initial environment information
+/// 
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Environment) for more info.
 #[derive(Clone, Debug, Default)]
 pub struct EnvironmentC {
     /// Wind speed value (m/s)
@@ -495,6 +562,9 @@ impl EnvironmentC {
     ///
     /// let env = utils::EnvironmentC::new(25., 3., 0.12);
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Environment) for more info.
     pub fn new(temperature: f32, wind_speed: f32, rain_intensity: f32) -> EnvironmentC {
         EnvironmentC {
             wind_speed,
@@ -516,6 +586,9 @@ impl EnvironmentC {
     ///
     /// let env = utils::EnvironmentC::default();
     /// ```
+    /// 
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Environment) for more info.
     pub fn default() -> EnvironmentC { EnvironmentC::new(26., 0., 0.) }
 }
 
@@ -603,11 +676,21 @@ impl Hash for PlayerStatusC {
 }
 
 /// Classic linear lerp
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::lerp(0., 5., 0.8);
+/// ```
 pub fn lerp(first: f32, second: f32, by: f32) -> f32 {
     first * (1. - by) + second * by
 }
 
 /// Clamp both ways
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::clamp(101., 0., 100.);
+/// ```
 pub fn clamp(value: f32, floor: f32, ceiling: f32) -> f32 {
     if value > ceiling {
         return ceiling;
@@ -621,6 +704,11 @@ pub fn clamp(value: f32, floor: f32, ceiling: f32) -> f32 {
 }
 
 /// Clamps ceiling
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::clamp_to(101., 100.);
+/// ```
 pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
     if value > ceiling {
         return ceiling;
@@ -630,6 +718,11 @@ pub fn clamp_to(value: f32, ceiling: f32) -> f32 {
 }
 
 /// Clamps floor
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::clamp_bottom(-5., 0.);
+/// ```
 pub fn clamp_bottom(value: f32, floor: f32) -> f32 {
     if value < floor {
         return floor;
@@ -640,6 +733,11 @@ pub fn clamp_bottom(value: f32, floor: f32) -> f32 {
 
 
 /// Clamps 0..1
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::clamp_01(2.3);
+/// ```
 pub fn clamp_01(value: f32) -> f32 {
     if value > 1. {
         return 1.;
@@ -652,6 +750,13 @@ pub fn clamp_01(value: f32) -> f32 {
 }
 
 /// Will return `true` is a given probability is satisfied
+/// 
+/// # Examples
+/// ```
+/// if zara::utils::roll_dice(65) {
+///     // ...
+/// }
+/// ```
 pub fn roll_dice(probability: usize) -> bool {
     if probability == 0 { return false; }
     if probability >= 100 { return true; }
@@ -663,16 +768,13 @@ pub fn roll_dice(probability: usize) -> bool {
 }
 
 /// Will return a random number between these two
+/// 
+/// # Examples
+/// ```
+/// let value = zara::utils::range(0., 100.);
+/// ```
 pub fn range(a: f32, b: f32) -> f32 {
     let mut rng = rand::thread_rng();
 
     rng.gen_range(a..b)
-}
-
-/// Box equality check
-pub fn eq<T: ?Sized>(left: &Box<T>, right: &Box<T>) -> bool {
-    let left : *const T = left.as_ref();
-    let right : *const T = right.as_ref();
-
-    left == right
 }
