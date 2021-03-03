@@ -15,7 +15,7 @@ impl Health {
     /// 
     /// # Examples
     /// ```
-    /// let mid = person.health.register_disease_monitor(Box::new(FluMonitor::new()));
+    /// let mid = person.health.register_disease_monitor(boxed_monitor);
     /// ```
     /// 
     /// # Links
@@ -38,7 +38,7 @@ impl Health {
     /// 
     /// # Examples
     /// ```
-    /// person.health.unregister_disease_monitor(mid)?
+    /// let result = person.health.unregister_disease_monitor(mid);
     /// ```
     /// 
     /// # Links
@@ -89,7 +89,7 @@ impl Health {
     /// 
     /// # Examples
     /// ```
-    /// person.health.unregister_side_effect_monitor(mid)?
+    /// let result = person.health.unregister_side_effect_monitor(mid);
     /// ```
     /// 
     /// # Links
