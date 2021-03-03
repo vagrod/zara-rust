@@ -65,7 +65,7 @@ impl Inventory {
         }
     }
 
-    /// Returns count of a certain item kind. None if not found.
+    /// Returns count of a certain item kind. `None` if not found.
     ///
     /// # Parameters
     /// - `name`: unique item kind name
@@ -83,7 +83,7 @@ impl Inventory {
         self.items.borrow().get(name).map(|x| x.get_count())
     }
 
-    /// Returns total weight of a certain item. None if not found.
+    /// Returns total weight of a certain item. `None` if not found.
     ///
     /// # Parameters
     /// - `name`: unique item kind name
