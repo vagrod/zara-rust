@@ -12,6 +12,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Links
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declare-dead) for more info.
     pub fn is_alive(&self) -> bool { self.health.is_alive() }
+
     /// Is this instance paused (all `update` calls are ignored)
     /// 
     /// # Examples

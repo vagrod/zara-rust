@@ -114,6 +114,7 @@ impl MedicalAgentGroup {
             items
         }
     }
+
     /// Checks whether this group contains a particular inventory item
     /// 
     /// # Parameters
@@ -262,6 +263,7 @@ impl MedicalAgent {
     pub(crate) fn on_consumed(&self, game_time: &GameTimeC, item_name: String) {
         self.add_dose_if_needed(game_time, item_name);
     }
+
     pub(crate) fn on_appliance_taken(&self, game_time: &GameTimeC, item_name: String) {
         self.add_dose_if_needed(game_time, item_name);
     }
@@ -355,6 +357,7 @@ impl MedicalAgent {
     /// let value = agent.is_active();
     /// ```
     pub fn is_active(&self) -> bool { self.is_active.get() }
+
     /// Returns medical agent percent of presence in blood (0..100%)
     /// 
     /// # Examples
@@ -362,6 +365,7 @@ impl MedicalAgent {
     /// let value = agent.percent_of_presence();
     /// ```
     pub fn percent_of_presence(&self) -> usize { self.percent_of_presence.get() as usize }
+
     /// Returns medical agent percent of overall activity (0..100%)
     /// 
     /// # Examples
@@ -369,6 +373,7 @@ impl MedicalAgent {
     /// let value = agent.percent_of_activity();
     /// ```
     pub fn percent_of_activity(&self) -> usize { self.percent_of_activity.get() as usize }
+
     /// Returns time when the last dose for this agent was taken
     /// 
     /// # Examples

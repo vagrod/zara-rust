@@ -334,6 +334,7 @@ impl<E: Listener + 'static> ZaraController<E> {
 
         Ok(())
     }
+
     /// Pause this instance (all `update` calls will be ignored)
     ///
     /// # Examples
@@ -344,6 +345,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Links
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Pausing-Zara) for more info.
     pub fn pause(&self) { self.is_paused.set(true); }
+
     /// Resume this instance (all `update` calls will be working again)
     ///
     /// # Examples

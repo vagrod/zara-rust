@@ -66,6 +66,7 @@ impl EnvironmentData {
             temperature: Cell::new(0.)
         }
     }
+
     /// Creates new `EnvironmentData` from a given `EnvironmentC` object.
     /// To create default `EnvironmentData`, use [`new`] method.
     ///

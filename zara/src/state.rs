@@ -251,6 +251,7 @@ impl<E: Listener + 'static> ZaraController<E> {
             is_paused: self.is_paused.get()
         }
     }
+
     /// Restores previously captured state. This will **not** restore active diseases, injuries,
     /// disease/inventory/side effects monitors or inventory items.
     ///

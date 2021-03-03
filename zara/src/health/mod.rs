@@ -172,9 +172,11 @@ impl MedicalAgentBuilder {
     /// 
     /// # Examples
     /// ```
-    /// MedicalAgentBuilder::start()
+    /// use zara::health::medagent;
+    ///
+    /// let medagent = medagent::MedicalAgentBuilder::start()
     ///     .for_agent("Epinephrine")
-    ///         .activates(CurveType::Immediately)
+    ///         .activates(medagent::CurveType::Immediately)
     ///         .and_lasts_for_minutes(23.)
     ///         .includes(
     ///             vec![
@@ -184,7 +186,7 @@ impl MedicalAgentBuilder {
     ///                 // ... and so on
     ///             ]
     ///         )
-    ///     .build()
+    ///     .build();
     /// ```
     /// 
     /// # Links

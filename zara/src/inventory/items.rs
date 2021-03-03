@@ -475,7 +475,6 @@ pub trait InventoryItem {
     /// let n = item.get_count();
     /// ```
     fn get_count(&self) -> usize;
-
     /// Sets new count for items of this kind
     ///
     /// # Examples
@@ -483,7 +482,6 @@ pub trait InventoryItem {
     /// item.set_count(new_value);
     /// ```
     fn set_count(&mut self, new_count: usize);
-
     /// Gets unique name for all items of this kind
     ///
     /// # Examples
@@ -491,7 +489,6 @@ pub trait InventoryItem {
     /// let s = item.get_name();
     /// ```
     fn get_name(&self) -> String;
-
     /// Returns `true` is this item is an infinite resource
     ///
     /// # Examples
@@ -499,7 +496,6 @@ pub trait InventoryItem {
     /// let f = item.get_is_infinite();
     /// ```
     fn get_is_infinite(&self) -> bool;
-
     /// Gets calculated weight of all items of this kind, in grams.
     ///
     /// Most of the time, it is `count` * `weight per item`.
@@ -509,7 +505,6 @@ pub trait InventoryItem {
     /// let n = item.get_total_weight();
     /// ```
     fn get_total_weight(&self) -> f32;
-
     /// Node that describes behavior of this item as a consumable
     fn consumable(&self) -> Option<&dyn ConsumableDescription>;
     /// Node that describes behavior of this item as an appliance

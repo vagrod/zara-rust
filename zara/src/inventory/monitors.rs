@@ -15,7 +15,6 @@ pub trait InventoryMonitor {
     /// - `inventory`: inventory controller object. It can be used to alter the inventory
     /// - `frame_data`: summary containing all environmental data, game time, health snapshot and etc.
     fn check(&self, inventory: &Inventory, frame_data: &FrameSummaryC);
-
     /// For downcasting
     fn as_any(&self) -> &dyn Any;
 }

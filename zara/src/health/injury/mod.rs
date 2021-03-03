@@ -49,6 +49,9 @@ mod status_methods;
 ///     ]
 /// );
 /// ```
+///
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declaring-an-Injury) for more info.
 #[macro_export]
 macro_rules! injury(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
@@ -92,6 +95,9 @@ macro_rules! injury(
 ///     ]
 /// );
 /// ```
+///
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declaring-an-Injury) for more info.
 #[macro_export]
 macro_rules! fracture(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (

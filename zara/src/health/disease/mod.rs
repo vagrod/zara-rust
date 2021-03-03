@@ -54,6 +54,9 @@ mod status_methods;
 ///     ]
 /// );
 /// ```
+///
+/// # Links
+/// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declaring-a-Disease) for more info.
 #[macro_export]
 macro_rules! disease(
     ($t:ty, $nm:expr, $trt:expr, $st:expr) => (
