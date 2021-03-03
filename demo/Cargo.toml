@@ -13,6 +13,6 @@ edition = "2018"
 
 [dependencies]
 # If you want to use local Zara lib, comment zara crate and uncomment rand
-zara = "1.0.5"
+zara = "1.0.6"
 #rand = "0.8.3"
 crossterm = "0.18"
