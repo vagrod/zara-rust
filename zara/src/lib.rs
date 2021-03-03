@@ -146,13 +146,16 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
-    /// ## Notes
-    /// Borrows `inventory.items` collection
-    ///
     /// # Examples
     /// ```
     /// person.consume(item_name);
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/How-to-eat-or-drink) for more info.
+    ///
+    /// ## Notes
+    /// Borrows `inventory.items` collection
     pub fn consume(&self, item_name: &String) -> Result<(), ItemConsumeErr> {
         if !self.health.is_alive() { return Err(ItemConsumeErr::CharacterIsDead); }
         if self.is_paused() { return Err(ItemConsumeErr::InstancePaused); }
@@ -219,13 +222,16 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// # Returns
     /// Ok on success
     ///
-    /// ## Notes
-    /// Borrows `inventory.items` collection, can borrow `body.appliances` collection
-    ///
     /// # Examples
     /// ```
     /// person.take_appliance(item_name, body_part);
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Appliances) for more info.
+    ///
+    /// ## Notes
+    /// Borrows `inventory.items` collection, can borrow `body.appliances` collection
     pub fn take_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceTakeErr> {
         if !self.health.is_alive() { return Err(ApplianceTakeErr::CharacterIsDead); }
         if self.is_paused() { return Err(ApplianceTakeErr::InstancePaused); }
@@ -289,13 +295,16 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// - `item_name`: inventory kind of appliance to remove
     /// - `body_part`: from which body part
     ///
-    /// ## Notes
-    /// Borrows `body.appliances` collection
-    ///
     /// # Examples
     /// ```
     /// person.remove_appliance(item_name, body_part);
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Appliances) for more info.
+    ///
+    /// ## Notes
+    /// Borrows `body.appliances` collection
     pub fn remove_appliance(&self, item_name: &String, body_part: BodyPart) -> Result<(), ApplianceRemoveErr> {
         if !self.health.is_alive() { return Err(ApplianceRemoveErr::CharacterIsDead); }
         if self.is_paused() { return Err(ApplianceRemoveErr::InstancePaused); }
@@ -313,6 +322,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// person.declare_dead();
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Declare-dead) for more info.
     pub fn declare_dead(&self) -> Result<(), DeclareDeadErr> {
         if self.is_paused() { return Err(DeclareDeadErr::InstancePaused); }
         self.health.declare_dead();
@@ -328,6 +340,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// person.pause();
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Pausing-Zara) for more info.
     pub fn pause(&self) { self.is_paused.set(true); }
     /// Resume this instance (all `update` calls will be working again)
     ///
@@ -335,6 +350,9 @@ impl<E: Listener + 'static> ZaraController<E> {
     /// ```
     /// person.resume();
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Pausing-Zara) for more info.
     pub fn resume(&self) { self.is_paused.set(true); }
 
     /// Adds given item to the `body.clothes` collection and recalculates inventory weight.
@@ -344,14 +362,17 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Returns
     /// Ok on success
-    /// 
-    /// ## Notes
-    /// This method borrows `body.clothes` collection.
     ///
     /// # Examples
     /// ```
     /// person.put_on_clothes(jacket_name);
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes) for more info.
+    ///
+    /// ## Notes
+    /// This method borrows `body.clothes` collection.
     pub fn put_on_clothes(&self, item_name: &String) -> Result<(), ClothesOnActionErr> {
         if !self.health.is_alive() { return Err(ClothesOnActionErr::CharacterIsDead); }
         if self.is_paused() { return Err(ClothesOnActionErr::InstancePaused); }
@@ -387,14 +408,17 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Returns
     /// Ok on success
-    /// 
-    /// ## Notes
-    /// This method borrows `body.clothes` collection.
     ///
     /// # Examples
     /// ```
     /// person.take_off_clothes(jacket_name);
     /// ```
+    ///
+    /// # Links
+    /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes) for more info.
+    ///
+    /// ## Notes
+    /// This method borrows `body.clothes` collection.
     pub fn take_off_clothes(&self, item_name: &String) -> Result<(), ClothesOffActionErr> {
         if !self.health.is_alive() { return Err(ClothesOffActionErr::CharacterIsDead); }
         if self.is_paused() { return Err(ClothesOffActionErr::InstancePaused); }

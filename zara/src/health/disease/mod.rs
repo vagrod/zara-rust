@@ -284,6 +284,13 @@ impl Hash for DiseaseDeltasC {
 }
 impl DiseaseDeltasC {
     /// Creates an empty disease deltas (all zeros)
+    ///
+    /// # Examples
+    /// ```
+    /// use zara::health::disease;
+    ///
+    /// let o = disease::DiseaseDeltasC::empty();
+    /// ```
     pub fn empty() -> Self {
         DiseaseDeltasC {
             body_temperature_delta: 0.,

@@ -145,7 +145,7 @@ impl ClothesItem {
     /// ```
     /// use zara::body;
     /// 
-    /// let o = body::ClothesItem::new(name, wr, cr);
+    /// let o = body::ClothesItem::new(name, 7, 15);
     /// ```
     /// 
     /// # Links
@@ -186,7 +186,8 @@ impl Hash for ClothesGroup {
 }
 
 impl ClothesGroup {
-    /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder) to construct new group.
+    /// Creates new clothes group set. You can use [`ClothesGroupBuilder`](crate::body::ClothesGroupBuilder)
+    /// to construct new group.
     /// 
     /// # Parameters
     /// - `name`: unique name of the group. Will become its key
@@ -222,6 +223,7 @@ impl ClothesGroup {
             bonus_water_resistance
         }
     }
+
     /// Returns `true` is this group contains particular clothes item
     /// 
     /// # Parameters
@@ -235,6 +237,7 @@ impl ClothesGroup {
     /// # Links
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Clothes-groups) for more info.
     pub fn contains(&self, item_name: &String) -> bool { self.items.contains_key(item_name) }
+
     /// Returns `true` if given set of clothes has all the items needed for this group
     /// 
     /// # Parameters

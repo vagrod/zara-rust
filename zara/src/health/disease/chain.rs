@@ -13,17 +13,17 @@ impl ActiveDisease {
     /// Use this to start the "curing" process
     ///
     /// ``` none
-    /// |InitialStage--------->|Progressing----------->|Worrying--------------->|Critical...
+    /// |InitialStage------>|Progressing--------->|Worrying--------------->|Critical...
     ///                                                          ^
     ///                                                     current time
     ///                                                     (Worrying 5%)
     /// ```
     /// After the inversion (after `invert` call):
     /// ``` none
-    /// |Critical--------->|Worrying------->|Progressing------->|InitialStage--------->|Cured
-    ///                                 ^
-    ///                            current time
-    ///                           (Worrying 95%)
+    /// |Critical------>|Worrying------->|Progressing------->|InitialStage------>|Cured
+    ///                              ^
+    ///                         current time
+    ///                        (Worrying 95%)
     /// ```
     ///
     /// # Parameters
@@ -41,8 +41,8 @@ impl ActiveDisease {
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
     /// 
     /// ## Notes
-    /// Will not do anything if `invert` was already called. Call [`invert_back`] to change
-    /// direction of passing stages again.
+    /// Will return `ChainInvertErr::AlreadyInverted` error if `invert` was already called.
+    /// Call [`invert_back`] to change direction of passing stages again.
     /// 
     /// [`invert_back`]: #method.invert_back
     pub fn invert(&self, game_time: &GameTimeC) -> Result<(), ChainInvertErr> {
@@ -155,17 +155,17 @@ impl ActiveDisease {
     /// "worse" again.
     ///
     /// ``` none
-    /// |Critical----------->|Worrying----------->|Progressing--------->|InitialStage------->|Cured
-    ///                                       ^
-    ///                                  current time
-    ///                                 (Worrying 95%)
+    /// |Critical-------->|Worrying----------->|Progressing----->|InitialStage------->|Cured
+    ///                                    ^
+    ///                               current time
+    ///                              (Worrying 95%)
     /// ```
     /// After the `invert_back` call:
     /// ``` none
-    /// |InitialStage------------->|Progressing----------->|Worrying--------------->|Critical...
-    ///                                                              ^
-    ///                                                         current time
-    ///                                                         (Worrying 5%)
+    /// |InitialStage---------->|Progressing-------->|Worrying--------------->|Critical...
+    ///                                                        ^
+    ///                                                   current time
+    ///                                                   (Worrying 5%)
     /// ```
     ///
     /// # Parameters
@@ -183,8 +183,8 @@ impl ActiveDisease {
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Disease-Treatment) for more info.
     ///  
     /// ## Notes
-    /// Will not do anything if `invert_back` was already called. Call [`invert`] to change
-    /// direction of passing stages again.
+    /// Will return `ChainInvertBackErr::AlreadyInvertedBack` error if `invert_back` was already called.
+    /// Call [`invert`] to change direction of passing stages again.
     /// 
     /// [`invert`]: #method.invert
     pub fn invert_back(&self, game_time: &GameTimeC) -> Result<(), ChainInvertBackErr> {

@@ -259,8 +259,9 @@ impl InjuryDeltasC {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health;
-    /// let o = health:InjuryDeltasC:new();
+    /// use zara::health::injury;
+    ///
+    /// let o = injury::InjuryDeltasC::new();
     /// ```
     pub fn empty() -> Self {
         InjuryDeltasC {
@@ -329,6 +330,7 @@ pub trait Injury {
     /// let name = injury.get_name();
     /// ```
     fn get_name(&self) -> String;
+
     /// Gets all injury stages. Use [`StageBuilder`](crate::health::injury::StageBuilder) to
     /// describe a stage
     /// 
@@ -337,6 +339,7 @@ pub trait Injury {
     /// let stages = injury.get_stages();
     /// ```
     fn get_stages(&self) -> Vec<StageDescription>;
+
     /// Treatment instance associated with this injury object
     /// 
     /// # Examples
@@ -349,6 +352,7 @@ pub trait Injury {
     /// # Links
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Injury-Treatment) for more info.
     fn get_treatment(&self) -> Option<Box<dyn InjuryTreatment>>;
+
     /// True if injury is a fracture
     /// 
     /// # Examples
@@ -356,6 +360,7 @@ pub trait Injury {
     /// let value = injury.get_is_fracture();
     /// ```
     fn get_is_fracture(&self) -> bool;
+
     /// For downcasting
     fn as_any(&self) -> &dyn Any;
 }
@@ -379,11 +384,11 @@ struct LerpDataC {
     is_endless: bool
 }
 
-/// Describes an active disease that can be also scheduled
+/// Describes an active injury that can be also scheduled
 pub struct ActiveInjury {
-    /// Injury instance linked to this `ActiveDisease`
+    /// Injury instance linked to this `ActiveInjury`
     pub injury: Rc<Box<dyn Injury>>,
-    /// Disease needs treatment or will self-heal
+    /// Injury needs treatment or will self-heal
     pub needs_treatment: bool,
     /// On which stage level injury will start self-healing (`StageLevel::Undefined` if none)
     pub will_self_heal_on: StageLevel,
