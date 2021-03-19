@@ -96,7 +96,7 @@ macro_rules! disease(
 ///         .water_level(0.1)
 ///     .affects_fatigue(5.)
 ///     .with_chance_of_death(2)
-/// .build()
+/// .build();
 /// ```
 /// 
 /// # Links
@@ -600,7 +600,7 @@ impl ActiveDisease {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health
+    /// use zara::health;
     /// 
     /// let disease = health::ActiveDisease::new(disease, game_time);
     /// ```
