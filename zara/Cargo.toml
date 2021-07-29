@@ -1,6 +1,6 @@
 [package]
 name = "zara"
-version = "1.0.6"
+version = "1.0.7"
 authors = ["Vadim Gromov <zara-survival@imw.su>"]
 description = "Zara survival engine"
 homepage = "https://github.com/vagrod/zara-rust"
