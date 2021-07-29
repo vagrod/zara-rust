@@ -355,7 +355,7 @@ impl<E: Listener + 'static> ZaraController<E> {
     ///
     /// # Links
     /// See [this wiki article](https://github.com/vagrod/zara-rust/wiki/Pausing-Zara) for more info.
-    pub fn resume(&self) { self.is_paused.set(true); }
+    pub fn resume(&self) { self.is_paused.set(false); }
 
     /// Adds given item to the `body.clothes` collection and recalculates inventory weight.
     ///

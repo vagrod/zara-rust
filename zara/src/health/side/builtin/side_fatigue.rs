@@ -15,8 +15,8 @@ impl FatigueSideEffects {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
-    /// let o = buitin::FatigueSideEffects::new(14);
+    /// use zara::health::side::builtin;
+    /// let o = builtin::FatigueSideEffects::new(14);
     /// ```
     /// 
     /// # Links

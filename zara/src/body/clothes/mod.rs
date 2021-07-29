@@ -201,9 +201,7 @@ impl ClothesGroup {
     /// 
     /// let o = body::ClothesGroup::new(name, 
     ///         vec![
-    ///             ("Pants", Box::new(PantsClothes)),
-    ///             ("Jacket", Box::new(JacketClothes)),
-    ///             // ... and so on
+    ///             // ... items here
     ///         ], 5, 7);
     /// ```
     /// 

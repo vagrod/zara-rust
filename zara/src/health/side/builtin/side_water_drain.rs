@@ -13,8 +13,8 @@ impl WaterDrainOverTimeSideEffect {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
-    /// let o = buitin::WaterDrainOverTimeSideEffect::new(0.03);
+    /// use zara::health::side::builtin;
+    /// let o = builtin::WaterDrainOverTimeSideEffect::new(0.03);
     /// ```
     /// 
     /// # Links

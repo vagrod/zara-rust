@@ -15,8 +15,8 @@ impl RunningSideEffects
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
-    /// let o = buitin::RunningSideEffects::new(0.22, 0.009);
+    /// use zara::health::side::builtin;
+    /// let o = builtin::RunningSideEffects::new(0.22, 0.009);
     /// ```
     /// 
     /// # Links

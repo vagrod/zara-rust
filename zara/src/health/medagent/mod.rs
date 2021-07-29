@@ -153,7 +153,7 @@ impl AgentUpdateResult {
     /// 
     /// # Examples
     /// ```
-    /// use zara:health;
+    /// use zara::health;
     /// 
     /// let o = health::AgentUpdateResult::empty();
     /// ```

@@ -20,7 +20,7 @@ impl MultiKeyedLerp {
     ///     health::KeyFrame::new(0., 0.),
     ///     health::KeyFrame::new(0.5, 7.),
     ///     health::KeyFrame::new(1., 12.3)
-    /// ])
+    /// ]);
     /// ```
     pub fn new(mut keyframes: Vec<KeyFrame>) -> Self {
         let mut segments = Vec::new();

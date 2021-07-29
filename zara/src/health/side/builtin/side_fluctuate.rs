@@ -10,8 +10,8 @@ impl DynamicVitalsSideEffect {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
-    /// let o = buitin::DynamicVitalsSideEffect::new();
+    /// use zara::health::side::builtin;
+    /// let o = builtin::DynamicVitalsSideEffect::new();
     /// ```
     /// 
     /// # Links

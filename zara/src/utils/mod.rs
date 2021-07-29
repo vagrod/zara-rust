@@ -427,7 +427,7 @@ impl HealthC {
     /// 
     /// # Examples
     /// ```
-    /// use zara::utile;
+    /// use zara::utils;
     /// 
     /// let o = utils::HealthC::healthy();
     /// ```

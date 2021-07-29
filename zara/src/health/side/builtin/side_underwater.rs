@@ -14,7 +14,7 @@ impl UnderwaterSideEffect {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
+    /// use zara::health::side::builtin;
     /// let o = buitin::UnderwaterSideEffect::new(0.15, 0.28);
     /// ```
     /// 

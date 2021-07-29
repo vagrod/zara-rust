@@ -13,8 +13,8 @@ impl FoodDrainOverTimeSideEffect {
     /// 
     /// # Examples
     /// ```
-    /// use zara::health::side:::buitin;
-    /// let o = buitin::DynamicVitalsSideEffect::new(0.01);
+    /// use zara::health::side::builtin;
+    /// let o = builtin::FoodDrainOverTimeSideEffect::new(0.01);
     /// ```
     /// 
     /// # Links
