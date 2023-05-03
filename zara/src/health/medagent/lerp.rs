@@ -14,8 +14,9 @@ impl MultiKeyedLerp {
     /// Constructs new lerp curve using a list of keyframes
     /// 
     /// # Examples
-    /// use zara::health;
     /// ```
+    /// use zara::health;
+    ///
     /// let o = health::MultiKeyedLerp::new(vec![
     ///     health::KeyFrame::new(0., 0.),
     ///     health::KeyFrame::new(0.5, 7.),
